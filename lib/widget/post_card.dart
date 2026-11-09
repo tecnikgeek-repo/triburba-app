@@ -15,6 +15,7 @@ import '../schermate/naviga.dart';
 import '../tema.dart';
 import 'emoji.dart';
 import 'faccia.dart';
+import 'iniziativa.dart';
 import 'tamtam.dart';
 import 'testo_ricco.dart';
 
@@ -219,11 +220,17 @@ class _PostCardState extends State<PostCard> {
             padding: const EdgeInsets.fromLTRB(14, 8, 14, 10),
             child: TestoRicco(
               p.testo,
-              stile: (p.immagine == null && p.testo.length <= 120 && '\n'.allMatches(p.testo).length < 3)
+              stile:
+                  (p.immagine == null &&
+                      p.attivita == null &&
+                      p.sondaggio == null &&
+                      p.testo.length <= 120 &&
+                      '\n'.allMatches(p.testo).length < 3)
                   ? const TextStyle(fontSize: 20, height: 1.35, color: testo, fontWeight: FontWeight.w500)
                   : null,
             ),
           ),
+          if (p.attivita != null || p.sondaggio != null) BloccoIniziativa(post: p, onCambiato: () => setState(() {})),
           if (p.immagine != null) _foto(),
           if (p.link != null && p.immagine == null) _anteprimaLink(p.link!),
           _numeri(),

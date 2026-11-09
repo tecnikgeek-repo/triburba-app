@@ -1,4 +1,6 @@
 // Scrivere un post nel proprio quartiere: testo con grassetto e colori, foto, e fin dove mandarlo.
+// Può essere anche un'attività (parte solo con il minimo di persone entro la data limite) o un sondaggio.
+import 'dart:convert';
 import 'dart:io';
 
 import 'package:flutter/material.dart';
@@ -29,6 +31,21 @@ class _SchermataScriviState extends State<SchermataScrivi> {
   bool _invio = false;
   bool _anteprima = false;
 
+  /// post, attivita, sondaggio
+  String _tipo = 'post';
+
+  // attività
+  DateTime? _quando;
+  DateTime? _scadenza;
+  int _minimo = 0;
+  final _luogo = TextEditingController();
+
+  // sondaggio
+  final List<TextEditingController> _risposte = [TextEditingController(), TextEditingController()];
+  bool _multi = false;
+  bool _soloResidenti = false;
+  int _durata = 0;
+
   @override
   void initState() {
     super.initState();
@@ -38,7 +55,64 @@ class _SchermataScriviState extends State<SchermataScrivi> {
   @override
   void dispose() {
     _campo.dispose();
+    _luogo.dispose();
+    for (final c in _risposte) {
+      c.dispose();
+    }
     super.dispose();
+  }
+
+  Future<DateTime?> _scegliData(DateTime? attuale, {DateTime? prima}) async {
+    final ora = DateTime.now();
+    final base = attuale ?? (prima ?? ora.add(const Duration(days: 2))).copyWith(minute: 0);
+    final d = await showDatePicker(
+      context: context,
+      initialDate: base.isBefore(ora) ? ora : base,
+      firstDate: ora,
+      lastDate: ora.add(const Duration(days: 365)),
+      helpText: 'Scegli il giorno',
+    );
+    if (d == null || !mounted) return null;
+    final t = await showTimePicker(context: context, initialTime: TimeOfDay.fromDateTime(base), helpText: 'Scegli l\'ora');
+    if (t == null) return null;
+    return DateTime(d.year, d.month, d.day, t.hour, t.minute);
+  }
+
+  static String _iso(DateTime d) =>
+      '${d.year}-${d.month.toString().padLeft(2, '0')}-${d.day.toString().padLeft(2, '0')} '
+      '${d.hour.toString().padLeft(2, '0')}:${d.minute.toString().padLeft(2, '0')}';
+
+  static String _leggibile(DateTime d) {
+    const g = ['lun', 'mar', 'mer', 'gio', 'ven', 'sab', 'dom'];
+    const m = ['gen', 'feb', 'mar', 'apr', 'mag', 'giu', 'lug', 'ago', 'set', 'ott', 'nov', 'dic'];
+    return '${g[d.weekday - 1]} ${d.day} ${m[d.month - 1]}, ${d.hour}:${d.minute.toString().padLeft(2, '0')}';
+  }
+
+  /// I campi in più per il sito, o un messaggio se manca qualcosa.
+  (Map<String, String>?, String?) _extra() {
+    if (_tipo == 'attivita') {
+      if (_quando == null) return (null, 'Scegli giorno e ora dell\'attività.');
+      final scad = _scadenza ?? _quando!.subtract(const Duration(hours: 1));
+      return (
+        {'tipo': 'attivita', 'quando': _iso(_quando!), 'scadenza': _iso(scad), 'minimo': '$_minimo', 'luogo': _luogo.text.trim()},
+        null,
+      );
+    }
+    if (_tipo == 'sondaggio') {
+      final r = _risposte.map((c) => c.text.trim()).where((t) => t.isNotEmpty).toList();
+      if (r.length < 2) return (null, 'Scrivi almeno due risposte.');
+      return (
+        {
+          'tipo': 'sondaggio',
+          'opzioni': jsonEncode(r),
+          'multi': _multi ? '1' : '0',
+          'solo_residenti': _soloResidenti ? '1' : '0',
+          'durata': '$_durata',
+        },
+        null,
+      );
+    }
+    return (const {}, null);
   }
 
   /// Avvolge la parte selezionata (o mette i segni dove c'è il cursore).
@@ -70,9 +144,14 @@ class _SchermataScriviState extends State<SchermataScrivi> {
       messaggio(context, 'Scrivi qualcosa prima di pubblicare.');
       return;
     }
+    final (extra, errore) = _extra();
+    if (errore != null) {
+      messaggio(context, errore);
+      return;
+    }
     setState(() => _invio = true);
     try {
-      final (post, msg) = await stato.api.pubblica(t, foto: _foto, portata: _portata);
+      final (post, msg) = await stato.api.pubblica(t, foto: _foto, portata: _portata, extra: extra!);
       if (!mounted) return;
       messaggio(context, msg);
       Navigator.pop(context, post);
@@ -88,10 +167,15 @@ class _SchermataScriviState extends State<SchermataScrivi> {
     final io = stato.io!;
     final casa = io.casa;
     final max = io.maxPost;
+    if (_minimo < io.attivitaMin) _minimo = io.attivitaMin < 5 ? 5 : io.attivitaMin;
     return Scaffold(
       appBar: AppBar(
         leading: IconButton(icon: const Icon(Icons.close), onPressed: () => Navigator.pop(context), tooltip: 'Annulla'),
-        title: const Text('Nuovo post'),
+        title: Text(switch (_tipo) {
+          'attivita' => 'Nuova attività',
+          'sondaggio' => 'Nuovo sondaggio',
+          _ => 'Nuovo post',
+        }),
         actions: [
           Padding(
             padding: const EdgeInsets.only(right: 10),
@@ -145,6 +229,22 @@ class _SchermataScriviState extends State<SchermataScrivi> {
                   ],
                 ),
                 const SizedBox(height: 12),
+                SegmentedButton<String>(
+                  segments: const [
+                    ButtonSegment(value: 'post', label: Text('Post'), icon: Icon(Icons.edit_note_rounded)),
+                    ButtonSegment(value: 'attivita', label: Text('Attività'), icon: Icon(Icons.handshake_outlined)),
+                    ButtonSegment(value: 'sondaggio', label: Text('Sondaggio'), icon: Icon(Icons.how_to_vote_outlined)),
+                  ],
+                  selected: {_tipo},
+                  showSelectedIcon: false,
+                  style: ButtonStyle(
+                    foregroundColor: WidgetStateProperty.resolveWith((st) => st.contains(WidgetState.selected) ? bianco : testo),
+                    backgroundColor: WidgetStateProperty.resolveWith((st) => st.contains(WidgetState.selected) ? terracotta : superficie),
+                    side: const WidgetStatePropertyAll(BorderSide(color: linea2)),
+                  ),
+                  onSelectionChanged: (v) => setState(() => _tipo = v.first),
+                ),
+                const SizedBox(height: 12),
                 if (_anteprima)
                   Carta(child: TestoRicco(_campo.text.isEmpty ? ' ' : _campo.text))
                 else
@@ -156,7 +256,13 @@ class _SchermataScriviState extends State<SchermataScrivi> {
                     maxLength: max > 0 ? max : null,
                     textCapitalization: TextCapitalization.sentences,
                     style: const TextStyle(fontSize: 17, height: 1.4),
-                    decoration: const InputDecoration(hintText: 'Cosa succede nel quartiere?'),
+                    decoration: InputDecoration(
+                      hintText: switch (_tipo) {
+                        'attivita' => 'Cosa proponi di fare insieme? Es. pulire il parco, una raccolta…',
+                        'sondaggio' => 'Fai una domanda ai tuoi vicini…',
+                        _ => 'Cosa succede nel quartiere?',
+                      },
+                    ),
                   ),
                 // grassetto, colori, anteprima, @tribu
                 Wrap(
@@ -194,6 +300,8 @@ class _SchermataScriviState extends State<SchermataScrivi> {
                     ),
                   ],
                 ),
+                if (_tipo == 'attivita') ..._campiAttivita(io),
+                if (_tipo == 'sondaggio') ..._campiSondaggio(casa),
                 const SizedBox(height: 14),
                 if (_foto != null)
                   Stack(
@@ -262,6 +370,161 @@ class _SchermataScriviState extends State<SchermataScrivi> {
             ),
     );
   }
+
+  Widget _sezione(String t) => Padding(
+    padding: const EdgeInsets.only(top: 16, bottom: 8),
+    child: Text(
+      t.toUpperCase(),
+      style: const TextStyle(color: muto, fontSize: 12, fontWeight: FontWeight.w800, letterSpacing: .6),
+    ),
+  );
+
+  Widget _riga(IconData ico, String t, String? valore, VoidCallback f) => Padding(
+    padding: const EdgeInsets.only(bottom: 8),
+    child: Material(
+      color: superficie,
+      borderRadius: BorderRadius.circular(12),
+      child: InkWell(
+        borderRadius: BorderRadius.circular(12),
+        onTap: f,
+        child: Container(
+          padding: const EdgeInsets.all(12),
+          decoration: BoxDecoration(
+            borderRadius: BorderRadius.circular(12),
+            border: Border.all(color: linea),
+          ),
+          child: Row(
+            children: [
+              Icon(ico, color: terracotta),
+              const SizedBox(width: 12),
+              Expanded(
+                child: Text(t, style: const TextStyle(fontWeight: FontWeight.w600)),
+              ),
+              Text(
+                valore ?? 'Scegli',
+                style: TextStyle(color: valore == null ? muto : testo, fontWeight: FontWeight.w700),
+              ),
+              const SizedBox(width: 4),
+              const Icon(Icons.chevron_right_rounded, color: muto),
+            ],
+          ),
+        ),
+      ),
+    ),
+  );
+
+  List<Widget> _campiAttivita(Io io) => [
+    _sezione('L\'attività'),
+    const Text(
+      'Parte solo se entro la data limite confermano almeno le persone che servono. Se non si arriva al minimo, avvisiamo tutti.',
+      style: TextStyle(color: testo2, fontSize: 13, height: 1.4),
+    ),
+    const SizedBox(height: 10),
+    _riga(Icons.event_outlined, 'Quando', _quando == null ? null : _leggibile(_quando!), () async {
+      final d = await _scegliData(_quando);
+      if (d != null) setState(() => _quando = d);
+    }),
+    _riga(
+      Icons.hourglass_bottom_rounded,
+      'Conferme entro',
+      _scadenza != null ? _leggibile(_scadenza!) : (_quando != null ? _leggibile(_quando!.subtract(const Duration(hours: 1))) : null),
+      () async {
+        final d = await _scegliData(_scadenza, prima: _quando?.subtract(const Duration(hours: 1)));
+        if (d != null) setState(() => _scadenza = d);
+      },
+    ),
+    Container(
+      padding: const EdgeInsets.fromLTRB(12, 4, 4, 4),
+      decoration: BoxDecoration(
+        color: superficie,
+        borderRadius: BorderRadius.circular(12),
+        border: Border.all(color: linea),
+      ),
+      child: Row(
+        children: [
+          const Icon(Icons.groups_outlined, color: terracotta),
+          const SizedBox(width: 12),
+          const Expanded(
+            child: Text('Persone che servono', style: TextStyle(fontWeight: FontWeight.w600)),
+          ),
+          IconButton(
+            tooltip: 'Meno',
+            onPressed: _minimo > io.attivitaMin ? () => setState(() => _minimo--) : null,
+            icon: const Icon(Icons.remove_circle_outline),
+          ),
+          Text('$_minimo', style: const TextStyle(fontWeight: FontWeight.w800, fontSize: 17)),
+          IconButton(
+            tooltip: 'Più',
+            onPressed: _minimo < 500 ? () => setState(() => _minimo++) : null,
+            icon: const Icon(Icons.add_circle_outline),
+          ),
+        ],
+      ),
+    ),
+    const SizedBox(height: 8),
+    TextField(
+      controller: _luogo,
+      maxLength: 120,
+      textCapitalization: TextCapitalization.sentences,
+      decoration: const InputDecoration(hintText: 'Dove (facoltativo): piazza, via, parco…', prefixIcon: Icon(Icons.place_outlined)),
+    ),
+  ];
+
+  List<Widget> _campiSondaggio(Map<String, dynamic>? casa) => [
+    _sezione('Le risposte'),
+    for (var i = 0; i < _risposte.length; i++)
+      Padding(
+        padding: const EdgeInsets.only(bottom: 8),
+        child: TextField(
+          controller: _risposte[i],
+          maxLength: 80,
+          textCapitalization: TextCapitalization.sentences,
+          decoration: InputDecoration(
+            hintText: 'Risposta ${i + 1}',
+            counterText: '',
+            suffixIcon: _risposte.length > 2
+                ? IconButton(
+                    tooltip: 'Togli',
+                    icon: const Icon(Icons.close_rounded),
+                    onPressed: () => setState(() => _risposte.removeAt(i).dispose()),
+                  )
+                : null,
+          ),
+        ),
+      ),
+    if (_risposte.length < 6)
+      Align(
+        alignment: Alignment.centerLeft,
+        child: TextButton.icon(
+          onPressed: () => setState(() => _risposte.add(TextEditingController())),
+          icon: const Icon(Icons.add_rounded),
+          label: const Text('Aggiungi una risposta'),
+        ),
+      ),
+    SwitchListTile(
+      contentPadding: EdgeInsets.zero,
+      value: _multi,
+      onChanged: (v) => setState(() => _multi = v),
+      title: const Text('Più risposte a testa'),
+    ),
+    SwitchListTile(
+      contentPadding: EdgeInsets.zero,
+      value: _soloResidenti,
+      onChanged: (v) => setState(() => _soloResidenti = v),
+      title: Text('Votano solo i residenti di ${casa?['nome'] ?? 'casa tua'}'),
+    ),
+    const SizedBox(height: 4),
+    const Text('Si chiude', style: TextStyle(fontWeight: FontWeight.w600)),
+    const SizedBox(height: 8),
+    Wrap(
+      spacing: 8,
+      runSpacing: 8,
+      children: [
+        for (final (g, t) in const [(0, 'Mai'), (1, 'Tra 1 giorno'), (3, 'Tra 3 giorni'), (7, 'Tra 7 giorni')])
+          ChoiceChip(label: Text(t), selected: _durata == g, onSelected: (_) => setState(() => _durata = g)),
+      ],
+    ),
+  ];
 
   Widget _tasto(Widget dentro, String aiuto, VoidCallback f) => Tooltip(
     message: aiuto,

@@ -105,6 +105,8 @@ class Post {
       soglia = _i(j['soglia']),
       link = j['link'] is Map ? AnteprimaLink(j['link'] as Map<String, dynamic>) : null,
       candidatura = j['candidatura'] is Map ? j['candidatura'] as Map<String, dynamic> : null,
+      attivita = j['attivita'] is Map ? Attivita(j['attivita'] as Map<String, dynamic>) : null,
+      sondaggio = j['sondaggio'] is Map ? Sondaggio(j['sondaggio'] as Map<String, dynamic>) : null,
       nascosto = _s(j['nascosto']),
       segnalato = j['segnalato'] == true,
       puoModificare = (j['puo'] as Map?)?['modifica'] == true,
@@ -128,6 +130,65 @@ class Post {
   bool mioRilancio, segnalato, puoSegnalare;
   final AnteprimaLink? link;
   final Map<String, dynamic>? candidatura;
+
+  /// Attività o sondaggio: cambiano dopo «Ci sarò» o un voto (si rilegge il post).
+  Attivita? attivita;
+  Sondaggio? sondaggio;
+}
+
+/// Un'attività: parte solo se entro la data limite confermano almeno [minimo] persone.
+class Attivita {
+  Attivita(Map<String, dynamic> j)
+    : quando = _s(j['quando_testo']) ?? '',
+      luogo = _s(j['luogo']),
+      minimo = _i(j['minimo']),
+      scadenza = _s(j['scadenza_testo']) ?? '',
+      stato = _s(j['stato']) ?? 'raccolta',
+      passata = j['passata'] == true,
+      n = _i(j['n']),
+      ciSono = j['ci_sono'] == true,
+      aperta = j['aperta'] == true,
+      facce = (j['facce'] as List? ?? []).map((f) => Faccia(f as Map<String, dynamic>)).toList();
+
+  final String quando, scadenza, stato;
+  final String? luogo;
+  final int minimo, n;
+  final bool passata, ciSono, aperta;
+  final List<Faccia> facce;
+}
+
+class OpzioneSondaggio {
+  OpzioneSondaggio(Map<String, dynamic> j)
+    : id = _i(j['id']),
+      testo = _s(j['testo']) ?? '',
+      voti = j['voti'] == null ? null : _i(j['voti']),
+      mia = j['mia'] == true;
+
+  final int id;
+  final String testo;
+
+  /// null finché non si vedono i risultati (prima di votare)
+  final int? voti;
+  final bool mia;
+}
+
+class Sondaggio {
+  Sondaggio(Map<String, dynamic> j)
+    : opzioni = (j['opzioni'] as List? ?? []).map((o) => OpzioneSondaggio(o as Map<String, dynamic>)).toList(),
+      votanti = _i(j['votanti']),
+      multi = j['multi'] == true,
+      soloResidenti = j['solo_residenti'] == true,
+      chiude = _s(j['chiude_testo']),
+      chiuso = j['chiuso'] == true,
+      votato = j['votato'] == true,
+      risultati = j['risultati'] == true,
+      puo = j['puo'] == true,
+      motivo = _s(j['motivo']);
+
+  final List<OpzioneSondaggio> opzioni;
+  final int votanti;
+  final bool multi, soloResidenti, chiuso, votato, risultati, puo;
+  final String? chiude, motivo;
 }
 
 class Pagina {
@@ -214,6 +275,9 @@ class Io {
   int get giorniCambio => _i(j['giorni_cambio']);
   int get garanzieMin => j['garanzie_min'] == null ? 2 : _i(j['garanzie_min']);
 
+  /// Persone minime per un'attività (chi propone può chiederne di più).
+  int get attivitaMin => j['attivita_min'] == null ? 3 : _i(j['attivita_min']);
+
   /// «tre vicini» (con la soglia vera del sito)
   String get viciniGaranti {
     const l = {1: 'un vicino', 2: 'due vicini', 3: 'tre vicini', 4: 'quattro vicini', 5: 'cinque vicini'};
@@ -294,7 +358,14 @@ class Mappa {
       casa = j['casa'] == null ? null : _i(j['casa']),
       giorniCambio = _i(j['giorni_cambio']),
       spenti = (j['spenti'] as List? ?? [])
-          .map((c) => (chiave: _s((c as Map)['chiave']) ?? 'c${c['id']}', nome: '${c['nome']}', richieste: _i(c['richieste']), mia: c['mia'] == true))
+          .map(
+            (c) => (
+              chiave: _s((c as Map)['chiave']) ?? 'c${c['id']}',
+              nome: '${c['nome']}',
+              richieste: _i(c['richieste']),
+              mia: c['mia'] == true,
+            ),
+          )
           .toList(),
       sogliaApertura = _i(j['soglia_apertura']),
       crediti = _s(j['crediti']) ?? '';
@@ -306,6 +377,7 @@ class Mappa {
   final Set<int> seguiti;
   final int? casa;
   final int giorniCambio, sogliaApertura;
+
   /// Comuni e quartieri di Napoli ancora spenti, da chiedere (chiave `c12` o `q34`).
   final List<({String chiave, String nome, int richieste, bool mia})> spenti;
   final String crediti;

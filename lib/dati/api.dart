@@ -161,10 +161,17 @@ class Api {
 
   Future<Post> leggiPost(int id) async => Post((await get('/app/v1/post/$id'))['post']);
 
-  Future<(Post?, String)> pubblica(String testo, {File? foto, String portata = 'quartiere', bool senzaAnteprima = false}) async {
+  /// [extra]: tipo `attivita` o `sondaggio` con i loro campi (vedi Iniziative::campi sul sito).
+  Future<(Post?, String)> pubblica(
+    String testo, {
+    File? foto,
+    String portata = 'quartiere',
+    bool senzaAnteprima = false,
+    Map<String, String> extra = const {},
+  }) async {
     final j = await invia(
       '/app/v1/pubblica',
-      {'testo': testo, 'portata': portata, if (senzaAnteprima) 'senza_anteprima': '1'},
+      {'testo': testo, 'portata': portata, if (senzaAnteprima) 'senza_anteprima': '1', ...extra},
       campoFile: 'foto',
       file: foto,
     );
@@ -177,6 +184,13 @@ class Api {
   }
 
   Future<void> elimina(int postId) => post('/app/v1/post/elimina', {'post_id': postId});
+
+  /// Ci sarò / mi ritiro da un'attività. Ritorna il messaggio.
+  Future<String> partecipa(int postId) async => ((await post('/api/attivita/partecipa', {'post_id': postId}))['msg'] ?? '').toString();
+
+  /// Voto (nessuna risposta = toglie il voto). Ritorna il messaggio.
+  Future<String> vota(int postId, List<int> opzioni) async =>
+      ((await post('/api/sondaggio/vota', {'post_id': postId, 'opzioni': opzioni}))['msg'] ?? '').toString();
 
   /// Reazione al post: stessa = la toglie, diversa = la cambia.
   Future<Map<String, dynamic>> reagisci(int postId, String reazione) => post('/api/like/toggle', {'post_id': postId, 'reazione': reazione});
