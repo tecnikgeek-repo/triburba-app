@@ -70,7 +70,7 @@ class _PrimiPassiState extends State<PrimiPassi> {
         final r = await SharePlus.instance.share(
           ShareParams(
             text:
-                'Ti aspetto su triburba, il social dei quartieri di Napoli e dell\'area metropolitana: iscriviti e scegli il tuo quartiere.\n\n$sito/register',
+                'Ti aspetto su triburba, il social dei quartieri nato a Napoli: iscriviti e scegli il tuo quartiere.\n\n$sito/register',
           ),
         );
         if (r.status == ShareResultStatus.dismissed) return;

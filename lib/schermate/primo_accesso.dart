@@ -69,7 +69,7 @@ class _SchermataPrimoAccessoState extends State<SchermataPrimoAccesso> {
       (
         Padding(padding: const EdgeInsets.all(14), child: emblema(64)),
         'Benvenuto su triburba',
-        'Tribus + urbs: la tribù della città. Il social dei quartieri di Napoli e dell\'area metropolitana, '
+        'Tribus + urbs: la tribù della città. Il social dei quartieri, nato a Napoli, '
             'dove ogni quartiere ha la sua voce e insieme fanno una città.',
         false,
       ),
