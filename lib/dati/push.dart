@@ -26,9 +26,28 @@ const _canale = AndroidNotificationChannel(
 @pragma('vm:entry-point')
 Future<void> _inSottofondo(RemoteMessage m) async {}
 
+/// iPhone: la configurazione arriva da --dart-define nella compilazione (segreti del repo), non da un file.
+const _iosApiKey = String.fromEnvironment('FB_IOS_API_KEY');
+const _iosAppId = String.fromEnvironment('FB_IOS_APP_ID');
+const _fbSender = String.fromEnvironment('FB_SENDER_ID');
+const _fbProgetto = String.fromEnvironment('FB_PROJECT_ID');
+
 Future<void> preparaPush() async {
   try {
-    await Firebase.initializeApp();
+    if (defaultTargetPlatform == TargetPlatform.iOS) {
+      if (_iosApiKey.isEmpty) return; // compilato senza configurazione: niente push
+      await Firebase.initializeApp(
+        options: const FirebaseOptions(
+          apiKey: _iosApiKey,
+          appId: _iosAppId,
+          messagingSenderId: _fbSender,
+          projectId: _fbProgetto,
+          iosBundleId: 'it.triburba.app',
+        ),
+      );
+    } else {
+      await Firebase.initializeApp();
+    }
   } catch (_) {
     return; // niente google-services.json: niente push
   }
