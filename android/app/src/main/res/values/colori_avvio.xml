@@ -1,0 +1,6 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <!-- nero vernice del sito triburba.it: fondo dell'avvio e delle notifiche -->
+    <color name="vernice">#120D0B</color>
+    <color name="terracotta">#E0663A</color>
+</resources>

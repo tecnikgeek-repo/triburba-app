@@ -1,0 +1,281 @@
+// Modifica del proprio profilo e impostazioni (regole, privacy, informazioni, esci, elimina account).
+import 'dart:io';
+
+import 'package:flutter/material.dart';
+import 'package:image_picker/image_picker.dart';
+import 'package:url_launcher/url_launcher.dart';
+
+import '../dati/api.dart';
+import '../dati/push.dart';
+import '../dati/stato.dart';
+import '../tema.dart';
+import '../widget/faccia.dart';
+
+class SchermataModificaProfilo extends StatefulWidget {
+  const SchermataModificaProfilo({super.key});
+
+  @override
+  State<SchermataModificaProfilo> createState() => _SchermataModificaProfiloState();
+}
+
+class _SchermataModificaProfiloState extends State<SchermataModificaProfilo> {
+  late final _nome = TextEditingController(text: stato.io?.nome);
+  late final _bio = TextEditingController(text: stato.io?.bio);
+  late final _lavoro = TextEditingController(text: stato.io?.lavoro);
+  late final _luogo = TextEditingController(text: stato.io?.luogo);
+  late final _sito = TextEditingController(text: stato.io?.sitoWeb);
+  bool _salvo = false;
+  bool _foto = false;
+
+  @override
+  void dispose() {
+    for (final c in [_nome, _bio, _lavoro, _luogo, _sito]) {
+      c.dispose();
+    }
+    super.dispose();
+  }
+
+  Future<void> _salva() async {
+    setState(() => _salvo = true);
+    try {
+      final io = await stato.api.salvaProfilo({
+        'nome': _nome.text.trim(),
+        'bio': _bio.text.trim(),
+        'lavoro': _lavoro.text.trim(),
+        'luogo': _luogo.text.trim(),
+        'sito': _sito.text.trim(),
+      });
+      stato.entra(io);
+      if (mounted) {
+        messaggio(context, 'Profilo aggiornato.');
+        Navigator.pop(context);
+      }
+    } on ErroreApi catch (e) {
+      if (mounted) messaggio(context, e.messaggio);
+    } finally {
+      if (mounted) setState(() => _salvo = false);
+    }
+  }
+
+  Future<void> _cambiaFoto({bool copertina = false}) async {
+    final x = await ImagePicker().pickImage(
+      source: ImageSource.gallery,
+      maxWidth: copertina ? 2000 : 900,
+      maxHeight: copertina ? 2000 : 900,
+      imageQuality: 88,
+    );
+    if (x == null) return;
+    setState(() => _foto = true);
+    try {
+      stato.entra(await stato.api.cambiaFoto(File(x.path), copertina: copertina));
+      if (mounted) messaggio(context, copertina ? 'Copertina aggiornata.' : 'Foto aggiornata.');
+    } on ErroreApi catch (e) {
+      if (mounted) messaggio(context, e.messaggio);
+    } finally {
+      if (mounted) setState(() => _foto = false);
+    }
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    final io = stato.io!;
+    return Scaffold(
+      appBar: AppBar(title: const Text('Modifica profilo')),
+      body: ListView(
+        padding: const EdgeInsets.all(16),
+        children: [
+          Center(
+            child: Stack(
+              children: [
+                FotoProfilo(faccia: io.faccia, lato: 96, anello: true),
+                Positioned(
+                  right: 0,
+                  bottom: 0,
+                  child: IconButton.filled(
+                    style: IconButton.styleFrom(backgroundColor: terracotta),
+                    onPressed: _foto ? null : () => _cambiaFoto(),
+                    icon: _foto
+                        ? const SizedBox(width: 18, height: 18, child: CircularProgressIndicator(strokeWidth: 2, color: bianco))
+                        : const Icon(Icons.photo_camera_outlined, color: bianco),
+                    tooltip: 'Cambia foto',
+                  ),
+                ),
+              ],
+            ),
+          ),
+          const SizedBox(height: 8),
+          Center(
+            child: TextButton.icon(
+              onPressed: _foto ? null : () => _cambiaFoto(copertina: true),
+              icon: const Icon(Icons.wallpaper_outlined),
+              label: const Text('Cambia copertina'),
+            ),
+          ),
+          const SizedBox(height: 12),
+          TextField(
+            controller: _nome,
+            maxLength: 64,
+            decoration: const InputDecoration(labelText: 'Nome e cognome'),
+          ),
+          const SizedBox(height: 8),
+          TextField(
+            controller: _bio,
+            maxLength: 240,
+            maxLines: 3,
+            decoration: const InputDecoration(labelText: 'Due righe su di te'),
+          ),
+          const SizedBox(height: 8),
+          TextField(
+            controller: _lavoro,
+            maxLength: 80,
+            decoration: const InputDecoration(labelText: 'Lavoro'),
+          ),
+          const SizedBox(height: 8),
+          TextField(
+            controller: _luogo,
+            maxLength: 80,
+            decoration: const InputDecoration(labelText: 'Dove vivi'),
+          ),
+          const SizedBox(height: 8),
+          TextField(
+            controller: _sito,
+            maxLength: 190,
+            keyboardType: TextInputType.url,
+            decoration: const InputDecoration(labelText: 'Sito o pagina social'),
+          ),
+          const SizedBox(height: 12),
+          BottoneCaldo(testo: 'Salva', occupato: _salvo, onPressed: _salva),
+          const SizedBox(height: 14),
+          const Text(
+            'Username, email e password si cambiano dal sito, nelle impostazioni.',
+            style: TextStyle(color: muto, fontSize: 12.5),
+            textAlign: TextAlign.center,
+          ),
+        ],
+      ),
+    );
+  }
+}
+
+class SchermataImpostazioni extends StatelessWidget {
+  const SchermataImpostazioni({super.key});
+
+  void _apri(String percorso) => launchUrl(Uri.parse('$sito$percorso'), mode: LaunchMode.externalApplication);
+
+  Future<void> _esci(BuildContext context) async {
+    if (!await conferma(
+      context,
+      'Vuoi uscire?',
+      'Su questo telefono non riceverai più le notifiche finché non rientri.',
+      si: 'Esci',
+      pericolo: false,
+    )) {
+      return;
+    }
+    await scollegaPush();
+    await stato.esci();
+    if (context.mounted) Navigator.of(context).popUntil((r) => r.isFirst);
+  }
+
+  Future<void> _elimina(BuildContext context) async {
+    final pw = await chiediTesto(context, 'Elimina l\'account', suggerimento: 'La tua password', ok: 'Elimina per sempre', password: true);
+    if (pw == null || pw.isEmpty || !context.mounted) return;
+    if (!await conferma(
+      context,
+      'Sei sicuro?',
+      'Spariscono per sempre il profilo, tutti i tuoi post, commenti, reazioni e foto. Non si può annullare.',
+    )) {
+      return;
+    }
+    try {
+      await stato.api.eliminaAccount(pw);
+      await scollegaPush();
+      await stato.esci();
+      if (context.mounted) {
+        Navigator.of(context).popUntil((r) => r.isFirst);
+      }
+    } on ErroreApi catch (e) {
+      if (context.mounted) messaggio(context, e.messaggio);
+    }
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    final io = stato.io;
+    return Scaffold(
+      appBar: AppBar(title: const Text('Impostazioni')),
+      body: ListView(
+        children: [
+          if (io != null)
+            ListTile(
+              leading: FotoProfilo(faccia: io.faccia, lato: 44),
+              title: Text(io.nome, style: const TextStyle(fontWeight: FontWeight.w700)),
+              subtitle: Text('@${io.username} · ${io.email}', style: const TextStyle(color: muto)),
+            ),
+          const Divider(),
+          _sezione('Account'),
+          ListTile(
+            leading: const Icon(Icons.manage_accounts_outlined),
+            title: const Text('Username, email e password'),
+            subtitle: const Text('Sul sito triburba.it', style: TextStyle(color: muto)),
+            trailing: const Icon(Icons.open_in_new, size: 18, color: muto),
+            onTap: () => _apri('/settings'),
+          ),
+          ListTile(
+            leading: const Icon(Icons.download_outlined),
+            title: const Text('Scarica i miei dati'),
+            subtitle: const Text('Dal sito, nelle impostazioni', style: TextStyle(color: muto)),
+            trailing: const Icon(Icons.open_in_new, size: 18, color: muto),
+            onTap: () => _apri('/settings#dati'),
+          ),
+          if (io?.admin == true)
+            ListTile(
+              leading: const Icon(Icons.admin_panel_settings_outlined, color: oro),
+              title: const Text('Pannello admin'),
+              trailing: const Icon(Icons.open_in_new, size: 18, color: muto),
+              onTap: () => _apri('/admin'),
+            ),
+          _sezione('Regole e privacy'),
+          ListTile(leading: const Icon(Icons.gavel_rounded), title: const Text('Regolamento'), onTap: () => _apri('/regolamento')),
+          ListTile(leading: const Icon(Icons.description_outlined), title: const Text('Termini'), onTap: () => _apri('/termini')),
+          ListTile(leading: const Icon(Icons.privacy_tip_outlined), title: const Text('Privacy'), onTap: () => _apri('/privacy')),
+          ListTile(leading: const Icon(Icons.cookie_outlined), title: const Text('Cookie'), onTap: () => _apri('/cookie')),
+          _sezione('App'),
+          ListTile(
+            leading: const Icon(Icons.info_outline),
+            title: const Text('Informazioni'),
+            subtitle: const Text('Versione, licenza, codice sorgente', style: TextStyle(color: muto)),
+            onTap: () => apriInformazioni(
+              context,
+              notaDati: 'Sul telefono restano solo il tuo accesso e le preferenze; i post stanno su triburba.it.',
+            ),
+          ),
+          const Divider(),
+          ListTile(
+            leading: const Icon(Icons.logout_rounded),
+            title: const Text('Esci', style: TextStyle(fontWeight: FontWeight.w700)),
+            onTap: () => _esci(context),
+          ),
+          ListTile(
+            leading: const Icon(Icons.delete_forever_outlined, color: pompeiano),
+            title: const Text(
+              'Elimina l\'account',
+              style: TextStyle(color: pompeiano, fontWeight: FontWeight.w700),
+            ),
+            subtitle: const Text('Cancella per sempre profilo, post e dati', style: TextStyle(color: muto)),
+            onTap: () => _elimina(context),
+          ),
+          const SizedBox(height: 30),
+        ],
+      ),
+    );
+  }
+
+  Widget _sezione(String t) => Padding(
+    padding: const EdgeInsets.fromLTRB(16, 18, 16, 4),
+    child: Text(
+      t.toUpperCase(),
+      style: const TextStyle(color: muto, fontSize: 12, fontWeight: FontWeight.w800, letterSpacing: .6),
+    ),
+  );
+}
