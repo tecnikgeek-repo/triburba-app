@@ -249,13 +249,13 @@ class DatiIscrizione {
             ),
           )
           .toList(),
-      spenti = (j['spenti'] as List).map((c) => ('${(c as Map)['id']}', '${c['nome']}', _i(c['richieste']))).toList(),
+      spenti = (j['spenti'] as List).map((c) => (_s((c as Map)['chiave']) ?? 'c${c['id']}', '${c['nome']}', _i(c['richieste']))).toList(),
       soglia = _i(j['soglia']);
 
   /// (nome municipalità, [(id, nome, colore)])
   final List<(String, List<(String, String, String)>)> gruppi;
 
-  /// (id comune, nome, richieste)
+  /// (chiave `c12` comune o `q34` quartiere di Napoli, nome, richieste)
   final List<(String, String, int)> spenti;
   final int soglia;
 }
@@ -294,7 +294,7 @@ class Mappa {
       casa = j['casa'] == null ? null : _i(j['casa']),
       giorniCambio = _i(j['giorni_cambio']),
       spenti = (j['spenti'] as List? ?? [])
-          .map((c) => (id: _i((c as Map)['id']), nome: '${c['nome']}', richieste: _i(c['richieste']), mia: c['mia'] == true))
+          .map((c) => (chiave: _s((c as Map)['chiave']) ?? 'c${c['id']}', nome: '${c['nome']}', richieste: _i(c['richieste']), mia: c['mia'] == true))
           .toList(),
       sogliaApertura = _i(j['soglia_apertura']),
       crediti = _s(j['crediti']) ?? '';
@@ -306,7 +306,8 @@ class Mappa {
   final Set<int> seguiti;
   final int? casa;
   final int giorniCambio, sogliaApertura;
-  final List<({int id, String nome, int richieste, bool mia})> spenti;
+  /// Comuni e quartieri di Napoli ancora spenti, da chiedere (chiave `c12` o `q34`).
+  final List<({String chiave, String nome, int richieste, bool mia})> spenti;
   final String crediti;
 
   List<QuartiereMappa> get tutti => [for (final g in gruppi) ...g.$2];

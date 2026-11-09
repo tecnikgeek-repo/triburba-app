@@ -41,9 +41,9 @@ class _SchermataMappaState extends State<SchermataMappa> {
     }
   }
 
-  Future<void> _chiedi(int id) async {
+  Future<void> _chiedi(String chiave) async {
     try {
-      final j = await stato.api.chiediComune(id);
+      final j = await stato.api.chiediZona(chiave);
       if (!mounted) return;
       messaggio(context, '${j['msg']}');
       _carica();
@@ -164,19 +164,19 @@ class _SchermataMappaState extends State<SchermataMappa> {
             children: [
               const Icon(Icons.wb_twilight_rounded, color: oro),
               const SizedBox(width: 8),
-              Expanded(child: Text('Accendi il tuo comune', style: titolo(19))),
+              Expanded(child: Text('Accendi la tua zona', style: titolo(19))),
             ],
           ),
           const SizedBox(height: 6),
           Text(
-            'I comuni dell\'area metropolitana restano nella nebbia finché non li chiede abbastanza gente: '
-            'a ${m.sogliaApertura} richieste si accendono da soli sulla mappa.',
+            'I quartieri di Napoli e i comuni dell\'area metropolitana restano nella nebbia finché non li chiede '
+            'abbastanza gente: a ${m.sogliaApertura} richieste si accendono da soli sulla mappa.',
             style: const TextStyle(color: testo2, fontSize: 13, height: 1.4),
           ),
           const SizedBox(height: 10),
           TextField(
             onChanged: (v) => setState(() => _filtroComuni = v),
-            decoration: const InputDecoration(hintText: 'Cerca il comune…', prefixIcon: Icon(Icons.search), isDense: true),
+            decoration: const InputDecoration(hintText: 'Cerca il quartiere o il comune…', prefixIcon: Icon(Icons.search), isDense: true),
           ),
           const SizedBox(height: 6),
           for (final c in lista.take(_filtroComuni.isEmpty ? 8 : 40))
@@ -188,7 +188,7 @@ class _SchermataMappaState extends State<SchermataMappa> {
                 child: LinearProgressIndicator(value: (c.richieste / m.sogliaApertura).clamp(0, 1), minHeight: 5, color: oro),
               ),
               trailing: TextButton(
-                onPressed: () => _chiedi(c.id),
+                onPressed: () => _chiedi(c.chiave),
                 child: Text(c.mia ? 'Ritira ${c.richieste}/${m.sogliaApertura}' : 'Chiedi ${c.richieste}/${m.sogliaApertura}'),
               ),
             ),

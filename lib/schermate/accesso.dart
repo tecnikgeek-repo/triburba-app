@@ -452,13 +452,13 @@ class _SceltaZonaState extends State<_SceltaZona> {
                       onTap: () => Navigator.pop(context, (q.$1, q.$2)),
                     ),
                 ],
-              if (widget.dati.spenti.any((c) => _va(c.$2))) _titolo('Comuni non ancora aperti'),
+              if (widget.dati.spenti.any((c) => _va(c.$2))) _titolo('Non ancora aperti'),
               for (final x in widget.dati.spenti.where((c) => _va(c.$2)).take(_q.isEmpty ? 12 : 60))
                 ListTile(
                   leading: const Icon(Icons.wb_twilight_rounded, color: muto, size: 20),
                   title: Text(x.$2),
                   subtitle: Text('${x.$3}/${widget.dati.soglia} richieste', style: const TextStyle(color: muto, fontSize: 12)),
-                  onTap: () => Navigator.pop(context, ('c${x.$1}', '${x.$2} (da aprire)')),
+                  onTap: () => Navigator.pop(context, (x.$1, '${x.$2} (da aprire)')),
                 ),
               ListTile(
                 leading: const Icon(Icons.travel_explore_rounded, color: oro),
