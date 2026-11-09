@@ -150,6 +150,9 @@ class Api {
 
   Future<Io> io() async => Io((await get('/app/v1/io'))['io']);
 
+  /// Guida: «benvenuto» visto, carta «nascondi», «invito» fatto.
+  Future<Map<String, dynamic>> guida(String azione) => post('/app/v1/guida', {'azione': azione});
+
   Future<void> registraPush(String fcm) => post('/app/v1/push', {'fcm': fcm, 'versione': versione});
 
   // ── Post ──

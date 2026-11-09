@@ -13,9 +13,11 @@ import 'package:triburba/dati/modelli.dart';
 import 'package:triburba/dati/stato.dart';
 import 'package:triburba/main.dart';
 import 'package:triburba/schermate/accesso.dart';
+import 'package:triburba/schermate/feed.dart';
 import 'package:triburba/schermate/home.dart';
 import 'package:triburba/schermate/naviga.dart';
 import 'package:triburba/schermate/post.dart';
+import 'package:triburba/schermate/primo_accesso.dart';
 import 'package:triburba/schermate/quartiere.dart';
 import 'package:triburba/schermate/scrivi.dart';
 import 'package:triburba/tema.dart';
@@ -124,7 +126,7 @@ void main() {
       '13-sondaggio',
       prima: () async {
         await t.ensureVisible(find.text('Sabato pomeriggio'));
-      await t.drag(find.text('Sabato pomeriggio'), const Offset(0, -120));
+        await t.drag(find.text('Sabato pomeriggio'), const Offset(0, -120));
         await t.pump(const Duration(milliseconds: 500));
       },
     );
@@ -158,5 +160,13 @@ void main() {
         }
       },
     );
+
+    // guida dei nuovi iscritti: benvenuto e carta «Primi passi»
+    stato.entra(Io({...ioFinto, 'guida': guidaFinta()}));
+    await _scatta(t, const SchermataPrimoAccesso(), '14-benvenuto');
+    await _scatta(t, const SchermataFeed(), '15-primi-passi');
+    stato.entra(Io({...ioFinto, 'guida': guidaFinta(completa: true)}));
+    await _scatta(t, const SchermataFeed(), '16-primi-passi-fatti');
+    stato.entra(Io(ioFinto));
   });
 }

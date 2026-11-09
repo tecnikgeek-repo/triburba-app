@@ -223,6 +223,57 @@ final ioFinto = {
   'motivi': ['Spam o pubblicità', 'Offese, odio o minacce'],
   'colori': {},
   'push': false,
+  'guida': {'benvenuto': true, 'nascosta': true, 'fatti': 7, 'totale': 7, 'completa': true, 'passi': <Object>[]},
+};
+
+/// Guida di una persona appena iscritta (per le anteprime della carta «Primi passi»).
+Map<String, dynamic> guidaFinta({bool completa = false}) => {
+  'benvenuto': false,
+  'nascosta': false,
+  'fatti': completa ? 7 : 3,
+  'totale': 7,
+  'completa': completa,
+  'passi': [
+    {'chiave': 'foto', 'titolo': 'Metti una foto profilo', 'testo': 'I vicini ti riconoscono.', 'fatto': true, 'tasto': 'Aggiungi la foto'},
+    {'chiave': 'casa', 'titolo': 'Scegli il quartiere dove abiti', 'testo': 'È la tua tribù.', 'fatto': true, 'tasto': 'Scegli'},
+    {
+      'chiave': 'garanzie',
+      'titolo': 'Fatti garantire dai vicini',
+      'testo': 'Servono le garanzie di 3 vicini già confermati che ti conoscono (ne hai 1). Chiedilo a chi abita vicino a te.',
+      'fatto': completa,
+      'tasto': 'Chiedi ai vicini',
+      'conta': [1, 3],
+    },
+    {
+      'chiave': 'partecipa',
+      'titolo': 'Reagisci o commenta un post',
+      'testo': 'Anche prima delle garanzie.',
+      'fatto': true,
+      'tasto': 'Leggi i post',
+    },
+    {
+      'chiave': 'segui',
+      'titolo': 'Segui un quartiere o una persona',
+      'testo': 'I loro post in «Per te».',
+      'fatto': completa,
+      'tasto': 'Trova chi seguire',
+    },
+    {
+      'chiave': 'post',
+      'titolo': 'Scrivi il tuo primo post',
+      'testo': 'Si sblocca quando sei residente confermato.',
+      'fatto': completa,
+      'tasto': 'Dopo le garanzie',
+      'bloccato': !completa,
+    },
+    {
+      'chiave': 'invito',
+      'titolo': 'Invita un vicino',
+      'testo': 'Più vicini ci sono, prima il quartiere prende vita.',
+      'fatto': completa,
+      'tasto': 'Invita',
+    },
+  ],
 };
 
 // due forme di esempio (unità di mappa)

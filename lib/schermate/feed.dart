@@ -5,6 +5,7 @@ import 'package:flutter/material.dart';
 import '../dati/stato.dart';
 import '../tema.dart';
 import '../widget/lista_post.dart';
+import '../widget/primi_passi.dart';
 import 'cerca.dart';
 import 'naviga.dart';
 
@@ -36,7 +37,10 @@ class SchermataFeedState extends State<SchermataFeed> with TickerProviderStateMi
 
   void _prepara() {
     final nuove = stato.io?.schede ?? const [('perte', 'Per te')];
-    if (nuove.map((e) => e.$1).join(',') == _elenco.map((e) => e.$1).join(',')) return;
+    if (nuove.map((e) => e.$1).join(',') == _elenco.map((e) => e.$1).join(',')) {
+      if (mounted) setState(() {}); // la carta «Primi passi» segue i dati aggiornati
+      return;
+    }
     final vecchio = _schede;
     setState(() {
       _elenco = nuove;
@@ -56,6 +60,8 @@ class SchermataFeedState extends State<SchermataFeed> with TickerProviderStateMi
   @override
   Widget build(BuildContext context) {
     final io = stato.io;
+    final guida = io?.guida;
+    final guidaVisibile = guida != null && !guida.nascosta;
     return Scaffold(
       appBar: AppBar(
         titleSpacing: 16,
@@ -78,8 +84,8 @@ class SchermataFeedState extends State<SchermataFeed> with TickerProviderStateMi
       ),
       body: Column(
         children: [
-          if (io != null && io.casa != null && io.residenza == 'in_attesa') _attesa(io.casa!),
-          if (io != null && io.casa == null) _senzaCasa(),
+          if (io != null && !guidaVisibile && io.casa != null && io.residenza == 'in_attesa') _attesa(io.casa!),
+          if (io != null && !guidaVisibile && io.casa == null) _senzaCasa(),
           Expanded(
             child: _schede == null
                 ? const SizedBox.shrink()
@@ -89,6 +95,16 @@ class SchermataFeedState extends State<SchermataFeed> with TickerProviderStateMi
                       for (final s in _elenco)
                         ListaPost(
                           key: _liste.putIfAbsent(s.$1, () => GlobalKey<ListaPostState>()),
+                          testa: s.$1 == 'perte' && guidaVisibile
+                              ? PrimiPassi(
+                                  key: ValueKey('guida-${guida.fatti}-${guida.completa}'),
+                                  guida: guida,
+                                  onLeggi: () {
+                                    final k = _elenco.indexWhere((e) => e.$1 == 'citta');
+                                    if (k >= 0) _schede?.animateTo(k);
+                                  },
+                                )
+                              : null,
                           carica: (prima) async {
                             final pg = await stato.api.feed(s.$1, prima: prima);
                             if (pg.notifiche != null) stato.impostaNotifiche(pg.notifiche!);

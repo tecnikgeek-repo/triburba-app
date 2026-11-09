@@ -10,6 +10,7 @@ import 'feed.dart';
 import 'mappa.dart';
 import 'naviga.dart';
 import 'notifiche.dart';
+import 'primo_accesso.dart';
 import 'scrivi.dart';
 import 'utente.dart';
 
@@ -25,6 +26,7 @@ class _SchermataHomeState extends State<SchermataHome> with WidgetsBindingObserv
   final _feed = GlobalKey<SchermataFeedState>();
   final _notifiche = GlobalKey<SchermataNotificheState>();
   Timer? _orologio;
+  bool _benvenutoProposto = false;
 
   @override
   void initState() {
@@ -53,6 +55,13 @@ class _SchermataHomeState extends State<SchermataHome> with WidgetsBindingObserv
   }
 
   void _cambio() {
+    // benvenuto al primo accesso, una volta sola (appena arrivano i dati della persona)
+    if (!_benvenutoProposto && stato.io?.guida != null && mounted) {
+      _benvenutoProposto = true;
+      WidgetsBinding.instance.addPostFrameCallback((_) {
+        if (mounted) proponiBenvenuto(context);
+      });
+    }
     final vai = stato.daAprire;
     if (vai == null || !mounted) {
       if (mounted) setState(() {});

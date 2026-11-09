@@ -275,6 +275,9 @@ class Io {
   int get giorniCambio => _i(j['giorni_cambio']);
   int get garanzieMin => j['garanzie_min'] == null ? 2 : _i(j['garanzie_min']);
 
+  /// Guida dei nuovi iscritti (benvenuto e Primi passi); null se il sito non la manda.
+  Guida? get guida => j['guida'] is Map ? Guida((j['guida'] as Map).cast<String, dynamic>()) : null;
+
   /// Persone minime per un'attività (chi propone può chiederne di più).
   int get attivitaMin => j['attivita_min'] == null ? 3 : _i(j['attivita_min']);
 
@@ -383,4 +386,36 @@ class Mappa {
   final String crediti;
 
   List<QuartiereMappa> get tutti => [for (final g in gruppi) ...g.$2];
+}
+
+/// Un passo della carta «Primi passi»: si spunta da solo coi dati veri del sito.
+class PassoGuida {
+  PassoGuida(Map<String, dynamic> j)
+    : chiave = _s(j['chiave']) ?? '',
+      titolo = _s(j['titolo']) ?? '',
+      testo = _s(j['testo']) ?? '',
+      tasto = _s(j['tasto']) ?? '',
+      fatto = j['fatto'] == true,
+      bloccato = j['bloccato'] == true,
+      conta = (j['conta'] as List?)?.map(_i).toList();
+
+  final String chiave, titolo, testo, tasto;
+  final bool fatto, bloccato;
+
+  /// [fatte, servono] per le garanzie
+  final List<int>? conta;
+}
+
+class Guida {
+  Guida(Map<String, dynamic> j)
+    : benvenuto = j['benvenuto'] == true,
+      nascosta = j['nascosta'] == true,
+      completa = j['completa'] == true,
+      fatti = _i(j['fatti']),
+      totale = _i(j['totale']),
+      passi = (j['passi'] as List? ?? []).map((p) => PassoGuida((p as Map).cast<String, dynamic>())).toList();
+
+  final bool benvenuto, nascosta, completa;
+  final int fatti, totale;
+  final List<PassoGuida> passi;
 }
