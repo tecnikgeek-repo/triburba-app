@@ -220,6 +220,18 @@ class Api {
   Future<String> tamtam(int postId, String dest) async =>
       ((await post('/api/porta', {'post_id': postId, 'dest': dest}))['msg'] ?? '').toString();
 
+  /// Ritira un tam-tam fatto da me: {citta, rilanci, arrivato} oppure {livello, nome}, sempre con msg.
+  Future<Map<String, dynamic>> ritiraTamtam(int postId, String dest) => post('/api/porta/ritira', {'post_id': postId, 'dest': dest});
+
+  /// Segna la condivisione e restituisce quante persone hanno condiviso il post.
+  Future<int> condiviso(int postId, String canale) async =>
+      ((await post('/api/condiviso', {'post_id': postId, 'canale': canale}))['condivisioni'] as num? ?? 0).toInt();
+
+  // ── Hashtag ──
+  Future<Map<String, dynamic>> tag(String tag) => get('/app/v1/tag/${Uri.encodeComponent(tag)}');
+
+  Future<Map<String, dynamic>> seguiTag(String tag) => post('/api/hashtag/segui', {'tag': tag});
+
   Future<String> segnala(int postId, String motivo) async =>
       ((await post('/api/segnala', {'post_id': postId, 'motivo': motivo}))['msg'] ?? '').toString();
 

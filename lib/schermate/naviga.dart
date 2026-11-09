@@ -10,6 +10,7 @@ import '../widget/emoji.dart';
 import '../widget/faccia.dart';
 import 'post.dart';
 import 'quartiere.dart';
+import 'tag.dart';
 import 'utente.dart';
 
 final chiaveNavigazione = GlobalKey<NavigatorState>();
@@ -23,7 +24,9 @@ Future<void> apriQuartiere(BuildContext context, String slug) => Navigator.of(co
 Future<void> apriPost(BuildContext context, int id, {Post? post, bool scrivi = false}) =>
     Navigator.of(context).push(_via(SchermataPost(id: id, post: post, scrivi: scrivi)));
 
-/// Destinazione da notifica o link: {tipo: post|utente|quartiere, …}
+Future<void> apriTag(BuildContext context, String tag) => Navigator.of(context).push(_via(SchermataTag(tag: tag)));
+
+/// Destinazione da notifica o link: {tipo: post|utente|quartiere|tag, …}
 void apriDestinazione(BuildContext context, Map<String, dynamic> vai) {
   switch (vai['tipo']) {
     case 'post':
@@ -32,6 +35,8 @@ void apriDestinazione(BuildContext context, Map<String, dynamic> vai) {
       apriUtente(context, '${vai['username']}');
     case 'quartiere':
       apriQuartiere(context, '${vai['slug']}');
+    case 'tag':
+      apriTag(context, '${vai['tag']}');
   }
 }
 

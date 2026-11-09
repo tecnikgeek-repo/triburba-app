@@ -15,6 +15,7 @@ import '../schermate/naviga.dart';
 import '../tema.dart';
 import 'emoji.dart';
 import 'faccia.dart';
+import 'bollino.dart';
 import 'iniziativa.dart';
 import 'tamtam.dart';
 import 'testo_ricco.dart';
@@ -120,12 +121,28 @@ class _PostCardState extends State<PostCard> {
           if (mounted) messaggio(context, e.messaggio);
         }
       case 'condividi':
-        SharePlus.instance.share(ShareParams(text: '${senzaFormato(p.testo).characters.take(140)}\n\n$sito${p.url}'));
+        await _condividi();
       case 'copia':
         await Clipboard.setData(ClipboardData(text: '$sito${p.url}'));
         if (mounted) messaggio(context, 'Link copiato.');
+        await _segnaCondiviso('copia');
       case 'segnala':
         await _segnala();
+    }
+  }
+
+  /// Condivide il post con le app del telefono e lo conta (come sul sito: una volta per persona).
+  Future<void> _condividi() async {
+    await SharePlus.instance.share(ShareParams(text: '${senzaFormato(p.testo).characters.take(140)}\n\n$sito${p.url}'));
+    await _segnaCondiviso('app');
+  }
+
+  Future<void> _segnaCondiviso(String canale) async {
+    try {
+      final n = await stato.api.condiviso(p.id, canale);
+      if (mounted) setState(() => p.condivisioni = n);
+    } on ErroreApi {
+      // il conteggio non riuscito non disturba chi sta condividendo
     }
   }
 
@@ -477,13 +494,12 @@ class _PostCardState extends State<PostCard> {
   );
 
   Widget _numeri() {
-    if (p.reazioni.n == 0 && p.commenti == 0) return const SizedBox(height: 4);
+    if (p.reazioni.n == 0) return const SizedBox(height: 4);
     return Padding(
       padding: const EdgeInsets.fromLTRB(14, 2, 14, 8),
       child: Row(
         children: [
-          if (p.reazioni.n > 0)
-            Expanded(
+          Expanded(
               child: GestureDetector(
                 onTap: () => apriChiHaReagito(context, p.id),
                 child: Row(
@@ -500,16 +516,6 @@ class _PostCardState extends State<PostCard> {
                     ),
                   ],
                 ),
-              ),
-            )
-          else
-            const Spacer(),
-          if (p.commenti > 0)
-            GestureDetector(
-              onTap: _apriCommenti,
-              child: Text(
-                '${p.commenti} ${p.commenti == 1 ? 'commento' : 'commenti'}',
-                style: const TextStyle(color: testo2, fontSize: 13),
               ),
             ),
         ],
@@ -542,8 +548,11 @@ class _PostCardState extends State<PostCard> {
             },
           ),
           _azione(
-            icona: const Icon(Icons.chat_bubble_outline, color: testo2, size: 21),
-            testo: 'Commenta',
+            icona: IconaConBollino(
+              icona: const Icon(Icons.chat_bubble_outline, color: testo2, size: 21),
+              n: p.commenti,
+            ),
+            testo: p.commenti == 0 ? 'Commenta' : (p.commenti == 1 ? 'Commento' : 'Commenti'),
             onTap: _apriCommenti,
           ),
           _azione(
@@ -563,9 +572,12 @@ class _PostCardState extends State<PostCard> {
             },
           ),
           _azione(
-            icona: const Icon(Icons.share_outlined, color: testo2, size: 21),
+            icona: IconaConBollino(
+              icona: const Icon(Icons.share_outlined, color: testo2, size: 21),
+              n: p.condivisioni,
+            ),
             testo: 'Condividi',
-            onTap: () => SharePlus.instance.share(ShareParams(text: '${senzaFormato(p.testo).characters.take(140)}\n\n$sito${p.url}')),
+            onTap: _condividi,
           ),
         ],
       ),

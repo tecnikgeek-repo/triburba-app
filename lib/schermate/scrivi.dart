@@ -151,7 +151,13 @@ class _SchermataScriviState extends State<SchermataScrivi> {
     }
     setState(() => _invio = true);
     try {
-      final (post, msg) = await stato.api.pubblica(t, foto: _foto, portata: _portata, extra: extra!);
+      final ovunque = _portata == 'ovunque';
+      final (post, msg) = await stato.api.pubblica(
+        t,
+        foto: _foto,
+        portata: ovunque ? 'quartiere' : _portata,
+        extra: {...extra!, if (ovunque) 'ovunque': '1'},
+      );
       if (!mounted) return;
       messaggio(context, msg);
       Navigator.pop(context, post);
@@ -309,6 +315,15 @@ class _SchermataScriviState extends State<SchermataScrivi> {
                       'Avvisa tutta la tua tribù (una volta al giorno)',
                       () => _avvolgi('@tribu ', ''),
                     ),
+                    if (io.superadmin)
+                      _tasto(
+                        const Text(
+                          '@triburba',
+                          style: TextStyle(color: oro, fontWeight: FontWeight.w800, fontSize: 12.5),
+                        ),
+                        'Solo tu: avvisa tutti gli iscritti e il post arriva ovunque',
+                        () => _avvolgi('@triburba ', ''),
+                      ),
                     _tasto(
                       Icon(_anteprima ? Icons.edit_outlined : Icons.visibility_outlined, size: 19),
                       _anteprima ? 'Scrivi' : 'Anteprima',
@@ -377,6 +392,8 @@ class _SchermataScriviState extends State<SchermataScrivi> {
                   io.tamtam['grande'] ?? 'Verso tutta Napoli',
                   io.tamtam['nota'] ?? 'Arriva quando lo rilanciano residenti di altri quartieri.',
                 ),
+                if (io.superadmin)
+                  _scelta('ovunque', Icons.public, 'Ovunque', 'Solo tu: lo vede tutta triburba, in ogni quartiere.'),
                 const SizedBox(height: 10),
                 const Text(
                   'Le foto passano un controllo automatico. Ricorda il regolamento: rispetto per tutti, niente dati personali di altri.',

@@ -6,7 +6,11 @@ import 'package:url_launcher/url_launcher.dart';
 import '../dati/stato.dart';
 import '../tema.dart';
 
-const gruppiMenzione = {'tribu', 'follower', 'followers', 'primopiano'};
+const gruppiMenzione = {'tribu', 'follower', 'followers', 'primopiano', 'triburba'};
+
+/// Stessa regola del sito (app/Services/Hashtag.php): # + 2–40 tra lettere, cifre e _, non solo cifre,
+/// non dentro i link (…/pagina#sezione) né attaccato ad altro testo.
+const _rxTag = r'(?<![\p{L}\p{N}_&#/.:=?])#([\p{L}\p{N}_]{2,40})(?![\p{L}\p{N}_])';
 
 class TestoRicco extends StatefulWidget {
   const TestoRicco(this.testo, {super.key, this.stile, this.maxRighe});
@@ -70,18 +74,49 @@ class _TestoRiccoState extends State<TestoRicco> {
 
   List<InlineSpan> _link(String t, TextStyle s) {
     final out = <InlineSpan>[];
-    final rx = RegExp(r'''https?://[^\s<>"']+|(?<=^|[\s(])@([A-Za-z0-9_.]{3,32})''');
+    final rx = RegExp(r'''https?://[^\s<>"']+|(?<=^|[\s(])@([A-Za-z0-9_.]{3,32})|''' + _rxTag, unicode: true);
     var pos = 0;
     for (final m in rx.allMatches(t)) {
       if (m.start > pos) out.add(TextSpan(text: t.substring(pos, m.start), style: s));
       final pezzo = m.group(0)!;
-      if (pezzo.startsWith('@')) {
-        final u = m.group(1)!;
-        if (gruppiMenzione.contains(u.toLowerCase())) {
+      if (pezzo.startsWith('#')) {
+        final tag = m.group(2)!;
+        if (RegExp(r'^\d+$').hasMatch(tag)) {
+          out.add(TextSpan(text: pezzo, style: s));
+        } else {
           out.add(
             TextSpan(
               text: pezzo,
-              style: s.copyWith(color: oro, fontWeight: FontWeight.w700),
+              style: s.copyWith(color: oro, fontWeight: FontWeight.w800),
+              recognizer: _tocco(() => stato.apri({'tipo': 'tag', 'tag': tag.toLowerCase()})),
+            ),
+          );
+        }
+      } else if (pezzo.startsWith('@')) {
+        final u = m.group(1)!;
+        if (gruppiMenzione.contains(u.toLowerCase())) {
+          // @tribu, @follower, @primopiano, @triburba: pastiglia calda come sul sito
+          out.add(
+            WidgetSpan(
+              alignment: PlaceholderAlignment.middle,
+              child: Container(
+                margin: const EdgeInsets.symmetric(horizontal: 1),
+                padding: const EdgeInsets.symmetric(horizontal: 7, vertical: 1),
+                decoration: BoxDecoration(
+                  gradient: const LinearGradient(colors: [oro, terracotta]),
+                  borderRadius: BorderRadius.circular(6),
+                ),
+                child: Text(
+                  pezzo,
+                  style: s.copyWith(
+                    color: vernice2,
+                    fontWeight: FontWeight.w800,
+                    fontSize: (s.fontSize ?? 15.5) * .9,
+                    height: 1.25,
+                    decoration: TextDecoration.none,
+                  ),
+                ),
+              ),
             ),
           );
         } else {

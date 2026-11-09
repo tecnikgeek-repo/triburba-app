@@ -20,6 +20,7 @@ import 'package:triburba/schermate/post.dart';
 import 'package:triburba/schermate/primo_accesso.dart';
 import 'package:triburba/schermate/quartiere.dart';
 import 'package:triburba/schermate/scrivi.dart';
+import 'package:triburba/schermate/tag.dart';
 import 'package:triburba/schermate/utente.dart';
 import 'package:triburba/tema.dart';
 
@@ -173,5 +174,35 @@ void main() {
     // profilo di un altro: tasto «Segui già» su una riga
     utenteFinto['utente'] = {...(utenteFinto['utente'] as Map), 'io': false, 'seguo': true, 'residente': false};
     await _scatta(t, const SchermataUtente(username: 'anna.rossi'), '17-profilo-segui-gia');
+
+    // 1.0.10: pagina #tag con bollini, @triburba e hashtag nel testo
+    await _scatta(t, const SchermataTag(tag: 'festadelquartiere'), '18-tag-bollini');
+    // foglio del tam-tam con «RITIRA» sulle destinazioni già mie
+    await _scatta(
+      t,
+      const SchermataTag(tag: 'festadelquartiere'),
+      '19-tamtam-ritira',
+      prima: () async {
+        await t.tap(find.text('Tam-tam').first);
+        for (var i = 0; i < 4; i++) {
+          await t.runAsync(() => Future<void>.delayed(const Duration(milliseconds: 200)));
+          await t.pump(const Duration(milliseconds: 300));
+        }
+      },
+    );
+    // compositore del super admin: «Ovunque»
+    stato.entra(Io({...ioFinto, 'puo': {...(ioFinto['puo'] as Map), 'superadmin': true}}));
+    await _scatta(
+      t,
+      const SchermataScrivi(),
+      '20-scrivi-ovunque',
+      prima: () async {
+        await t.drag(find.text('FIN DOVE ARRIVA'), const Offset(0, -900));
+        await t.pump(const Duration(milliseconds: 500));
+        await t.tap(find.text('Ovunque'));
+        await t.pump(const Duration(milliseconds: 400));
+      },
+    );
+    stato.entra(Io(ioFinto));
   });
 }

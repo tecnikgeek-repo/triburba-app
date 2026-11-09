@@ -96,12 +96,14 @@ class Post {
       sfocata = j['sfocata'] == true,
       reazioni = Reazioni(j['reazioni'] as Map<String, dynamic>),
       commenti = _i(j['commenti']),
+      condivisioni = _i(j['condivisioni']),
       anteprima = (j['anteprima'] as List? ?? []).map((c) => CommentoBreve(c as Map<String, dynamic>)).toList(),
       portate = (j['portate'] as List? ?? []).map((p) => Portata(p as Map<String, dynamic>)).toList(),
       citta = j['citta'] == true,
       area = j['area'] == true,
       rilanci = _i(j['rilanci']),
       mioRilancio = j['mio_rilancio'] == true,
+      mieiTamtam = (j['miei_tamtam'] as List? ?? []).map((e) => '$e').toList(),
       soglia = _i(j['soglia']),
       link = j['link'] is Map ? AnteprimaLink(j['link'] as Map<String, dynamic>) : null,
       candidatura = j['candidatura'] is Map ? j['candidatura'] as Map<String, dynamic> : null,
@@ -120,11 +122,18 @@ class Post {
   String testo;
   final Faccia autore;
   final QuartiereBreve? quartiere;
-  final bool daComune, sfocata, citta, area, puoModificare, puoEliminare, puoTamtam;
+  final bool daComune, sfocata, area, puoModificare, puoEliminare, puoTamtam;
+  bool citta;
   final String? immagine, nascosto;
   final Reazioni reazioni;
   int commenti;
+
+  /// Persone che hanno condiviso il post (chi condivide più volte conta una volta).
+  int condivisioni;
   final List<CommentoBreve> anteprima;
+
+  /// Tam-tam fatti da me, che posso ritirare: «c:1», «q:12», «m:7».
+  final List<String> mieiTamtam;
   final List<Portata> portate;
   int rilanci, soglia;
   bool mioRilancio, segnalato, puoSegnalare;
@@ -292,6 +301,7 @@ class Io {
   bool get puoCommentare => _puo('commentare');
   bool get residente => _puo('residente');
   bool get admin => _puo('admin');
+  bool get superadmin => _puo('superadmin');
   bool get fotoPost => _puo('foto');
 
   int get maxPost => _i((j['limiti'] as Map?)?['post']);

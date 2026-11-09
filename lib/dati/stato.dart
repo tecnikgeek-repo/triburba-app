@@ -60,6 +60,10 @@ late Stato stato;
 Map<String, dynamic>? destinazioneDaLink(String link) {
   var l = link;
   if (l.startsWith(sito)) l = l.substring(sito.length);
+  final pp = RegExp(r'^/p/(\d+)').firstMatch(l);
+  if (pp != null) return {'tipo': 'post', 'id': int.parse(pp.group(1)!)};
+  final tg = RegExp(r'^/tag/([^/?#]+)').firstMatch(l);
+  if (tg != null) return {'tipo': 'tag', 'tag': Uri.decodeComponent(tg.group(1)!)};
   final p = RegExp(r'^/u/([^#/?]+)#p(\d+)').firstMatch(l);
   if (p != null) return {'tipo': 'post', 'id': int.parse(p.group(2)!), 'username': Uri.decodeComponent(p.group(1)!)};
   final u = RegExp(r'^/u/([^#/?]+)').firstMatch(l);

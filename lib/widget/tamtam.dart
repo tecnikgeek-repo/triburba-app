@@ -13,7 +13,7 @@ Future<Mappa> mappaInMemoria({bool ricarica = false}) async {
   return _mappaInMemoria!;
 }
 
-/// Ritorna true se il post è cambiato (rilancio fatto).
+/// Ritorna true se il post è cambiato (tam-tam fatto o ritirato).
 Future<bool> apriTamtam(BuildContext context, Post p) async {
   final t = stato.io?.tamtam ?? const {};
   final dest = await showModalBottomSheet<String>(
@@ -49,6 +49,7 @@ Future<bool> apriTamtam(BuildContext context, Post p) async {
                 testo: p.mioRilancio ? 'Hai già rilanciato: tocca per ritirare il tuo voto.' : (t['nota'] ?? ''),
                 attivo: !p.citta || p.mioRilancio,
                 evidenza: p.mioRilancio,
+                ritira: p.mioRilancio,
                 onTap: () => Navigator.pop(c, 'c:1'),
               ),
               const SizedBox(height: 16),
@@ -74,6 +75,8 @@ Future<bool> apriTamtam(BuildContext context, Post p) async {
                     colore: golfo,
                     titolo: mu.nome,
                     testo: 'Tutti i quartieri della municipalità',
+                    evidenza: p.mieiTamtam.contains('m:${mu.id}'),
+                    ritira: p.mieiTamtam.contains('m:${mu.id}'),
                     onTap: () => Navigator.pop(c, 'm:${mu.id}'),
                   ),
                 for (final q in m.tutti.where((q) => q.nome != p.quartiere?.nome))
@@ -82,6 +85,8 @@ Future<bool> apriTamtam(BuildContext context, Post p) async {
                     colore: colore(q.colore),
                     titolo: q.nome,
                     testo: q.citta == 'Napoli' ? '${q.residenti} residenti' : q.citta,
+                    evidenza: p.mieiTamtam.contains('q:${q.id}'),
+                    ritira: p.mieiTamtam.contains('q:${q.id}'),
                     onTap: () => Navigator.pop(c, 'q:${q.id}'),
                   ),
               ],
@@ -92,12 +97,26 @@ Future<bool> apriTamtam(BuildContext context, Post p) async {
     ),
   );
   if (dest == null || !context.mounted) return false;
+  final ritira = dest == 'c:1' ? p.mioRilancio : p.mieiTamtam.contains(dest);
   try {
+    if (ritira) {
+      final j = await stato.api.ritiraTamtam(p.id, dest);
+      p.mieiTamtam.remove(dest);
+      if (j['citta'] == true) {
+        p.mioRilancio = false;
+        p.rilanci = (j['rilanci'] as num? ?? 0).toInt();
+        p.citta = j['arrivato'] == true;
+      } else {
+        p.portate.removeWhere((x) => x.nome == '${j['nome']}');
+      }
+      if (context.mounted) messaggio(context, (j['msg'] ?? 'Tam-tam ritirato').toString());
+      return true;
+    }
     final msg = await stato.api.tamtam(p.id, dest);
+    if (!p.mieiTamtam.contains(dest)) p.mieiTamtam.add(dest);
     if (dest == 'c:1') {
-      p.mioRilancio = !p.mioRilancio;
-      p.rilanci += p.mioRilancio ? 1 : -1;
-      if (p.rilanci < 0) p.rilanci = 0;
+      p.mioRilancio = true;
+      p.rilanci += 1;
     }
     if (context.mounted) messaggio(context, msg);
     return true;
@@ -116,6 +135,7 @@ class _Opzione extends StatelessWidget {
     required this.onTap,
     this.attivo = true,
     this.evidenza = false,
+    this.ritira = false,
   });
 
   final IconData icona;
@@ -124,12 +144,18 @@ class _Opzione extends StatelessWidget {
   final VoidCallback onTap;
   final bool attivo, evidenza;
 
+  /// Tam-tam già fatto da me: mostra «RITIRA» e toccandolo si annulla.
+  final bool ritira;
+
   @override
   Widget build(BuildContext context) => Padding(
     padding: const EdgeInsets.only(bottom: 8),
     child: Material(
       color: evidenza ? colore.withValues(alpha: .16) : superficie2,
-      borderRadius: BorderRadius.circular(12),
+      shape: RoundedRectangleBorder(
+        borderRadius: BorderRadius.circular(12),
+        side: ritira ? BorderSide(color: terracotta.withValues(alpha: .6)) : BorderSide.none,
+      ),
       child: InkWell(
         borderRadius: BorderRadius.circular(12),
         onTap: attivo ? onTap : null,
@@ -153,6 +179,16 @@ class _Opzione extends StatelessWidget {
                   ],
                 ),
               ),
+              if (ritira)
+                Container(
+                  margin: const EdgeInsets.only(left: 8),
+                  padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
+                  decoration: BoxDecoration(color: terracotta.withValues(alpha: .18), borderRadius: BorderRadius.circular(99)),
+                  child: const Text(
+                    'RITIRA',
+                    style: TextStyle(color: terracotta, fontSize: 11, fontWeight: FontWeight.w800, letterSpacing: .6),
+                  ),
+                ),
             ],
           ),
         ),

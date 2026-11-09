@@ -493,6 +493,25 @@ final utenteFinto = {
   },
 };
 
+// post con bollini (12 commenti, 1000 condivisioni), @triburba, hashtag e tam-tam già fatti da me
+final postTag = {
+  ...post(
+    9,
+    'Sabato la #festaDelQuartiere in piazza: musica, giochi e panzarotti. Portate i bambini! @triburba #napoli',
+    autore: faccia('marco.e', 'Marco Esposito', colori: ['#1aa39a', '#2b6cb0']),
+    reazioni: 23,
+    top: ['cuore', 'applauso'],
+    chi: 'Anna Rossi e altre 22 persone',
+    commenti: 12,
+  ),
+  'condivisioni': 1000,
+  'mio_rilancio': true,
+  'rilanci': 2,
+  'miei_tamtam': ['c:1', 'm:7'],
+};
+
+final tagFinto = {'ok': true, 'tag': 'festadelquartiere', 'post': [postTag], 'n_post': 1, 'seguaci': 4, 'seguo': false};
+
 http.Client clientFinto() => MockClient((r) async {
   final p = r.url.path;
   Object j = {'ok': false, 'error': 'non previsto: $p'};
@@ -504,5 +523,6 @@ http.Client clientFinto() => MockClient((r) async {
   if (p == '/app/v1/notifiche') j = notificheFinte;
   if (p.startsWith('/app/v1/quartiere/')) j = quartiereFinto;
   if (p.startsWith('/app/v1/utente/')) j = utenteFinto;
+  if (p.startsWith('/app/v1/tag/')) j = tagFinto;
   return http.Response.bytes(utf8.encode(jsonEncode(j)), 200, headers: {'content-type': 'application/json; charset=utf-8'});
 });
