@@ -1,4 +1,4 @@
-// Struttura dell'app: barra in basso (Home, Tribù, Scrivi, Notifiche, Profilo) e apertura delle destinazioni
+// Struttura dell'app: barra in basso (Home, Mappa, Scrivi, Notifiche, Profilo) e apertura delle destinazioni
 // che arrivano da notifiche push e link.
 import 'dart:async';
 
@@ -119,7 +119,7 @@ class _SchermataHomeState extends State<SchermataHome> with WidgetsBindingObserv
         },
         destinations: [
           const NavigationDestination(icon: Icon(Icons.home_outlined), selectedIcon: Icon(Icons.home_rounded), label: 'Home'),
-          const NavigationDestination(icon: Icon(Icons.map_outlined), selectedIcon: Icon(Icons.map_rounded), label: 'Tribù'),
+          const NavigationDestination(icon: Icon(Icons.map_outlined), selectedIcon: Icon(Icons.map_rounded), label: 'Mappa'),
           NavigationDestination(
             icon: Container(
               width: 50,

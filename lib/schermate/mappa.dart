@@ -56,7 +56,7 @@ class _SchermataMappaState extends State<SchermataMappa> {
   Widget build(BuildContext context) {
     final m = _m;
     return Scaffold(
-      appBar: AppBar(title: const Text('Le tribù')),
+      appBar: AppBar(title: const Text('Mappa')),
       body: m == null
           ? Center(
               child: _errore == null
