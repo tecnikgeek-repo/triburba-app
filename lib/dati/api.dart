@@ -257,6 +257,10 @@ class Api {
 
   Future<Map<String, dynamic>> chiediZona(String chiave) => post('/app/v1/comune/chiedi', {'chiave': chiave});
 
+  /// Follower ('follower') o Seguiti ('seguiti') di una persona, 25 per pagina
+  Future<Map<String, dynamic>> elencoFollow(String username, String tipo, {int pagina = 1}) =>
+      get('/app/v1/utente/${Uri.encodeComponent(username)}/$tipo', {if (pagina > 1) 'pagina': '$pagina'});
+
   Future<Map<String, dynamic>> utente(String username, {int prima = 0}) =>
       get('/app/v1/utente/${Uri.encodeComponent(username)}', {if (prima > 0) 'prima': '$prima'});
 

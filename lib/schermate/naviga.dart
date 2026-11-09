@@ -8,6 +8,7 @@ import '../dati/stato.dart';
 import '../tema.dart';
 import '../widget/emoji.dart';
 import '../widget/faccia.dart';
+import 'follow.dart';
 import 'post.dart';
 import 'quartiere.dart';
 import 'tag.dart';
@@ -18,6 +19,9 @@ final chiaveNavigazione = GlobalKey<NavigatorState>();
 Route<T> _via<T>(Widget w) => MaterialPageRoute<T>(builder: (_) => w);
 
 Future<void> apriUtente(BuildContext context, String username) => Navigator.of(context).push(_via(SchermataUtente(username: username)));
+
+Future<void> apriFollow(BuildContext context, String username, String nome, {bool seguiti = false}) =>
+    Navigator.of(context).push(_via(SchermataFollow(username: username, nome: nome, seguiti: seguiti)));
 
 Future<void> apriQuartiere(BuildContext context, String slug) => Navigator.of(context).push(_via(SchermataQuartiere(slug: slug)));
 

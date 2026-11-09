@@ -15,6 +15,7 @@ import 'package:triburba/dati/stato.dart';
 import 'package:triburba/main.dart';
 import 'package:triburba/schermate/accesso.dart';
 import 'package:triburba/schermate/feed.dart';
+import 'package:triburba/schermate/follow.dart';
 import 'package:triburba/schermate/home.dart';
 import 'package:triburba/schermate/naviga.dart';
 import 'package:triburba/schermate/post.dart';
@@ -207,6 +208,9 @@ void main() {
     // profilo di un altro: tasto «Segui già» su una riga
     utenteFinto['utente'] = {...(utenteFinto['utente'] as Map), 'io': false, 'seguo': true, 'residente': false};
     await _scatta(t, const SchermataUtente(username: 'anna.rossi'), '17-profilo-segui-gia');
+
+    // numeri del profilo cliccabili: elenco Follower / Seguiti
+    await _scatta(t, const SchermataFollow(username: 'anna.rossi', nome: 'Anna Rossi'), '21-follower');
 
     // 1.0.10: pagina #tag con bollini, @triburba e hashtag nel testo
     await _scatta(t, const SchermataTag(tag: 'festadelquartiere'), '18-tag-bollini');

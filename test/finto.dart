@@ -516,6 +516,21 @@ final tagFinto = {'ok': true, 'tag': 'festadelquartiere', 'post': [postTag], 'n_
 /// Forme vere della mappa (zone spente, regione, San Pietro a Patierno acceso) prese dal server il 09/11/2026.
 Map<String, dynamic> mappaVera() => jsonDecode(File('test/mappa_vera.json').readAsStringSync()) as Map<String, dynamic>;
 
+final followFinti = {
+  'ok': true,
+  'tipo': 'follower',
+  'totale': 4,
+  'pagina': 1,
+  'altri': false,
+  'conti': {'followers': 4, 'following': 2},
+  'persone': [
+    {'faccia': faccia('marco.e', 'Marco Esposito', colori: ['#1aa39a', '#2b6cb0']), 'quartiere': 'Borgo Fiorito', 'seguo': true, 'io': false},
+    {'faccia': faccia('giulia.f', 'Giulia Ferraro', colori: ['#7b4bd6', '#e0663a']), 'quartiere': 'Borgo Fiorito', 'seguo': false, 'io': false},
+    {'faccia': faccia('pietro.de.filippis', 'Pietro De Filippis'), 'quartiere': 'Borgo Fiorito', 'seguo': false, 'io': true},
+    {'faccia': faccia('luca.m', 'Luca Marino con un nome molto lungo da accorciare', colori: ['#ef4b3f', '#e0663a']), 'quartiere': 'Porto', 'seguo': false, 'io': false},
+  ],
+};
+
 http.Client clientFinto() => MockClient((r) async {
   final p = r.url.path;
   Object j = {'ok': false, 'error': 'non previsto: $p'};
@@ -527,6 +542,7 @@ http.Client clientFinto() => MockClient((r) async {
   if (p == '/app/v1/notifiche') j = notificheFinte;
   if (p.startsWith('/app/v1/quartiere/')) j = quartiereFinto;
   if (p.startsWith('/app/v1/utente/')) j = utenteFinto;
+  if (p.endsWith('/follower') || p.endsWith('/seguiti')) j = followFinti;
   if (p.startsWith('/app/v1/tag/')) j = tagFinto;
   return http.Response.bytes(utf8.encode(jsonEncode(j)), 200, headers: {'content-type': 'application/json; charset=utf-8'});
 });

@@ -27,7 +27,26 @@ class SchermataUtente extends StatefulWidget {
 class _SchermataUtenteState extends State<SchermataUtente> {
   Map<String, dynamic>? _u;
   final _lista = GlobalKey<ListaPostState>();
+  final _scorri = ScrollController();
+  final _chiaveTesta = GlobalKey();
   bool _occupato = false;
+
+  @override
+  void dispose() {
+    _scorri.dispose();
+    super.dispose();
+  }
+
+  /// Il numero «post» scorre fino al primo post, sotto la testata del profilo
+  void _vaiAiPost() {
+    final h = _chiaveTesta.currentContext?.size?.height;
+    if (h == null || !_scorri.hasClients) return;
+    _scorri.animateTo(
+      (h + 4).clamp(0, _scorri.position.maxScrollExtent).toDouble(),
+      duration: const Duration(milliseconds: 450),
+      curve: Curves.easeOutCubic,
+    );
+  }
 
   Future<(List<Post>, bool)> _carica(int prima) async {
     final j = await stato.api.utente(widget.username, prima: prima);
@@ -72,8 +91,9 @@ class _SchermataUtenteState extends State<SchermataUtente> {
       ),
       body: ListaPost(
         key: _lista,
+        controller: _scorri,
         carica: _carica,
-        testa: u == null ? null : _testa(u),
+        testa: u == null ? null : KeyedSubtree(key: _chiaveTesta, child: _testa(u)),
         vuoto: Vuoto(
           icona: Icons.edit_note_rounded,
           testo: u?['io'] == true ? 'Non hai ancora scritto niente. Il tuo quartiere ti aspetta!' : 'Non ha ancora scritto niente.',
@@ -185,9 +205,9 @@ class _SchermataUtenteState extends State<SchermataUtente> {
               const SizedBox(height: 14),
               Row(
                 children: [
-                  _numero('${conti['post'] ?? 0}', 'post'),
-                  _numero('${conti['followers'] ?? 0}', 'follower'),
-                  _numero('${conti['following'] ?? 0}', 'seguiti'),
+                  _numero('${conti['post'] ?? 0}', 'post', onTap: _vaiAiPost),
+                  _numero('${conti['followers'] ?? 0}', 'follower', onTap: () => apriFollow(context, f.username, f.nome)),
+                  _numero('${conti['following'] ?? 0}', 'seguiti', onTap: () => apriFollow(context, f.username, f.nome, seguiti: true)),
                   _numero('${att['reazioni'] ?? 0}', 'reazioni'),
                 ],
               ),
@@ -209,12 +229,19 @@ class _SchermataUtenteState extends State<SchermataUtente> {
     ],
   );
 
-  Widget _numero(String n, String t) => Expanded(
-    child: Column(
-      children: [
-        Text(n, style: titolo(20)),
-        Text(t, style: const TextStyle(color: muto, fontSize: 12)),
-      ],
+  Widget _numero(String n, String t, {VoidCallback? onTap}) => Expanded(
+    child: InkWell(
+      onTap: onTap,
+      borderRadius: BorderRadius.circular(10),
+      child: Padding(
+        padding: const EdgeInsets.symmetric(vertical: 6),
+        child: Column(
+          children: [
+            Text(n, style: titolo(20)),
+            Text(t, style: TextStyle(color: onTap != null ? testo2 : muto, fontSize: 12)),
+          ],
+        ),
+      ),
     ),
   );
 }
