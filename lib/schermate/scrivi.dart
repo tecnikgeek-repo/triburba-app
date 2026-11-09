@@ -231,9 +231,21 @@ class _SchermataScriviState extends State<SchermataScrivi> {
                 const SizedBox(height: 12),
                 SegmentedButton<String>(
                   segments: const [
-                    ButtonSegment(value: 'post', label: Text('Post'), icon: Icon(Icons.edit_note_rounded)),
-                    ButtonSegment(value: 'attivita', label: Text('Attività'), icon: Icon(Icons.handshake_outlined)),
-                    ButtonSegment(value: 'sondaggio', label: Text('Sondaggio'), icon: Icon(Icons.how_to_vote_outlined)),
+                    ButtonSegment(
+                      value: 'post',
+                      label: FittedBox(fit: BoxFit.scaleDown, child: Text('Post', maxLines: 1, softWrap: false)),
+                      icon: Icon(Icons.edit_note_rounded),
+                    ),
+                    ButtonSegment(
+                      value: 'attivita',
+                      label: FittedBox(fit: BoxFit.scaleDown, child: Text('Attività', maxLines: 1, softWrap: false)),
+                      icon: Icon(Icons.handshake_outlined),
+                    ),
+                    ButtonSegment(
+                      value: 'sondaggio',
+                      label: FittedBox(fit: BoxFit.scaleDown, child: Text('Sondaggio', maxLines: 1, softWrap: false)),
+                      icon: Icon(Icons.how_to_vote_outlined),
+                    ),
                   ],
                   selected: {_tipo},
                   showSelectedIcon: false,
@@ -241,6 +253,10 @@ class _SchermataScriviState extends State<SchermataScrivi> {
                     foregroundColor: WidgetStateProperty.resolveWith((st) => st.contains(WidgetState.selected) ? bianco : testo),
                     backgroundColor: WidgetStateProperty.resolveWith((st) => st.contains(WidgetState.selected) ? terracotta : superficie),
                     side: const WidgetStatePropertyAll(BorderSide(color: linea2)),
+                    padding: const WidgetStatePropertyAll(EdgeInsets.symmetric(horizontal: 8)),
+                    iconSize: const WidgetStatePropertyAll(18),
+                    textStyle: const WidgetStatePropertyAll(TextStyle(fontFamily: 'Inter', fontSize: 14.5, fontWeight: FontWeight.w600)),
+                    visualDensity: VisualDensity.compact,
                   ),
                   onSelectionChanged: (v) => setState(() => _tipo = v.first),
                 ),
