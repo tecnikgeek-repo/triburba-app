@@ -4,6 +4,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 
 import 'kit_tk.dart';
+import 'widget/icona_tk.dart';
 
 export 'kit_tk.dart';
 
@@ -231,10 +232,12 @@ class Carta extends StatelessWidget {
 
 /// Pastiglia con il colore del quartiere (come i «reach-chip» del sito).
 class Chip2 extends StatelessWidget {
-  const Chip2({super.key, required this.testo, this.icona, this.colore = terracotta, this.onTap, this.tenue = false});
+  const Chip2({super.key, required this.testo, this.icona, this.iconaTk, this.colore = terracotta, this.onTap, this.tenue = false});
 
   final String testo;
   final IconData? icona;
+  /// nome di un'icona disegnata come sul sito (IconaTk), al posto di [icona]
+  final String? iconaTk;
   final Color colore;
   final VoidCallback? onTap;
   final bool tenue;
@@ -251,7 +254,8 @@ class Chip2 extends StatelessWidget {
       child: Row(
         mainAxisSize: MainAxisSize.min,
         children: [
-          if (icona != null) ...[Icon(icona, size: 13, color: colore), const SizedBox(width: 4)],
+          if (iconaTk != null) ...[IconaTk(iconaTk!, lato: 14, colore: colore), const SizedBox(width: 4)]
+          else if (icona != null) ...[Icon(icona, size: 13, color: colore), const SizedBox(width: 4)],
           Flexible(
             child: Text(
               testo,

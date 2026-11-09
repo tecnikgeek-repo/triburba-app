@@ -16,6 +16,7 @@ import '../tema.dart';
 import 'emoji.dart';
 import 'faccia.dart';
 import 'bollino.dart';
+import 'icona_tk.dart';
 import 'iniziativa.dart';
 import 'tamtam.dart';
 import 'testo_ricco.dart';
@@ -344,7 +345,7 @@ class _PostCardState extends State<PostCard> {
       chips.add(
         Chip2(
           testo: p.daComune ? "Verso l'area ${p.rilanci}" : 'Verso Napoli ${p.rilanci}/${p.soglia}',
-          icona: Icons.campaign_outlined,
+          iconaTk: 'tamtam',
           colore: oro,
           tenue: true,
         ),
@@ -538,7 +539,7 @@ class _PostCardState extends State<PostCard> {
       child: Row(
         children: [
           _azione(
-            icona: mia == null ? const Icon(Icons.favorite_border, color: testo2, size: 22) : Emoji(mia, lato: 22),
+            icona: mia == null ? const IconaTk('heart', lato: 22, colore: testo2) : Emoji(mia, lato: 22),
             testo: mia == null ? 'Mi piace' : (nomiReazioni[mia] ?? 'Mi piace'),
             colore: mia == null ? testo2 : (mia == 'cuore' ? pompeiano : oro),
             onTap: () => _reagisci(mia ?? 'cuore'),
@@ -549,14 +550,14 @@ class _PostCardState extends State<PostCard> {
           ),
           _azione(
             icona: IconaConBollino(
-              icona: const Icon(Icons.chat_bubble_outline, color: testo2, size: 21),
+              icona: const IconaTk('comment', lato: 22, colore: testo2),
               n: p.commenti,
             ),
             testo: p.commenti == 0 ? 'Commenta' : (p.commenti == 1 ? 'Commento' : 'Commenti'),
             onTap: _apriCommenti,
           ),
           _azione(
-            icona: Icon(Icons.campaign_outlined, color: p.mioRilancio ? oro : testo2, size: 23),
+            icona: IconaTk('tamtam', lato: 24, colore: p.mioRilancio ? oro : testo2),
             testo: 'Tam-tam',
             colore: p.mioRilancio ? oro : testo2,
             onTap: () async {
@@ -573,7 +574,7 @@ class _PostCardState extends State<PostCard> {
           ),
           _azione(
             icona: IconaConBollino(
-              icona: const Icon(Icons.share_outlined, color: testo2, size: 21),
+              icona: const IconaTk('share', lato: 22, colore: testo2),
               n: p.condivisioni,
             ),
             testo: 'Condividi',

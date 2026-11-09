@@ -1,4 +1,5 @@
 // Tam-tam: far girare un post alle altre tribù (un quartiere, una municipalità) o rilanciarlo a tutta la città.
+import 'icona_tk.dart';
 import 'package:flutter/material.dart';
 
 import '../dati/api.dart';
@@ -33,7 +34,7 @@ Future<bool> apriTamtam(BuildContext context, Post p) async {
             children: [
               Row(
                 children: [
-                  const Icon(Icons.campaign_outlined, color: oro, size: 28),
+                  const IconaTk('tamtam', lato: 28, colore: oro),
                   const SizedBox(width: 8),
                   Expanded(child: Text('Tam-tam', style: titolo(24))),
                 ],
