@@ -20,6 +20,7 @@ import 'package:triburba/schermate/post.dart';
 import 'package:triburba/schermate/primo_accesso.dart';
 import 'package:triburba/schermate/quartiere.dart';
 import 'package:triburba/schermate/scrivi.dart';
+import 'package:triburba/schermate/utente.dart';
 import 'package:triburba/tema.dart';
 
 import 'caratteri.dart';
@@ -168,5 +169,9 @@ void main() {
     stato.entra(Io({...ioFinto, 'guida': guidaFinta(completa: true)}));
     await _scatta(t, const SchermataFeed(), '16-primi-passi-fatti');
     stato.entra(Io(ioFinto));
+
+    // profilo di un altro: tasto «Segui già» su una riga
+    utenteFinto['utente'] = {...(utenteFinto['utente'] as Map), 'io': false, 'seguo': true, 'residente': false};
+    await _scatta(t, const SchermataUtente(username: 'anna.rossi'), '17-profilo-segui-gia');
   });
 }

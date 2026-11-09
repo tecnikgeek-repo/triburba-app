@@ -124,8 +124,8 @@ class _SchermataUtenteState extends State<SchermataUtente> {
                         icon: const Icon(Icons.edit_outlined, size: 18),
                         label: const Text('Modifica'),
                       )
-                    : SizedBox(
-                        width: 130,
+                    : ConstrainedBox(
+                        constraints: const BoxConstraints(minWidth: 130),
                         child: u['seguo'] == true
                             ? OutlinedButton.icon(
                                 onPressed: _occupato ? null : _segui,
@@ -147,7 +147,7 @@ class _SchermataUtenteState extends State<SchermataUtente> {
                 children: [
                   Flexible(child: Text(f.nome, style: titolo(24))),
                   const SizedBox(width: 6),
-                  StemmaMini(stemma: f.stemma, altezza: 22),
+                  StemmaMini(stemma: f.stemma, altezza: 34),
                   if (f.bot) ...[const SizedBox(width: 6), const PillaProva()],
                 ],
               ),
