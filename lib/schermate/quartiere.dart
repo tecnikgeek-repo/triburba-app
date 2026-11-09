@@ -37,7 +37,7 @@ class _SchermataQuartiereState extends State<SchermataQuartiere> {
     if (!await conferma(
       context,
       'Abiti a ${q['nome']}?',
-      'Diventa la tua tribù: lì potrai scrivere quando due vicini già confermati garantiranno per te. Il quartiere di casa si cambia al massimo una volta al mese.',
+      'Diventa la tua tribù: lì potrai scrivere quando ${stato.io?.viciniGaranti ?? 'i vicini'} già confermati garantiranno per te. Il quartiere di casa si cambia al massimo una volta al mese.',
       si: 'Sì, abito qui',
       pericolo: false,
     )) {

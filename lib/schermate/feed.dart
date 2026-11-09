@@ -130,7 +130,7 @@ class SchermataFeedState extends State<SchermataFeed> with TickerProviderStateMi
                       text: 'Residenza in attesa a ${casa['nome']}. ',
                       style: const TextStyle(fontWeight: FontWeight.w700),
                     ),
-                    const TextSpan(text: 'Due vicini già confermati devono garantire per te: poi potrai pubblicare.'),
+                    TextSpan(text: 'Servono ${stato.io!.viciniGaranti} già confermati che garantiscano per te: poi potrai pubblicare.'),
                   ],
                 ),
                 style: const TextStyle(fontSize: 13, color: testo2, height: 1.35),

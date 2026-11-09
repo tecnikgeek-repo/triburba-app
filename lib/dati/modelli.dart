@@ -212,6 +212,13 @@ class Io {
   Map<String, dynamic>? get casa => j['casa'] as Map<String, dynamic>?;
   String? get residenza => _s(j['residenza']);
   int get giorniCambio => _i(j['giorni_cambio']);
+  int get garanzieMin => j['garanzie_min'] == null ? 2 : _i(j['garanzie_min']);
+
+  /// «tre vicini» (con la soglia vera del sito)
+  String get viciniGaranti {
+    const l = {1: 'un vicino', 2: 'due vicini', 3: 'tre vicini', 4: 'quattro vicini', 5: 'cinque vicini'};
+    return l[garanzieMin] ?? '$garanzieMin vicini';
+  }
 
   bool _puo(String k) => (j['puo'] as Map?)?[k] == true;
   bool get puoPubblicare => _puo('pubblicare');

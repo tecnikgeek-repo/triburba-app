@@ -119,7 +119,7 @@ class _SchermataScriviState extends State<SchermataScrivi> {
                   Text(
                     casa == null
                         ? 'Su triburba si scrive nella propria tribù: scegli il quartiere dove abiti dalla mappa.'
-                        : 'Per pubblicare a ${casa['nome']} servono le garanzie di due vicini già confermati. Intanto puoi leggere, reagire e commentare.',
+                        : 'Per pubblicare a ${casa['nome']} servono le garanzie di ${io.viciniGaranti} già confermati. Intanto puoi leggere, reagire e commentare.',
                     textAlign: TextAlign.center,
                     style: const TextStyle(color: testo2, height: 1.45),
                   ),

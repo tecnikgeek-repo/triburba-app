@@ -545,7 +545,10 @@ class _PostCardState extends State<PostCard> {
             colore: p.mioRilancio ? oro : testo2,
             onTap: () async {
               if (!p.puoTamtam) {
-                messaggio(context, 'Il tam-tam lo fanno i residenti confermati: chiedi a due vicini di garantire per te.');
+                messaggio(
+                  context,
+                  'Il tam-tam lo fanno i residenti confermati: chiedi a ${stato.io?.viciniGaranti ?? 'i vicini'} di garantire per te.',
+                );
                 return;
               }
               final ok = await apriTamtam(context, p);
