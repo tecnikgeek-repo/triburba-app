@@ -381,7 +381,15 @@ class Mappa {
           )
           .toList(),
       sogliaApertura = _i(j['soglia_apertura']),
-      crediti = _s(j['crediti']) ?? '';
+      crediti = _s(j['crediti']) ?? '',
+      nebbia = (j['nebbia'] as List? ?? [])
+          .map((z) => ZonaGrigia(z as Map<String, dynamic>))
+          .where((z) => z.forma.isNotEmpty && z.box.length == 4)
+          .toList(),
+      regioni = (j['regioni'] as List? ?? [])
+          .map((z) => ZonaGrigia(z as Map<String, dynamic>))
+          .where((z) => z.forma.isNotEmpty && z.box.length == 4)
+          .toList();
 
   final List<(String, List<QuartiereMappa>)> gruppi;
 
@@ -395,7 +403,24 @@ class Mappa {
   final List<({String chiave, String nome, int richieste, bool mia})> spenti;
   final String crediti;
 
+  /// Zone ancora spente (in grigio sulla mappa) e sagome delle regioni sotto, come sul web.
+  final List<ZonaGrigia> nebbia, regioni;
+
   List<QuartiereMappa> get tutti => [for (final g in gruppi) ...g.$2];
+}
+
+/// Una forma grigia della mappa: zona spenta (quartiere di Napoli o comune) o sagoma di una regione.
+class ZonaGrigia {
+  ZonaGrigia(Map<String, dynamic> j)
+    : nome = _s(j['nome']) ?? '',
+      forma = _s(j['forma']) ?? '',
+      box = (j['box'] as List? ?? []).map((e) => (e as num).toDouble()).toList(),
+      napoli = j['tipo'] == 'napoli',
+      dove = _s(j['dove']) ?? '';
+
+  final String nome, forma, dove;
+  final List<double> box;
+  final bool napoli;
 }
 
 /// Un passo della carta «Primi passi»: si spunta da solo coi dati veri del sito.

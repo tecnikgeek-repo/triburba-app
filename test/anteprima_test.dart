@@ -2,6 +2,7 @@
 import 'dart:io';
 import 'dart:ui' as ui;
 
+import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/rendering.dart';
 import 'package:flutter/services.dart';
@@ -26,6 +27,7 @@ import 'package:triburba/tema.dart';
 
 import 'caratteri.dart';
 import 'finto.dart';
+import 'package:triburba/widget/mappa_disegno.dart';
 
 Future<void> _scatta(WidgetTester t, Widget w, String nome, {Future<void> Function()? prima}) async {
   final k = GlobalKey();
@@ -108,6 +110,37 @@ void main() {
           await t.runAsync(() => Future<void>.delayed(const Duration(milliseconds: 200)));
           await t.pump(const Duration(milliseconds: 300));
         }
+      },
+    );
+    // mappa allontanata fino alla Campania col cursore
+    await _scatta(
+      t,
+      const SchermataHome(),
+      '08b-mappa-campania',
+      prima: () async {
+        await t.tap(find.byIcon(Icons.map_outlined));
+        for (var i = 0; i < 3; i++) {
+          await t.runAsync(() => Future<void>.delayed(const Duration(milliseconds: 200)));
+          await t.pump(const Duration(milliseconds: 300));
+        }
+        await t.drag(find.byType(Slider), const Offset(0, 120), warnIfMissed: false);
+        await t.pump(const Duration(milliseconds: 300));
+      },
+    );
+    // etichetta di una zona spenta toccata
+    await _scatta(
+      t,
+      const SchermataHome(),
+      '08c-mappa-etichetta',
+      prima: () async {
+        await t.tap(find.byIcon(Icons.map_outlined));
+        for (var i = 0; i < 3; i++) {
+          await t.runAsync(() => Future<void>.delayed(const Duration(milliseconds: 200)));
+          await t.pump(const Duration(milliseconds: 300));
+        }
+        final r = t.getRect(find.byType(MappaDisegno));
+        await t.tapAt(r.topLeft + Offset(r.width * .3, r.height * .3), kind: PointerDeviceKind.touch);
+        await t.pump(const Duration(milliseconds: 400));
       },
     );
     await _scatta(

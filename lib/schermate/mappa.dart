@@ -1,11 +1,12 @@
-// La mappa delle tribù: forme vere dei quartieri e dei comuni ACCESI (gli altri restano nella nebbia),
-// col colore della loro zona; tocco = apre il quartiere. Sotto, l'elenco e i comuni da far aprire.
+// La mappa delle tribù, come sul web: la regione sotto, le zone spente in grigio, quelle accese a colori
+// (lib/widget/mappa_disegno.dart). Sotto, l'elenco dei quartieri accesi e le zone da far accendere.
 import 'package:flutter/material.dart';
 
 import '../dati/api.dart';
 import '../dati/modelli.dart';
 import '../dati/stato.dart';
 import '../tema.dart';
+import '../widget/mappa_disegno.dart';
 import '../widget/tamtam.dart';
 import 'naviga.dart';
 
@@ -75,12 +76,20 @@ class _SchermataMappaState extends State<SchermataMappa> {
               child: ListView(
                 padding: const EdgeInsets.fromLTRB(12, 4, 12, 90),
                 children: [
-                  _Disegno(mappa: m, onTocco: (q) => apriQuartiere(context, q.slug)),
-                  Padding(
-                    padding: const EdgeInsets.only(top: 6, bottom: 14),
-                    child: Text(
-                      m.crediti,
-                      style: const TextStyle(color: muto, fontSize: 10.5),
+                  MappaDisegno(mappa: m, onApri: (q) => apriQuartiere(context, q.slug)),
+                  const Padding(
+                    padding: EdgeInsets.only(top: 8, bottom: 14),
+                    child: Text.rich(
+                      TextSpan(
+                        children: [
+                          TextSpan(text: 'Confini © '),
+                          TextSpan(text: 'OpenStreetMap', style: TextStyle(color: testo2, fontWeight: FontWeight.w600)),
+                          TextSpan(text: ' ·\nISTAT via '),
+                          TextSpan(text: 'openpolis', style: TextStyle(color: testo2, fontWeight: FontWeight.w600)),
+                          TextSpan(text: ' · CC-BY 4.0'),
+                        ],
+                      ),
+                      style: TextStyle(color: muto, fontSize: 11, height: 1.6, fontFamily: fontTesto),
                       textAlign: TextAlign.center,
                     ),
                   ),
@@ -196,157 +205,4 @@ class _SchermataMappaState extends State<SchermataMappa> {
       ),
     );
   }
-}
-
-/// Le forme dei quartieri accesi, scalate nel riquadro, con zoom e tocco.
-class _Disegno extends StatelessWidget {
-  const _Disegno({required this.mappa, required this.onTocco});
-
-  final Mappa mappa;
-  final void Function(QuartiereMappa) onTocco;
-
-  @override
-  Widget build(BuildContext context) {
-    final forme = [
-      for (final q in mappa.tutti)
-        if (q.forma != null && q.box != null) (q, leggiForma(q.forma!)),
-    ];
-    if (forme.isEmpty) return const SizedBox(height: 8);
-    var x0 = double.infinity, y0 = double.infinity, x1 = -double.infinity, y1 = -double.infinity;
-    for (final (q, _) in forme) {
-      x0 = x0 < q.box![0] ? x0 : q.box![0];
-      y0 = y0 < q.box![1] ? y0 : q.box![1];
-      x1 = x1 > q.box![2] ? x1 : q.box![2];
-      y1 = y1 > q.box![3] ? y1 : q.box![3];
-    }
-    final riquadro = Rect.fromLTRB(x0, y0, x1, y1);
-    return AspectRatio(
-      aspectRatio: 1.15,
-      child: Container(
-        decoration: BoxDecoration(
-          color: vernice2,
-          borderRadius: BorderRadius.circular(14),
-          border: Border.all(color: linea),
-        ),
-        clipBehavior: Clip.antiAlias,
-        child: LayoutBuilder(
-          builder: (c, lim) {
-            final dim = Size(lim.maxWidth, lim.maxHeight);
-            final t = trasforma(riquadro, dim, margine: 28);
-            return InteractiveViewer(
-              maxScale: 8,
-              child: GestureDetector(
-                onTapUp: (d) {
-                  for (final (q, path) in forme.reversed) {
-                    if (path.transform(t.storage).contains(d.localPosition)) {
-                      onTocco(q);
-                      return;
-                    }
-                  }
-                },
-                child: CustomPaint(
-                  size: dim,
-                  painter: _Pittore(forme, t, casa: mappa.casa),
-                ),
-              ),
-            );
-          },
-        ),
-      ),
-    );
-  }
-}
-
-/// Matrice che porta il riquadro della mappa dentro la tela, centrato.
-Matrix4 trasforma(Rect r, Size tela, {double margine = 20}) {
-  final w = r.width <= 0 ? 1.0 : r.width, h = r.height <= 0 ? 1.0 : r.height;
-  final k = ((tela.width - 2 * margine) / w).clamp(0.0, (tela.height - 2 * margine) / h);
-  final dx = (tela.width - w * k) / 2 - r.left * k;
-  final dy = (tela.height - h * k) / 2 - r.top * k;
-  return Matrix4.identity()
-    ..translateByDouble(dx, dy, 0, 1)
-    ..scaleByDouble(k, k, 1, 1);
-}
-
-/// «M x y L x y … Z» (anche più pezzi) → Path.
-Path leggiForma(String d) {
-  final p = Path();
-  final rx = RegExp(r'([MLZ])\s*(-?[\d.]+)?\s*(-?[\d.]+)?', caseSensitive: false);
-  for (final m in rx.allMatches(d)) {
-    final c = m.group(1)!.toUpperCase();
-    if (c == 'Z') {
-      p.close();
-      continue;
-    }
-    final x = double.tryParse(m.group(2) ?? ''), y = double.tryParse(m.group(3) ?? '');
-    if (x == null || y == null) continue;
-    c == 'M' ? p.moveTo(x, y) : p.lineTo(x, y);
-  }
-  return p;
-}
-
-class _Pittore extends CustomPainter {
-  _Pittore(this.forme, this.t, {this.casa});
-
-  final List<(QuartiereMappa, Path)> forme;
-  final Matrix4 t;
-  final int? casa;
-
-  @override
-  void paint(Canvas canvas, Size size) {
-    // griglia sottile di fondo
-    final g = Paint()
-      ..color = bianco.withValues(alpha: .035)
-      ..strokeWidth = 1;
-    for (double x = 0; x < size.width; x += 28) {
-      canvas.drawLine(Offset(x, 0), Offset(x, size.height), g);
-    }
-    for (double y = 0; y < size.height; y += 28) {
-      canvas.drawLine(Offset(0, y), Offset(size.width, y), g);
-    }
-    for (final (q, path) in forme) {
-      final pp = path.transform(t.storage);
-      final col = colore(q.colore);
-      final mia = q.id == casa;
-      canvas.drawPath(pp, Paint()..color = col.withValues(alpha: mia ? .55 : .32));
-      canvas.drawPath(
-        pp,
-        Paint()
-          ..style = PaintingStyle.stroke
-          ..strokeWidth = mia ? 2.4 : 1.4
-          ..color = mia ? oro : col,
-      );
-    }
-    // pallino e nome al centro di ogni forma
-    for (final (q, path) in forme) {
-      final b = path.transform(t.storage).getBounds();
-      final c = b.center;
-      canvas.drawCircle(c, 5, Paint()..color = colore(q.colore));
-      canvas.drawCircle(
-        c,
-        5,
-        Paint()
-          ..style = PaintingStyle.stroke
-          ..strokeWidth = 1.6
-          ..color = bianco,
-      );
-      final tp = TextPainter(
-        text: TextSpan(
-          text: q.nome,
-          style: const TextStyle(
-            color: testo,
-            fontSize: 12.5,
-            fontWeight: FontWeight.w800,
-            fontFamily: fontTesto,
-            shadows: [Shadow(color: Colors.black, blurRadius: 4)],
-          ),
-        ),
-        textDirection: TextDirection.ltr,
-      )..layout(maxWidth: 160);
-      tp.paint(canvas, Offset(c.dx - tp.width / 2, c.dy - 10 - tp.height));
-    }
-  }
-
-  @override
-  bool shouldRepaint(covariant _Pittore old) => old.forme != forme || old.casa != casa;
 }

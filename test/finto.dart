@@ -1,5 +1,6 @@
 // Sito finto per le prove: risponde come triburba.it con dati di esempio neutri.
 import 'dart:convert';
+import 'dart:io';
 
 import 'package:http/http.dart' as http;
 import 'package:http/testing.dart';
@@ -512,6 +513,9 @@ final postTag = {
 
 final tagFinto = {'ok': true, 'tag': 'festadelquartiere', 'post': [postTag], 'n_post': 1, 'seguaci': 4, 'seguo': false};
 
+/// Forme vere della mappa (zone spente, regione, San Pietro a Patierno acceso) prese dal server il 09/11/2026.
+Map<String, dynamic> mappaVera() => jsonDecode(File('test/mappa_vera.json').readAsStringSync()) as Map<String, dynamic>;
+
 http.Client clientFinto() => MockClient((r) async {
   final p = r.url.path;
   Object j = {'ok': false, 'error': 'non previsto: $p'};
@@ -519,7 +523,7 @@ http.Client clientFinto() => MockClient((r) async {
   if (p == '/app/v1/feed') j = {'ok': true, 'scheda': 'perte', 'post': feedFinto, 'altri': false, 'notifiche': 3};
   if (p.startsWith('/app/v1/post/')) j = {'ok': true, 'post': feedFinto.first};
   if (p == '/api/comment/list') j = commentiFinti;
-  if (p == '/app/v1/mappa') j = mappaFinta;
+  if (p == '/app/v1/mappa') j = {...mappaFinta, ...mappaVera()};
   if (p == '/app/v1/notifiche') j = notificheFinte;
   if (p.startsWith('/app/v1/quartiere/')) j = quartiereFinto;
   if (p.startsWith('/app/v1/utente/')) j = utenteFinto;
