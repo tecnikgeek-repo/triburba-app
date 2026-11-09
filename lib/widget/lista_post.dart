@@ -106,7 +106,7 @@ class ListaPostState extends State<ListaPost> with AutomaticKeepAliveClientMixin
         child: ListView.builder(
           controller: widget.controller,
           physics: const AlwaysScrollableScrollPhysics(),
-          padding: const EdgeInsets.only(bottom: 90),
+          padding: const EdgeInsets.only(top: 12, bottom: 90),
           itemCount: pezzi.length + _post.length + (_altri && _post.isNotEmpty ? 1 : 0),
           itemBuilder: (c, i) {
             if (i < pezzi.length) return pezzi[i];
