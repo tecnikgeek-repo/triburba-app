@@ -102,7 +102,7 @@ void main() {
       const SchermataHome(),
       '08-mappa',
       prima: () async {
-        await t.tap(find.text('Tribù'));
+        await t.tap(find.byIcon(Icons.map_outlined));
         for (var i = 0; i < 3; i++) {
           await t.runAsync(() => Future<void>.delayed(const Duration(milliseconds: 200)));
           await t.pump(const Duration(milliseconds: 300));
