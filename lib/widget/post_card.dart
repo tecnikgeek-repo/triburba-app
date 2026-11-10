@@ -16,6 +16,7 @@ import '../tema.dart';
 import 'emoji.dart';
 import 'faccia.dart';
 import 'bollino.dart';
+import '../schermate/moderazione.dart';
 import 'icona_tk.dart';
 import 'iniziativa.dart';
 import 'tamtam.dart';
@@ -423,10 +424,20 @@ class _PostCardState extends State<PostCard> {
           ),
           if (c != null && c['puo_votare'] == true)
             _votoCandidato(c)
-          else if (c != null && p.quartiere?.slug != null && !eletto)
+          else if (c != null && p.quartiere?.slug != null)
+            // porta dritto ai candidati e ai voti (scheda Moderatori), non alla pagina generica del quartiere
             TextButton(
-              onPressed: () => apriQuartiere(context, p.quartiere!.slug!),
-              child: const Text('Vedi la tribù'),
+              onPressed: () async {
+                await Navigator.of(context).push(
+                  MaterialPageRoute<void>(builder: (_) => SchermataModerazione(slug: p.quartiere!.slug!)),
+                );
+                if (mounted) setState(() {});
+              },
+              child: Text(
+                (c['candidato_id'] as num?)?.toInt() == stato.io?.id
+                    ? 'I tuoi voti'
+                    : (eletto ? 'Moderatori' : 'Vedi i candidati'),
+              ),
             ),
         ],
       ),
