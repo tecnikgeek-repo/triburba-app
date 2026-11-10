@@ -185,9 +185,12 @@ class _SchermataUtenteState extends State<SchermataUtente> {
                 bottom: 40,
                 child: copertina != null
                     ? GestureDetector(
-                    onTap: () => apriFoto(context, copertina),
-                    child: CachedNetworkImage(imageUrl: copertina, fit: BoxFit.cover),
-                  )
+                        onTap: () => apriFoto(context, copertina, titolo: f.nome, sottotitolo: 'Copertina'),
+                        child: Hero(
+                          tag: 'foto-$copertina',
+                          child: CachedNetworkImage(imageUrl: copertina, fit: BoxFit.cover),
+                        ),
+                      )
                     : const DecoratedBox(decoration: BoxDecoration(gradient: gradiente)),
               ),
               Positioned(
@@ -197,12 +200,17 @@ class _SchermataUtenteState extends State<SchermataUtente> {
                   padding: const EdgeInsets.all(3),
                   decoration: const BoxDecoration(color: vernice, shape: BoxShape.circle),
                   // tocco sulla foto: si apre grande (le iniziali senza foto non si aprono)
-                  child: GestureDetector(
-                    onTap: () {
+                  child: Builder(
+                    builder: (context) {
                       final a = img(f.foto);
-                      if (a != null && !a.startsWith('data:')) apriFoto(context, a);
+                      final apribile = a != null && !a.startsWith('data:');
+                      final foto = FotoProfilo(faccia: f, lato: 88, anello: true);
+                      if (!apribile) return foto;
+                      return GestureDetector(
+                        onTap: () => apriFoto(context, a, titolo: f.nome, sottotitolo: 'Foto profilo · @${f.username}', tondo: true),
+                        child: Hero(tag: 'foto-$a', child: foto),
+                      );
                     },
-                    child: FotoProfilo(faccia: f, lato: 88, anello: true),
                   ),
                 ),
               ),

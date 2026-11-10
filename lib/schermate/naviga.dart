@@ -1,5 +1,4 @@
 // Aperture comuni: post, persone, quartieri, foto a tutto schermo, chi ha reagito.
-import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
 
 import '../dati/api.dart';
@@ -8,6 +7,7 @@ import '../dati/stato.dart';
 import '../tema.dart';
 import '../widget/emoji.dart';
 import '../widget/faccia.dart';
+import '../widget/visore_foto.dart';
 import 'package:share_plus/share_plus.dart';
 
 import '../widget/da_fare.dart';
@@ -87,23 +87,18 @@ Future<void> apriDestinazione(BuildContext context, Map<String, dynamic> vai) as
   }
 }
 
-Future<void> apriFoto(BuildContext context, String url) => Navigator.of(context).push(
-  PageRouteBuilder(
-    opaque: false,
-    barrierColor: Colors.black,
-    pageBuilder: (c, _, _) => Scaffold(
-      backgroundColor: Colors.black,
-      appBar: AppBar(backgroundColor: Colors.black, foregroundColor: bianco),
-      body: Center(
-        child: InteractiveViewer(
-          maxScale: 5,
-          child: CachedNetworkImage(imageUrl: url, fit: BoxFit.contain),
-        ),
+/// Foto a tutto schermo con il visore «wouuu» (animazione dalla foto toccata, sfondo sfocato, zoom, trascina giù).
+Future<void> apriFoto(BuildContext context, String url, {String? titolo, String? sottotitolo, bool tondo = false}) =>
+    Navigator.of(context).push(
+      PageRouteBuilder(
+        opaque: false,
+        barrierColor: Colors.transparent,
+        transitionDuration: const Duration(milliseconds: 320),
+        reverseTransitionDuration: const Duration(milliseconds: 240),
+        pageBuilder: (c, _, _) => VisoreFoto(url: url, titolo: titolo, sottotitolo: sottotitolo, tondo: tondo),
+        transitionsBuilder: (_, a, _, child) => FadeTransition(opacity: CurvedAnimation(parent: a, curve: Curves.easeOut), child: child),
       ),
-    ),
-    transitionsBuilder: (_, a, _, child) => FadeTransition(opacity: a, child: child),
-  ),
-);
+    );
 
 /// Chi ha reagito a un post, con la sua emoji e il quartiere.
 Future<void> apriChiHaReagito(BuildContext context, int postId) => showModalBottomSheet<void>(
