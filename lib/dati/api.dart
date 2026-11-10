@@ -257,6 +257,10 @@ class Api {
 
   Future<Map<String, dynamic>> bloccati() => get('/app/v1/bloccati');
 
+  /// Chi suggerire quando si scrive @ (post e commenti)
+  Future<Map<String, dynamic>> menzioni(String q, {int? postId}) =>
+      get('/app/v1/menzioni', {'q': q, if (postId != null) 'post': '$postId'});
+
   Future<Map<String, dynamic>> cerca(String q) => get('/api/cerca', {'q': q});
 
   Future<Mappa> mappa() async => Mappa(await get('/app/v1/mappa'));

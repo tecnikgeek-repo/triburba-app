@@ -12,6 +12,7 @@ import '../dati/stato.dart';
 import '../tema.dart';
 import '../widget/faccia.dart';
 import '../widget/testo_ricco.dart';
+import '../widget/menzioni.dart';
 
 /// Ritorna il post pubblicato (o null se annullato).
 Future<Post?> apriScrivi(BuildContext context, {String tipo = 'post', bool foto = false}) =>
@@ -291,6 +292,7 @@ class _SchermataScriviState extends State<SchermataScrivi> {
                       },
                     ),
                   ),
+                if (!_anteprima) SuggerimentiMenzioni(campo: _campo),
                 // grassetto, colori, anteprima, @tribu
                 Wrap(
                   spacing: 6,

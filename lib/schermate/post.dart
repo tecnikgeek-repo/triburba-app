@@ -7,6 +7,7 @@ import '../dati/stato.dart';
 import '../tema.dart';
 import '../widget/emoji.dart';
 import '../widget/faccia.dart';
+import '../widget/menzioni.dart';
 import '../widget/post_card.dart';
 import '../widget/testo_ricco.dart';
 import 'naviga.dart';
@@ -328,6 +329,7 @@ class _SchermataPostState extends State<SchermataPost> {
                   ],
                 ),
               ),
+            SuggerimentiMenzioni(campo: _campo, postId: widget.id, altezza: 210),
             Padding(
               padding: const EdgeInsets.fromLTRB(10, 8, 6, 8),
               child: Row(
