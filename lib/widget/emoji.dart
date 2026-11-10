@@ -1,12 +1,18 @@
-// Le 6 reazioni di triburba con le emoji animate Noto (le stesse del sito, ospitate nell'app).
+// Le 8 reazioni di triburba con le emoji animate Noto (le stesse del sito, ospitate nell'app).
 import 'package:flutter/material.dart';
 
 import '../tema.dart';
 
-const reazioniOrdine = ['cuore', 'ridere', 'wow', 'triste', 'rabbia', 'applauso'];
+/// Ordine della barra (come sul sito). Il tocco rapido mette «tribu»: il tamburo di triburba, emoji nostra.
+const reazioniOrdine = ['tribu', 'capito', 'cuore', 'ridere', 'wow', 'triste', 'rabbia', 'applauso'];
+
+/// Reazione del tocco rapido su «Mi piace».
+const reazioneRapida = 'tribu';
 
 const nomiReazioni = {
-  'cuore': 'Mi piace',
+  'tribu': 'Mi piace',
+  'capito': 'Ho capito',
+  'cuore': 'Adoro',
   'ridere': 'Che ridere',
   'wow': 'Wow',
   'triste': 'Che tristezza',
@@ -24,7 +30,7 @@ class Emoji extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final n = reazioniOrdine.contains(nome) ? nome : 'cuore';
+    final n = reazioniOrdine.contains(nome) ? nome : (nome == 'pollice' ? 'tribu' : 'cuore');
     return Image.asset(
       'assets/emoji/$n.${animata ? 'webp' : 'png'}',
       width: lato,
@@ -65,41 +71,54 @@ class PilaEmoji extends StatelessWidget {
   }
 }
 
-/// Barra a comparsa con le 6 reazioni animate (tenendo premuto «Mi piace»). Ritorna la scelta.
+/// Barra a comparsa con le 8 reazioni animate (tenendo premuto «Mi piace»). Ritorna la scelta.
 Future<String?> scegliReazione(BuildContext context, {String? attuale}) => showModalBottomSheet<String>(
   context: context,
   showDragHandle: false,
   backgroundColor: Colors.transparent,
-  builder: (c) => SafeArea(
-    child: Container(
-      margin: const EdgeInsets.fromLTRB(12, 0, 12, 12),
-      padding: const EdgeInsets.symmetric(vertical: 14, horizontal: 8),
-      decoration: BoxDecoration(
-        color: superficie2,
-        borderRadius: BorderRadius.circular(40),
-        border: Border.all(color: linea2),
-      ),
-      child: Row(
-        mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-        children: [
-          for (final r in reazioniOrdine)
-            Tooltip(
+  builder: (c) => SafeArea(child: BarraReazioni(attuale: attuale, onScelta: (r) => Navigator.pop(c, r))),
+);
+
+/// Le 8 emoji in una riga sola, che si adatta alla larghezza del telefono.
+class BarraReazioni extends StatelessWidget {
+  const BarraReazioni({super.key, this.attuale, required this.onScelta});
+
+  final String? attuale;
+  final ValueChanged<String> onScelta;
+
+  @override
+  Widget build(BuildContext context) => Container(
+    margin: const EdgeInsets.fromLTRB(12, 0, 12, 12),
+    padding: const EdgeInsets.symmetric(vertical: 12, horizontal: 6),
+    decoration: BoxDecoration(
+      color: superficie2,
+      borderRadius: BorderRadius.circular(40),
+      border: Border.all(color: linea2),
+    ),
+    child: Row(
+      children: [
+        for (final r in reazioniOrdine)
+          Expanded(
+            child: Tooltip(
               message: nomiReazioni[r]!,
               child: InkResponse(
-                onTap: () => Navigator.pop(c, r),
-                radius: 30,
-                child: AnimatedScale(
-                  scale: r == attuale ? 1.2 : 1,
-                  duration: const Duration(milliseconds: 200),
-                  child: Emoji(r, lato: 44, animata: true),
+                onTap: () => onScelta(r),
+                radius: 26,
+                child: Padding(
+                  padding: const EdgeInsets.symmetric(horizontal: 2),
+                  child: AnimatedScale(
+                    scale: r == attuale ? 1.2 : 1,
+                    duration: const Duration(milliseconds: 200),
+                    child: AspectRatio(aspectRatio: 1, child: Emoji(r, lato: 44, animata: true)),
+                  ),
                 ),
               ),
             ),
-        ],
-      ),
+          ),
+      ],
     ),
-  ),
-);
+  );
+}
 
 /// Emoji grande che esplode al centro dello schermo (come sul telefono nel sito).
 void esplodiEmoji(BuildContext context, String nome) {

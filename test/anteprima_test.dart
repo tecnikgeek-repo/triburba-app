@@ -26,6 +26,7 @@ import 'package:triburba/schermate/preferenze_notifiche.dart';
 import 'package:triburba/schermate/tag.dart';
 import 'package:triburba/schermate/utente.dart';
 import 'package:triburba/tema.dart';
+import 'package:triburba/widget/emoji.dart';
 
 import 'caratteri.dart';
 import 'finto.dart';
@@ -244,5 +245,17 @@ void main() {
       },
     );
     stato.entra(Io(ioFinto));
+
+    // barra delle 8 reazioni (tamburo di triburba «Mi piace» e 👌 «Ho capito» nuove)
+    await _scatta(
+      t,
+      Scaffold(
+        body: Align(
+          alignment: Alignment.bottomCenter,
+          child: SafeArea(child: BarraReazioni(attuale: 'capito', onScelta: (_) {})),
+        ),
+      ),
+      '23-barra-reazioni',
+    );
   });
 }

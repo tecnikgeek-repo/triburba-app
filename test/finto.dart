@@ -214,7 +214,9 @@ final ioFinto = {
     'vicino': 'Nella tua municipalità arriva subito; negli altri quartieri',
   },
   'reazioni': {
-    'cuore': 'Mi piace',
+    'tribu': 'Mi piace',
+    'capito': 'Ho capito',
+    'cuore': 'Adoro',
     'ridere': 'Che ridere',
     'wow': 'Wow',
     'triste': 'Che tristezza',

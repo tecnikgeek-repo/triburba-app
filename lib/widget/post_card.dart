@@ -539,10 +539,10 @@ class _PostCardState extends State<PostCard> {
       child: Row(
         children: [
           _azione(
-            icona: mia == null ? const IconaTk('heart', lato: 22, colore: testo2) : Emoji(mia, lato: 22),
+            icona: mia == null ? const Opacity(opacity: .6, child: ColorFiltered(colorFilter: ColorFilter.matrix(<double>[.33, .33, .33, 0, 30, .33, .33, .33, 0, 30, .33, .33, .33, 0, 30, 0, 0, 0, 1, 0]), child: Emoji('tribu', lato: 22))) : Emoji(mia, lato: 22),
             testo: mia == null ? 'Mi piace' : (nomiReazioni[mia] ?? 'Mi piace'),
-            colore: mia == null ? testo2 : (mia == 'cuore' ? pompeiano : oro),
-            onTap: () => _reagisci(mia ?? 'cuore'),
+            colore: mia == null ? testo2 : (mia == 'cuore' ? pompeiano : terracotta),
+            onTap: () => _reagisci(mia ?? reazioneRapida),
             onLongPress: () async {
               final r = await scegliReazione(context, attuale: mia);
               if (r != null) _reagisci(r);

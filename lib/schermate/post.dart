@@ -230,8 +230,8 @@ class _SchermataPostState extends State<SchermataPost> {
                     Text(_quando(c.creato), style: const TextStyle(color: muto, fontSize: 12)),
                     _azioncina(
                       c.mia == null ? 'Mi piace' : nomiReazioni[c.mia]!,
-                      () => _reagisci(c, c.mia ?? 'cuore'),
-                      colore: c.mia == null ? muto : (c.mia == 'cuore' ? pompeiano : oro),
+                      () => _reagisci(c, c.mia ?? reazioneRapida),
+                      colore: c.mia == null ? muto : (c.mia == 'cuore' ? pompeiano : terracotta),
                       // tenendo premuto «Mi piace» si sceglie l'emoji, come sul sito
                       tenuto: () async {
                         final r = await scegliReazione(context, attuale: c.mia);
