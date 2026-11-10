@@ -33,7 +33,6 @@ import 'package:triburba/schermate/utente.dart';
 import 'package:triburba/tema.dart';
 import 'package:triburba/widget/emoji.dart';
 import 'package:triburba/widget/da_fare.dart';
-import 'package:triburba/widget/fascia_email.dart';
 import 'package:triburba/schermate/notifiche.dart';
 
 import 'caratteri.dart';
