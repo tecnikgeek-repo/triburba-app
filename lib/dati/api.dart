@@ -320,6 +320,19 @@ class Api {
   Future<Map<String, dynamic>> adminEliminaCommento(int id) => post('/app/v1/admin/commento/elimina', {'comment_id': id});
   Future<Map<String, dynamic>> legale(String pagina) => get('/app/v1/legale/$pagina');
 
+  // ── Da fare, nuovi vicini e benvenuto ──
+
+  /// La fila «Da fare» di chi è collegato (uguale alla Home del sito): {voci: [...]}.
+  Future<List<Map<String, dynamic>>> daFare() async =>
+      ((await get('/app/v1/da-fare'))['voci'] as List).cast<Map<String, dynamic>>();
+
+  /// Chi è arrivato nel mio quartiere negli ultimi 7 giorni: [{id, faccia, quando, salutato}].
+  Future<List<Map<String, dynamic>>> nuoviVicini() async =>
+      ((await get('/app/v1/nuovi-vicini'))['persone'] as List).cast<Map<String, dynamic>>();
+
+  /// Benvenuto a un nuovo vicino (una volta sola): {msg}.
+  Future<Map<String, dynamic>> benvenuto(int userId) => post('/app/v1/benvenuto', {'user_id': userId});
+
   // ── Moderatori e moderazione del quartiere ──
 
   Future<Map<String, dynamic>> moderazione(String slug) => get('/app/v1/quartiere/$slug/moderazione');

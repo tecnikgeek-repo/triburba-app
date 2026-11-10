@@ -102,6 +102,69 @@ class _SchermataUtenteState extends State<SchermataUtente> {
     );
   }
 
+  /// Proprio profilo incompleto: barra discreta «Profilo completo al 60%» con i pezzi mancanti (come sul sito).
+  Widget _completa(Map<String, dynamic> u) {
+    String? v(String k) => (u[k] as String?)?.trim().isNotEmpty == true ? u[k] as String : null;
+    final pezzi = <(String, String, bool)>[
+      ('Foto', 'avatar', v('foto') != null),
+      ('Quartiere', 'casa', u['casa'] != null),
+      ('Due righe su di te', 'bio', v('bio') != null),
+      ('Professione', 'occupation', v('lavoro') != null),
+      ('Copertina', 'cover', v('copertina') != null),
+    ];
+    final mancano = pezzi.where((p) => !p.$3).toList();
+    if (mancano.isEmpty) return const SizedBox.shrink();
+    final perc = ((pezzi.length - mancano.length) / pezzi.length * 100).round();
+    return Container(
+      margin: const EdgeInsets.fromLTRB(12, 10, 12, 10),
+      padding: const EdgeInsets.fromLTRB(14, 12, 14, 12),
+      decoration: BoxDecoration(color: superficie, borderRadius: BorderRadius.circular(14), border: Border.all(color: linea)),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Row(
+            children: [
+              Text('Profilo completo al $perc%', style: const TextStyle(fontWeight: FontWeight.w800, fontSize: 14)),
+              const SizedBox(width: 12),
+              Expanded(
+                child: ClipRRect(
+                  borderRadius: BorderRadius.circular(99),
+                  child: Stack(children: [
+                    Container(height: 6, color: linea2),
+                    FractionallySizedBox(widthFactor: perc / 100, child: Container(height: 6, decoration: const BoxDecoration(gradient: gradiente))),
+                  ]),
+                ),
+              ),
+            ],
+          ),
+          const SizedBox(height: 10),
+          Wrap(
+            spacing: 6,
+            runSpacing: 6,
+            crossAxisAlignment: WrapCrossAlignment.center,
+            children: [
+              const Text('Manca:', style: TextStyle(color: muto, fontSize: 12.5)),
+              for (final m in mancano)
+                ActionChip(
+                  avatar: const Icon(Icons.add, size: 16, color: terracotta),
+                  label: Text(m.$1),
+                  labelStyle: const TextStyle(fontFamily: 'Inter', fontWeight: FontWeight.w700, fontSize: 12.5, color: testo),
+                  backgroundColor: terracotta.withValues(alpha: .14),
+                  side: BorderSide(color: terracotta.withValues(alpha: .4)),
+                  shape: const StadiumBorder(),
+                  visualDensity: VisualDensity.compact,
+                  onPressed: () async {
+                    await apriDestinazione(context, m.$2 == 'casa' ? {'tipo': 'mappa'} : {'tipo': 'modifica_profilo', 'campo': m.$2});
+                    _lista.currentState?.aggiorna();
+                  },
+                ),
+            ],
+          ),
+        ],
+      ),
+    );
+  }
+
   Widget _testa(Map<String, dynamic> u) {
     final f = Faccia(u);
     final casa = u['casa'] as Map?;
@@ -112,6 +175,7 @@ class _SchermataUtenteState extends State<SchermataUtente> {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.stretch,
       children: [
+        if (io) _completa(u),
         SizedBox(
           height: 190,
           child: Stack(

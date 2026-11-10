@@ -4,6 +4,7 @@ import 'package:flutter/material.dart';
 
 import '../dati/stato.dart';
 import '../tema.dart';
+import '../widget/da_fare.dart';
 import '../widget/lista_post.dart';
 import '../widget/primi_passi.dart';
 import 'cerca.dart';
@@ -20,6 +21,7 @@ class SchermataFeedState extends State<SchermataFeed> with TickerProviderStateMi
   TabController? _schede;
   List<(String, String)> _elenco = const [];
   final _liste = <String, GlobalKey<ListaPostState>>{};
+  final _fila = GlobalKey<FilaDaFareState>();
 
   @override
   void initState() {
@@ -52,6 +54,7 @@ class SchermataFeedState extends State<SchermataFeed> with TickerProviderStateMi
   /// Dopo aver pubblicato: torna su «Per te» e ricarica.
   void aggiornaTutto() {
     _schede?.animateTo(0);
+    _fila.currentState?.aggiorna();
     for (final k in _liste.values) {
       k.currentState?.aggiorna();
     }
@@ -95,14 +98,23 @@ class SchermataFeedState extends State<SchermataFeed> with TickerProviderStateMi
                       for (final s in _elenco)
                         ListaPost(
                           key: _liste.putIfAbsent(s.$1, () => GlobalKey<ListaPostState>()),
-                          testa: s.$1 == 'perte' && guidaVisibile
-                              ? PrimiPassi(
-                                  key: ValueKey('guida-${guida.fatti}-${guida.completa}'),
-                                  guida: guida,
-                                  onLeggi: () {
-                                    final k = _elenco.indexWhere((e) => e.$1 == 'citta');
-                                    if (k >= 0) _schede?.animateTo(k);
-                                  },
+                          // in cima a «Per te», come un social vero: «Cosa succede a …?», la fila «Da fare» e i Primi passi
+                          testa: s.$1 == 'perte'
+                              ? Column(
+                                  crossAxisAlignment: CrossAxisAlignment.stretch,
+                                  children: [
+                                    TestataHome(onScritto: aggiornaTutto),
+                                    FilaDaFare(key: _fila),
+                                    if (guidaVisibile)
+                                      PrimiPassi(
+                                        key: ValueKey('guida-${guida.fatti}-${guida.completa}'),
+                                        guida: guida,
+                                        onLeggi: () {
+                                          final k = _elenco.indexWhere((e) => e.$1 == 'citta');
+                                          if (k >= 0) _schede?.animateTo(k);
+                                        },
+                                      ),
+                                  ],
                                 )
                               : null,
                           carica: (prima) async {

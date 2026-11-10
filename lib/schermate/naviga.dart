@@ -8,7 +8,14 @@ import '../dati/stato.dart';
 import '../tema.dart';
 import '../widget/emoji.dart';
 import '../widget/faccia.dart';
+import 'package:share_plus/share_plus.dart';
+
+import '../widget/da_fare.dart';
+import 'admin.dart';
 import 'follow.dart';
+import 'moderazione.dart';
+import 'profilo.dart';
+import 'scrivi.dart';
 import 'post.dart';
 import 'quartiere.dart';
 import 'tag.dart';
@@ -30,17 +37,53 @@ Future<void> apriPost(BuildContext context, int id, {Post? post, bool scrivi = f
 
 Future<void> apriTag(BuildContext context, String tag) => Navigator.of(context).push(_via(SchermataTag(tag: tag)));
 
-/// Destinazione da notifica o link: {tipo: post|utente|quartiere|tag, …}
-void apriDestinazione(BuildContext context, Map<String, dynamic> vai) {
+/// Schede della moderazione a cui si arriva dai link «?t=…» del sito e dalla fila «Da fare».
+const schedeModerazione = {'moderatori': 'moderatori', 'proposti': 'proposte', 'proposte': 'proposte', 'segnalati': 'nascosti', 'nascosti': 'nascosti', 'regole': 'regole'};
+
+/// Destinazione da notifica, link o scheda «Da fare»: porta sempre dritta alla schermata dell'azione.
+/// {tipo: post|utente|quartiere (+scheda)|moderazione (+scheda)|tag|modifica_profilo (+campo)|admin|mappa|notifiche|
+///  scrivi (+tipo)|feed|invito|nuovi_vicini|sito (+link)}
+Future<void> apriDestinazione(BuildContext context, Map<String, dynamic> vai) async {
   switch (vai['tipo']) {
     case 'post':
-      apriPost(context, (vai['id'] as num).toInt());
+      await apriPost(context, (vai['id'] as num).toInt());
     case 'utente':
-      apriUtente(context, '${vai['username']}');
+      await apriUtente(context, '${vai['username']}');
     case 'quartiere':
-      apriQuartiere(context, '${vai['slug']}');
+      final scheda = '${vai['scheda'] ?? ''}';
+      if (schedeModerazione.containsKey(scheda)) {
+        await Navigator.of(context).push(_via(SchermataModerazione(slug: '${vai['slug']}', scheda: schedeModerazione[scheda]!)));
+      } else {
+        await Navigator.of(context).push(_via(SchermataQuartiere(slug: '${vai['slug']}', apriResidenti: scheda == 'residenti')));
+      }
+    case 'moderazione':
+      await Navigator.of(context).push(_via(SchermataModerazione(slug: '${vai['slug']}', scheda: schedeModerazione['${vai['scheda']}'] ?? 'moderatori')));
     case 'tag':
-      apriTag(context, '${vai['tag']}');
+      await apriTag(context, '${vai['tag']}');
+    case 'modifica_profilo':
+      await Navigator.of(context).push(_via(SchermataModificaProfilo(campo: '${vai['campo'] ?? ''}')));
+    case 'admin':
+      if (stato.io?.admin == true) await Navigator.of(context).push(_via(const SchermataAdmin()));
+    case 'mappa' || 'notifiche':
+      stato.apri({'tipo': vai['tipo']});
+    case 'scrivi':
+      await apriScrivi(context, tipo: '${vai['tipo_post'] ?? 'post'}');
+    case 'nuovi_vicini':
+      await Navigator.of(context).push(_via(const SchermataNuoviVicini()));
+    case 'invito':
+      final r = await SharePlus.instance.share(ShareParams(
+        text: 'Ti aspetto su triburba, il social dei quartieri nato a Napoli: iscriviti e scegli il tuo quartiere.\n\n$sito/register',
+      ));
+      if (r.status == ShareResultStatus.success) {
+        try {
+          await stato.api.guida('invito');
+        } catch (_) {}
+      }
+    case 'sito':
+      // link che il server non ha tradotto: se lo riconosco lo apro nell'app (mai il browser)
+      final d = destinazioneDaLink('${vai['link'] ?? ''}');
+      if (d != null && d['tipo'] != 'sito' && context.mounted) await apriDestinazione(context, d);
+    // 'feed' e voci sconosciute: si resta dove si è
   }
 }
 

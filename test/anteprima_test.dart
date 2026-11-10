@@ -32,6 +32,8 @@ import 'package:triburba/schermate/tag.dart';
 import 'package:triburba/schermate/utente.dart';
 import 'package:triburba/tema.dart';
 import 'package:triburba/widget/emoji.dart';
+import 'package:triburba/widget/da_fare.dart';
+import 'package:triburba/schermate/notifiche.dart';
 
 import 'caratteri.dart';
 import 'admin_finto.dart';
@@ -169,7 +171,14 @@ void main() {
       const SchermataHome(),
       '13-sondaggio',
       prima: () async {
-        await t.ensureVisible(find.text('Sabato pomeriggio'));
+        // in cima alla Home ora ci sono la carta «Cosa succede…» e la fila «Da fare»: si scorre fino al sondaggio
+        await t.runAsync(() => Future<void>.delayed(const Duration(milliseconds: 300)));
+        await t.pump(const Duration(milliseconds: 300));
+        await t.scrollUntilVisible(
+          find.text('Sabato pomeriggio'),
+          300,
+          scrollable: find.byWidgetPredicate((w) => w is Scrollable && w.axisDirection == AxisDirection.down).first,
+        );
         await t.drag(find.text('Sabato pomeriggio'), const Offset(0, -120));
         await t.pump(const Duration(milliseconds: 500));
       },
@@ -305,5 +314,36 @@ void main() {
     await _scatta(t, SchermataAdmin(iniziali: adm, scheda: 3), '32-admin-visite');
     await _scatta(t, SchermataAdmin(iniziali: adm, scheda: 4), '33-admin-registro');
     await _scatta(t, SchermataLegale(pagina: 'cookie', iniziali: legaleFinta), '34-legale-cookie');
+
+    // Home «come un social vero»: carta «Cosa succede a …?» e fila «Da fare» (residente con cose da fare)
+    await _scatta(t, const SchermataFeed(), '35-home-da-fare');
+    // chi si è appena iscritto (non può ancora scrivere): solo la fila
+    await _scatta(
+      t,
+      Scaffold(appBar: AppBar(title: const Text('Per te')), body: ListView(children: [FilaDaFare(voci: daFareNuovo)])),
+      '36-da-fare-nuovo-iscritto',
+    );
+    await _scatta(t, const SchermataQuartiere(slug: 'borgo-fiorito'), '37-quartiere-pallini');
+    await _scatta(t, const SchermataNuoviVicini(), '38-nuovi-vicini');
+    // profilo mio senza foto né bio: barra «Profilo completo al …%»
+    final utentePrima = utenteFinto['utente'];
+    utenteFinto['utente'] = {...(utentePrima as Map), 'foto': null, 'bio': null, 'lavoro': null, 'copertina': null, 'io': true};
+    await _scatta(t, const SchermataUtente(username: 'anna.rossi', mio: true), '39-profilo-da-completare');
+    utenteFinto['utente'] = utentePrima;
+    // tocco su una notifica: si apre il post
+    await _scatta(
+      t,
+      const SchermataNotifiche(),
+      '40-notifica-tocco',
+      prima: () async {
+        await t.runAsync(() => Future<void>.delayed(const Duration(milliseconds: 300)));
+        await t.pump(const Duration(milliseconds: 300));
+        await t.tap(find.textContaining('Io porto il caffè', findRichText: true).first);
+        for (var i = 0; i < 10; i++) {
+          await t.runAsync(() => Future<void>.delayed(const Duration(milliseconds: 60)));
+          await t.pump(const Duration(milliseconds: 100));
+        }
+      },
+    );
   });
 }

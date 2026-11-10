@@ -528,22 +528,32 @@ Future<String?> chiediTesto(BuildContext context, String titolo,
   c.selection = TextSelection(
       baseOffset: 0,
       extentOffset: iniziale.contains('.') && !password ? iniziale.lastIndexOf('.') : iniziale.length);
+  var vedi = false;
   return showDialog<String>(
     context: context,
-    builder: (d) => AlertDialog(
+    builder: (d) => StatefulBuilder(builder: (d, aggiorna) => AlertDialog(
       title: Text(titolo),
       content: TextField(
         controller: c,
         autofocus: true,
-        obscureText: password,
-        decoration: InputDecoration(hintText: suggerimento),
+        obscureText: password && !vedi,
+        decoration: InputDecoration(
+          hintText: suggerimento,
+          suffixIcon: password
+              ? IconButton(
+                  onPressed: () => aggiorna(() => vedi = !vedi),
+                  icon: Icon(vedi ? Icons.visibility_off_outlined : Icons.visibility_outlined),
+                  tooltip: vedi ? 'Nascondi la password' : 'Mostra la password',
+                )
+              : null,
+        ),
         onSubmitted: (v) => Navigator.pop(d, v.trim()),
       ),
       actions: [
         TextButton(onPressed: () => Navigator.pop(d), child: const Text('Annulla')),
         FilledButton(onPressed: () => Navigator.pop(d, c.text.trim()), child: Text(ok)),
       ],
-    ),
+    )),
   );
 }
 

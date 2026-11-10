@@ -11,9 +11,12 @@ import '../widget/faccia.dart';
 import 'naviga.dart';
 
 class SchermataModerazione extends StatefulWidget {
-  const SchermataModerazione({super.key, required this.slug, this.datiIniziali});
+  const SchermataModerazione({super.key, required this.slug, this.datiIniziali, this.scheda = 'moderatori'});
 
   final String slug;
+
+  /// Scheda da aprire subito: moderatori, proposte, nascosti, regole (se chi guarda la vede).
+  final String scheda;
 
   /// Solo per le anteprime: dati già pronti, senza rete.
   final Map<String, dynamic>? datiIniziali;
@@ -107,8 +110,10 @@ class _SchermataModerazioneState extends State<SchermataModerazione> {
       if (puoMod) ('Nascosti ${(d['nascosti'] as List).isEmpty ? '' : '· ${(d['nascosti'] as List).length}'}'.trim(), _nascosti(d)),
       if (puoMod) ('Regole', _scheda([_cartaRegole()])),
     ];
+    final iniziale = schede.indexWhere((s) => s.$1.toLowerCase().startsWith(widget.scheda));
     return DefaultTabController(
       length: schede.length,
+      initialIndex: iniziale < 0 ? 0 : iniziale,
       child: Scaffold(
         appBar: AppBar(
           title: Text('${(d['quartiere'] as Map)['nome']}'),
@@ -360,6 +365,17 @@ class _SchermataModerazioneState extends State<SchermataModerazione> {
       children: [
         const Text('Le regole valgono per tutti i post del quartiere e si aggiungono al regolamento di triburba.',
             style: TextStyle(color: muto, height: 1.4)),
+        if (((_d?['quartiere'] as Map?)?['regole_base']) == true) ...[
+          const SizedBox(height: 10),
+          Container(
+            padding: const EdgeInsets.all(12),
+            decoration: BoxDecoration(color: terracotta.withValues(alpha: .12), borderRadius: BorderRadius.circular(12), border: Border.all(color: terracotta.withValues(alpha: .4))),
+            child: const Text(
+              'Rivedi le regole del quartiere: sono quelle di base di triburba. Aggiungi o togli quello che serve al tuo quartiere e salva.',
+              style: TextStyle(color: testo, height: 1.4),
+            ),
+          ),
+        ],
         const SizedBox(height: 12),
         TextField(
           controller: _regole,

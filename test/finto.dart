@@ -447,6 +447,7 @@ final quartiereFinto = {
   'altri': false,
   'post': feedFinto.take(2).toList(),
   'quartiere': {
+    'da_fare': {'garantire': 2, 'candidati': 3, 'votato': false, 'senza_mod': false, 'proposte': 1, 'segnalati': 1, 'regole_vuote': false, 'nuovi': 1, 'residente': true, 'mod': true},
     'id': 23,
     'nome': 'Borgo Fiorito',
     'slug': 'borgo-fiorito',
@@ -566,6 +567,44 @@ final followFinti = {
   ],
 };
 
+/// Fila «Da fare» come la manda /app/v1/da-fare (residente con cose da fare)
+final daFareResidente = <Map<String, dynamic>>[
+  {'chiave': 'profilo', 'icona': 'user', 'gruppo': 'profilo', 'numero': '60%', 'titolo': 'Completa il tuo profilo',
+   'testo': 'Manca: due righe su di te, copertina. I vicini si fidano di più di chi si presenta.', 'tasto': 'Completa',
+   'link': '/settings?campo=bio', 'app': {'tipo': 'modifica_profilo', 'campo': 'bio'}},
+  {'chiave': 'garantisci', 'icona': 'handshake', 'gruppo': 'quartiere', 'numero': 2, 'titolo': '2 vicini da garantire',
+   'testo': 'Se li conosci, garantisci per loro: così possono scrivere nel quartiere.', 'tasto': 'Garantisci',
+   'link': '/q/borgo-fiorito?t=residenti', 'app': {'tipo': 'quartiere', 'slug': 'borgo-fiorito', 'scheda': 'residenti'}},
+  {'chiave': 'vota', 'icona': 'vote', 'gruppo': 'quartiere', 'numero': 3, 'titolo': 'Vota i moderatori',
+   'testo': 'Ci sono 3 candidati a Borgo Fiorito: scegli chi modera il quartiere.', 'tasto': 'Vota',
+   'link': '/q/borgo-fiorito?t=moderatori', 'app': {'tipo': 'moderazione', 'slug': 'borgo-fiorito', 'scheda': 'moderatori'}},
+  {'chiave': 'nuovi', 'icona': 'sparkle', 'gruppo': 'quartiere', 'numero': 1, 'titolo': '1 nuovo vicino',
+   'testo': 'È arrivato a Borgo Fiorito questa settimana: dagli il benvenuto.', 'tasto': 'Saluta',
+   'link': '/q/borgo-fiorito?t=residenti#nuovi', 'app': {'tipo': 'nuovi_vicini'}},
+  {'chiave': 'segnalati', 'icona': 'flag', 'gruppo': 'moderazione', 'numero': 1, 'titolo': '1 post segnalato',
+   'testo': 'Guardalo e decidi se rimetterlo visibile o eliminarlo.', 'tasto': 'Rivedi',
+   'link': '/q/borgo-fiorito?t=segnalati', 'app': {'tipo': 'moderazione', 'slug': 'borgo-fiorito', 'scheda': 'nascosti'}},
+];
+
+/// La stessa fila per chi si è appena iscritto e ha chiuso i Primi passi
+final daFareNuovo = <Map<String, dynamic>>[
+  {'chiave': 'profilo', 'icona': 'user', 'gruppo': 'profilo', 'numero': '0%', 'titolo': 'Completa il tuo profilo',
+   'testo': 'Manca: foto, quartiere, due righe su di te, professione, copertina.', 'tasto': 'Completa',
+   'link': '/settings?campo=avatar', 'app': {'tipo': 'modifica_profilo', 'campo': 'avatar'}},
+  {'chiave': 'guida-garanzie', 'icona': 'handshake', 'gruppo': 'guida', 'numero': '0/3', 'titolo': 'Fatti garantire',
+   'testo': 'Dopo aver scelto il quartiere, servono le garanzie di 3 vicini già confermati che ti conoscono.', 'tasto': 'Vai al quartiere',
+   'link': '/quartieri', 'app': {'tipo': 'mappa'}},
+  {'chiave': 'guida-partecipa', 'icona': 'heart', 'gruppo': 'guida', 'numero': null, 'titolo': 'Commenta un post',
+   'testo': 'Anche prima delle garanzie puoi leggere, reagire e commentare.', 'tasto': 'Leggi i post', 'link': '/?tab=citta', 'app': {'tipo': 'feed'}},
+  {'chiave': 'guida-invito', 'icona': 'share', 'gruppo': 'guida', 'numero': null, 'titolo': 'Invita un vicino',
+   'testo': 'Più vicini ci sono, prima il quartiere prende vita.', 'tasto': 'Invita', 'link': '#invita', 'app': {'tipo': 'invito'}},
+];
+
+final nuoviViciniFinti = <Map<String, dynamic>>[
+  {'id': 41, 'faccia': faccia('sara.c', 'Sara Coppola', colori: ['#7b4bd6', '#e0663a']), 'quando': '2 giorni fa', 'salutato': false},
+  {'id': 42, 'faccia': faccia('ciro.v', 'Ciro Vitale', colori: ['#138a82', '#f0b34a']), 'quando': '5 giorni fa', 'salutato': true},
+];
+
 http.Client clientFinto() => MockClient((r) async {
   final p = r.url.path;
   Object j = {'ok': false, 'error': 'non previsto: $p'};
@@ -579,6 +618,8 @@ http.Client clientFinto() => MockClient((r) async {
   if (p.startsWith('/app/v1/utente/')) j = utenteFinto;
   if (p.endsWith('/follower') || p.endsWith('/seguiti')) j = followFinti;
   if (p.startsWith('/app/v1/tag/')) j = tagFinto;
+  if (p == '/app/v1/da-fare') j = {'ok': true, 'voci': daFareResidente};
+  if (p == '/app/v1/nuovi-vicini') j = {'ok': true, 'persone': nuoviViciniFinti};
   return http.Response.bytes(utf8.encode(jsonEncode(j)), 200, headers: {'content-type': 'application/json; charset=utf-8'});
 });
 

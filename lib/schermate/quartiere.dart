@@ -14,9 +14,12 @@ import 'moderazione.dart';
 import 'naviga.dart';
 
 class SchermataQuartiere extends StatefulWidget {
-  const SchermataQuartiere({super.key, required this.slug});
+  const SchermataQuartiere({super.key, required this.slug, this.apriResidenti = false});
 
   final String slug;
+
+  /// Dalla notifica «chiede di essere garantito» o da «Da fare»: appena caricato si aprono i residenti.
+  final bool apriResidenti;
 
   @override
   State<SchermataQuartiere> createState() => _SchermataQuartiereState();
@@ -28,7 +31,11 @@ class _SchermataQuartiereState extends State<SchermataQuartiere> {
 
   Future<(List<Post>, bool)> _carica(int prima) async {
     final j = await stato.api.quartiere(widget.slug, prima: prima);
-    if (prima == 0 && mounted) setState(() => _q = j['quartiere'] as Map<String, dynamic>);
+    if (prima == 0 && mounted) {
+      final primaVolta = _q == null;
+      setState(() => _q = j['quartiere'] as Map<String, dynamic>);
+      if (primaVolta && widget.apriResidenti) WidgetsBinding.instance.addPostFrameCallback((_) { if (mounted) _apriResidenti(_q!); });
+    }
     return ((j['post'] as List).map((p) => Post(p as Map<String, dynamic>)).toList(), j['altri'] == true);
   }
 
@@ -197,7 +204,7 @@ class _SchermataQuartiereState extends State<SchermataQuartiere> {
                   child: OutlinedButton.icon(
                     onPressed: () => _apriResidenti(q),
                     icon: const Icon(Icons.groups_outlined, size: 19),
-                    label: const Text('Residenti'),
+                    label: _conPallino('Residenti', _daFare(q, 'garantire')),
                   ),
                 ),
             ],
@@ -285,7 +292,16 @@ class _SchermataQuartiereState extends State<SchermataQuartiere> {
                 leading: const Icon(Icons.gavel_rounded, color: oro),
                 title: const Text('Regole della tribù', style: TextStyle(fontWeight: FontWeight.w700)),
                 childrenPadding: const EdgeInsets.fromLTRB(16, 0, 16, 14),
-                children: [Text('${q['regole']}', style: const TextStyle(color: testo2, height: 1.45))],
+                children: [
+                  Text('${q['regole']}', style: const TextStyle(color: testo2, height: 1.45)),
+                  if (q['regole_base'] == true) ...[
+                    const SizedBox(height: 10),
+                    const Text(
+                      'Sono le regole di base di triburba, uguali per tutte le tribù: i moderatori possono aggiungere o togliere quello che serve al quartiere.',
+                      style: TextStyle(color: muto, fontSize: 12.5, height: 1.4),
+                    ),
+                  ],
+                ],
               ),
             ),
           ),
@@ -298,7 +314,10 @@ class _SchermataQuartiereState extends State<SchermataQuartiere> {
               _lista.currentState?.aggiorna();
             },
             icon: Icon(q['puo_moderare'] == true ? Icons.shield_outlined : Icons.how_to_vote_outlined, size: 18),
-            label: Text(q['puo_moderare'] == true ? 'Moderazione' : (q['residente'] == true ? 'Moderatori e voto' : 'Moderatori')),
+            label: _conPallino(
+              q['puo_moderare'] == true ? 'Moderazione' : (q['residente'] == true ? 'Moderatori e voto' : 'Moderatori'),
+              _cosaModerazione(q),
+            ),
           ),
         ),
         const Padding(
@@ -320,6 +339,33 @@ class _SchermataQuartiereState extends State<SchermataQuartiere> {
       ],
     ),
   );
+
+  int _daFare(Map<String, dynamic> q, String k) => ((q['da_fare'] as Map?)?[k] as num?)?.toInt() ?? 0;
+
+  /// Pallino sul tasto Moderazione: «Vota» se non ho votato, oppure quante cose aspettano una decisione.
+  String _cosaModerazione(Map<String, dynamic> q) {
+    final df = (q['da_fare'] as Map?) ?? const {};
+    if (df['residente'] == true && df['votato'] == false) return 'Vota';
+    final n = _daFare(q, 'proposte') + _daFare(q, 'segnalati');
+    return n > 0 ? '$n' : '';
+  }
+
+  Widget _conPallino(String testo, Object pallino) {
+    final p = '$pallino';
+    if (p.isEmpty || p == '0') return Text(testo);
+    return Row(
+      mainAxisSize: MainAxisSize.min,
+      children: [
+        Flexible(child: Text(testo, overflow: TextOverflow.ellipsis)),
+        const SizedBox(width: 6),
+        Container(
+          padding: const EdgeInsets.symmetric(horizontal: 7, vertical: 1),
+          decoration: BoxDecoration(gradient: gradiente, borderRadius: BorderRadius.circular(99)),
+          child: Text(p, style: const TextStyle(color: bianco, fontSize: 11.5, fontWeight: FontWeight.w800)),
+        ),
+      ],
+    );
+  }
 
   void _apriResidenti(Map<String, dynamic> q) => Navigator.of(context).push(
     MaterialPageRoute<void>(

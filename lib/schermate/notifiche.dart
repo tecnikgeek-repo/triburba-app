@@ -73,6 +73,8 @@ class SchermataNotificheState extends State<SchermataNotifiche> {
     'eye-off' => Icons.visibility_off_rounded,
     'vote' => Icons.how_to_vote_rounded,
     'sparkle' => Icons.auto_awesome_rounded,
+    'camera' => Icons.photo_camera_rounded,
+    'map' || 'pin' => Icons.place_rounded,
     _ => Icons.notifications_rounded,
   };
 

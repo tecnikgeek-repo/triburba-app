@@ -68,7 +68,13 @@ Map<String, dynamic>? destinazioneDaLink(String link) {
   if (p != null) return {'tipo': 'post', 'id': int.parse(p.group(2)!), 'username': Uri.decodeComponent(p.group(1)!)};
   final u = RegExp(r'^/u/([^#/?]+)').firstMatch(l);
   if (u != null) return {'tipo': 'utente', 'username': Uri.decodeComponent(u.group(1)!)};
-  final q = RegExp(r'^/q/([a-z0-9-]+)').firstMatch(l);
-  if (q != null) return {'tipo': 'quartiere', 'slug': q.group(1)!};
+  final q = RegExp(r'^/q/([a-z0-9-]+)(?:\?t=(\w+))?').firstMatch(l);
+  if (q != null) return {'tipo': 'quartiere', 'slug': q.group(1)!, 'scheda': q.group(2) ?? 'bacheca'};
+  final st = RegExp(r'^/settings(?:\?campo=(\w+))?').firstMatch(l);
+  if (st != null) return {'tipo': 'modifica_profilo', 'campo': st.group(1) ?? ''};
+  if (l.startsWith('/admin')) return {'tipo': 'admin'};
+  if (l.startsWith('/notifiche')) return {'tipo': 'notifiche'};
+  if (l == '/quartieri' || l.startsWith('/mappa')) return {'tipo': 'mappa'};
+  if (l.startsWith('/#compose')) return {'tipo': 'scrivi'};
   return null;
 }

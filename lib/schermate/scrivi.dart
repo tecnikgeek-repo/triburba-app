@@ -14,11 +14,15 @@ import '../widget/faccia.dart';
 import '../widget/testo_ricco.dart';
 
 /// Ritorna il post pubblicato (o null se annullato).
-Future<Post?> apriScrivi(BuildContext context) =>
-    Navigator.of(context).push<Post>(MaterialPageRoute(fullscreenDialog: true, builder: (_) => const SchermataScrivi()));
+Future<Post?> apriScrivi(BuildContext context, {String tipo = 'post', bool foto = false}) =>
+    Navigator.of(context).push<Post>(MaterialPageRoute(fullscreenDialog: true, builder: (_) => SchermataScrivi(tipo: tipo, foto: foto)));
 
 class SchermataScrivi extends StatefulWidget {
-  const SchermataScrivi({super.key});
+  const SchermataScrivi({super.key, this.tipo = 'post', this.foto = false});
+
+  /// Dalle scorciatoie della Home: si apre già su Attività o Sondaggio, oppure con la scelta della foto.
+  final String tipo;
+  final bool foto;
 
   @override
   State<SchermataScrivi> createState() => _SchermataScriviState();
@@ -32,7 +36,7 @@ class _SchermataScriviState extends State<SchermataScrivi> {
   bool _anteprima = false;
 
   /// post, attivita, sondaggio
-  String _tipo = 'post';
+  late String _tipo = widget.tipo;
 
   // attività
   DateTime? _quando;
@@ -50,6 +54,7 @@ class _SchermataScriviState extends State<SchermataScrivi> {
   void initState() {
     super.initState();
     _campo.addListener(() => setState(() {}));
+    if (widget.foto) WidgetsBinding.instance.addPostFrameCallback((_) => _scegliFoto(ImageSource.gallery));
   }
 
   @override

@@ -157,7 +157,7 @@ class _SchermataAccessoState extends State<SchermataAccesso> {
             suffixIcon: IconButton(
               onPressed: () => setState(() => _vedi = !_vedi),
               icon: Icon(_vedi ? Icons.visibility_off_outlined : Icons.visibility_outlined),
-              tooltip: _vedi ? 'Nascondi' : 'Mostra',
+              tooltip: _vedi ? 'Nascondi la password' : 'Mostra la password',
             ),
           ),
         ),
@@ -361,6 +361,7 @@ class _SchermataIscrizioneState extends State<SchermataIscrizione> {
               suffixIcon: IconButton(
                 onPressed: () => setState(() => _vedi = !_vedi),
                 icon: Icon(_vedi ? Icons.visibility_off_outlined : Icons.visibility_outlined),
+                tooltip: _vedi ? 'Nascondi la password' : 'Mostra la password',
               ),
             ),
           ),

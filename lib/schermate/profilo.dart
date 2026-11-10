@@ -17,7 +17,10 @@ import 'legale.dart';
 import 'preferenze_notifiche.dart';
 
 class SchermataModificaProfilo extends StatefulWidget {
-  const SchermataModificaProfilo({super.key});
+  const SchermataModificaProfilo({super.key, this.campo = ''});
+
+  /// Campo da completare (da «Completa il tuo profilo» o dal promemoria): avatar, cover, bio, occupation.
+  final String campo;
 
   @override
   State<SchermataModificaProfilo> createState() => _SchermataModificaProfiloState();
@@ -31,12 +34,35 @@ class _SchermataModificaProfiloState extends State<SchermataModificaProfilo> {
   late final _sito = TextEditingController(text: stato.io?.sitoWeb);
   bool _salvo = false;
   bool _foto = false;
+  final _fuocoBio = FocusNode();
+  final _fuocoLavoro = FocusNode();
+
+  @override
+  void initState() {
+    super.initState();
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      if (!mounted) return;
+      if (widget.campo == 'bio') _fuocoBio.requestFocus();
+      if (widget.campo == 'occupation') _fuocoLavoro.requestFocus();
+    });
+  }
+
+  /// Il pezzo che manca si accende con un bordo caldo.
+  Widget _evidenzia(String campo, Widget figlio) => widget.campo != campo
+      ? figlio
+      : Container(
+          padding: const EdgeInsets.all(6),
+          decoration: BoxDecoration(borderRadius: BorderRadius.circular(16), border: Border.all(color: terracotta, width: 2)),
+          child: figlio,
+        );
 
   @override
   void dispose() {
     for (final c in [_nome, _bio, _lavoro, _luogo, _sito]) {
       c.dispose();
     }
+    _fuocoBio.dispose();
+    _fuocoLavoro.dispose();
     super.dispose();
   }
 
@@ -89,8 +115,19 @@ class _SchermataModificaProfiloState extends State<SchermataModificaProfilo> {
       body: ListView(
         padding: const EdgeInsets.all(16),
         children: [
+          if (widget.campo == 'avatar' || widget.campo == 'cover')
+            Padding(
+              padding: const EdgeInsets.only(bottom: 12),
+              child: Text(
+                widget.campo == 'avatar'
+                    ? 'Metti una foto: i vicini ti riconoscono e si fidano di più a garantire per te.'
+                    : 'Scegli una copertina: è la prima cosa che vede chi apre il tuo profilo.',
+                textAlign: TextAlign.center,
+                style: const TextStyle(color: testo2, height: 1.4),
+              ),
+            ),
           Center(
-            child: Stack(
+            child: _evidenzia('avatar', Stack(
               children: [
                 FotoProfilo(faccia: io.faccia, lato: 96, anello: true),
                 Positioned(
@@ -106,15 +143,15 @@ class _SchermataModificaProfiloState extends State<SchermataModificaProfilo> {
                   ),
                 ),
               ],
-            ),
+            )),
           ),
           const SizedBox(height: 8),
           Center(
-            child: TextButton.icon(
+            child: _evidenzia('cover', TextButton.icon(
               onPressed: _foto ? null : () => _cambiaFoto(copertina: true),
               icon: const Icon(Icons.wallpaper_outlined),
               label: const Text('Cambia copertina'),
-            ),
+            )),
           ),
           const SizedBox(height: 12),
           TextField(
@@ -125,6 +162,7 @@ class _SchermataModificaProfiloState extends State<SchermataModificaProfilo> {
           const SizedBox(height: 8),
           TextField(
             controller: _bio,
+            focusNode: _fuocoBio,
             maxLength: 240,
             maxLines: 3,
             decoration: const InputDecoration(labelText: 'Due righe su di te'),
@@ -132,6 +170,7 @@ class _SchermataModificaProfiloState extends State<SchermataModificaProfilo> {
           const SizedBox(height: 8),
           TextField(
             controller: _lavoro,
+            focusNode: _fuocoLavoro,
             maxLength: 80,
             decoration: const InputDecoration(labelText: 'Lavoro'),
           ),
@@ -319,9 +358,10 @@ Future<List<String>?> _modulo(
   String? nota,
 }) {
   final cc = [for (final c in campi) TextEditingController(text: c.iniziale)];
+  final vedi = List<bool>.filled(campi.length, false);
   return showDialog<List<String>>(
     context: context,
-    builder: (c) => AlertDialog(
+    builder: (c) => StatefulBuilder(builder: (c, aggiorna) => AlertDialog(
       title: Text(titolo),
       content: SingleChildScrollView(
         child: Column(
@@ -334,12 +374,21 @@ Future<List<String>?> _modulo(
                 padding: const EdgeInsets.only(bottom: 10),
                 child: TextField(
                   controller: cc[i],
-                  obscureText: campi[i].password,
+                  obscureText: campi[i].password && !vedi[i],
                   keyboardType: campi[i].tipo,
                   autocorrect: false,
                   enableSuggestions: !campi[i].password,
                   autofocus: i == 0,
-                  decoration: InputDecoration(labelText: campi[i].etichetta),
+                  decoration: InputDecoration(
+                    labelText: campi[i].etichetta,
+                    suffixIcon: campi[i].password
+                        ? IconButton(
+                            onPressed: () => aggiorna(() => vedi[i] = !vedi[i]),
+                            icon: Icon(vedi[i] ? Icons.visibility_off_outlined : Icons.visibility_outlined),
+                            tooltip: vedi[i] ? 'Nascondi la password' : 'Mostra la password',
+                          )
+                        : null,
+                  ),
                 ),
               ),
           ],
@@ -349,7 +398,7 @@ Future<List<String>?> _modulo(
         TextButton(onPressed: () => Navigator.pop(c), child: const Text('Annulla')),
         FilledButton(onPressed: () => Navigator.pop(c, [for (final x in cc) x.text]), child: Text(ok)),
       ],
-    ),
+    )),
   );
 }
 
