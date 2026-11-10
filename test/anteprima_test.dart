@@ -22,6 +22,7 @@ import 'package:triburba/schermate/post.dart';
 import 'package:triburba/schermate/primo_accesso.dart';
 import 'package:triburba/schermate/quartiere.dart';
 import 'package:triburba/schermate/scrivi.dart';
+import 'package:triburba/schermate/preferenze_notifiche.dart';
 import 'package:triburba/schermate/tag.dart';
 import 'package:triburba/schermate/utente.dart';
 import 'package:triburba/tema.dart';
@@ -203,6 +204,8 @@ void main() {
     await _scatta(t, const SchermataFeed(), '15-primi-passi');
     stato.entra(Io({...ioFinto, 'guida': guidaFinta(completa: true)}));
     await _scatta(t, const SchermataFeed(), '16-primi-passi-fatti');
+    // preferenze delle notifiche: come Impostazioni → Notifiche sul sito
+    await _scatta(t, SchermataPreferenzeNotifiche(iniziali: preferenzeFinte), '22-preferenze-notifiche');
     stato.entra(Io(ioFinto));
 
     // profilo di un altro: tasto «Segui già» su una riga

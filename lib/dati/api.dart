@@ -155,6 +155,11 @@ class Api {
 
   Future<void> registraPush(String fcm) => post('/app/v1/push', {'fcm': fcm, 'versione': versione});
 
+  /// Preferenze delle notifiche: categorie con campanella e telefono
+  Future<Map<String, dynamic>> preferenzeNotifiche() => get('/app/v1/notifiche/preferenze');
+  Future<Map<String, dynamic>> salvaPreferenzeNotifiche(Map<String, dynamic> scelte) =>
+      post('/app/v1/notifiche/preferenze', {'scelte': scelte});
+
   // ── Post ──
 
   Future<Pagina> feed(String scheda, {int prima = 0}) async {

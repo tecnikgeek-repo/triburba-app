@@ -10,6 +10,7 @@ import '../dati/push.dart';
 import '../dati/stato.dart';
 import '../tema.dart';
 import '../widget/faccia.dart';
+import 'preferenze_notifiche.dart';
 
 class SchermataModificaProfilo extends StatefulWidget {
   const SchermataModificaProfilo({super.key});
@@ -213,6 +214,14 @@ class SchermataImpostazioni extends StatelessWidget {
               subtitle: Text('@${io.username} · ${io.email}', style: const TextStyle(color: muto)),
             ),
           const Divider(),
+          _sezione('Notifiche'),
+          ListTile(
+            leading: const Icon(Icons.notifications_active_outlined),
+            title: const Text('Scegli cosa ricevere'),
+            subtitle: const Text('Commenti, reazioni, menzioni… in app e sul telefono', style: TextStyle(color: muto)),
+            trailing: const Icon(Icons.chevron_right_rounded, color: muto),
+            onTap: () => Navigator.of(context).push(MaterialPageRoute<void>(builder: (_) => const SchermataPreferenzeNotifiche())),
+          ),
           _sezione('Account'),
           ListTile(
             leading: const Icon(Icons.manage_accounts_outlined),

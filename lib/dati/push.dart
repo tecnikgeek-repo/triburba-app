@@ -7,12 +7,15 @@ import 'dart:ui' show Color;
 import 'package:firebase_core/firebase_core.dart';
 import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:flutter/foundation.dart';
+import 'package:flutter/widgets.dart' show AppLifecycleListener;
 import 'package:flutter_local_notifications/flutter_local_notifications.dart';
 
 import 'stato.dart';
 
 final _locali = FlutterLocalNotificationsPlugin();
 StreamSubscription<String>? _registrazione;
+AppLifecycleListener? _ciclo;
+DateTime? _ultimoInvio;
 bool _pronto = false;
 
 const _canale = AndroidNotificationChannel(
@@ -103,24 +106,57 @@ void _apriLink(String link) {
   stato.apri(d ?? {'tipo': 'notifiche'});
 }
 
-/// Dopo l'accesso: chiede il permesso (Android 13+, iPhone) e manda al sito l'indirizzo di questo telefono.
+/// Dopo l'accesso (e a ogni avvio da collegato): chiede il permesso (Android 13+, iPhone) e manda al sito
+/// il token FCM di questo telefono. ATTENZIONE: register()/onRegistered danno il Firebase Installation ID,
+/// che l'API di invio NON accetta (risponde UNREGISTERED e il sito cancellava l'indirizzo): serve getToken().
 Future<void> collegaPush() async {
   if (!_pronto) return;
   try {
     final fm = FirebaseMessaging.instance;
     await fm.requestPermission();
-    // l'indirizzo arriva (e cambia) da onRegistered: lo mando al sito ogni volta
-    _registrazione ??= fm.onRegistered.listen((t) => stato.api.registraPush(t).catchError((_) {}));
-    await fm.register();
+    await _mandaToken(forza: true);
+    // il token può cambiare: lo rimando ogni volta
+    // ignore: deprecated_member_use
+    _registrazione ??= fm.onTokenRefresh.listen((t) => _invia(t));
+    // quando l'app torna in primo piano ricontrollo (al massimo ogni 6 ore), così il sito ha sempre l'indirizzo giusto
+    _ciclo ??= AppLifecycleListener(onResume: () => _mandaToken());
   } catch (e) {
     debugPrint('push non collegate: $e');
   }
 }
 
+Future<void> _mandaToken({bool forza = false}) async {
+  if (!_pronto || stato.api.token == null) return;
+  if (!forza && _ultimoInvio != null && DateTime.now().difference(_ultimoInvio!) < const Duration(hours: 6)) return;
+  try {
+    final fm = FirebaseMessaging.instance;
+    // iPhone: il token FCM esiste solo dopo quello di Apple (APNs), che arriva qualche istante dopo il permesso
+    if (defaultTargetPlatform == TargetPlatform.iOS) {
+      for (var i = 0; i < 10 && await fm.getAPNSToken() == null; i++) {
+        await Future<void>.delayed(const Duration(seconds: 1));
+      }
+    }
+    // ignore: deprecated_member_use
+    final t = await fm.getToken();
+    if (t != null && t.isNotEmpty) await _invia(t);
+  } catch (e) {
+    debugPrint('token push non disponibile: $e');
+  }
+}
+
+Future<void> _invia(String t) async {
+  try {
+    await stato.api.registraPush(t);
+    _ultimoInvio = DateTime.now();
+  } catch (_) {}
+}
+
 /// All'uscita l'indirizzo push si cancella dal telefono (il sito l'ha già tolto col token).
 Future<void> scollegaPush() async {
   if (!_pronto) return;
+  _ultimoInvio = null;
   try {
-    await FirebaseMessaging.instance.unregister();
+    // ignore: deprecated_member_use
+    await FirebaseMessaging.instance.deleteToken();
   } catch (_) {}
 }

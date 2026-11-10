@@ -546,3 +546,12 @@ http.Client clientFinto() => MockClient((r) async {
   if (p.startsWith('/app/v1/tag/')) j = tagFinto;
   return http.Response.bytes(utf8.encode(jsonEncode(j)), 200, headers: {'content-type': 'application/json; charset=utf-8'});
 });
+
+/// Preferenze delle notifiche come le manda /app/v1/notifiche/preferenze
+final preferenzeFinte = <Map<String, dynamic>>[
+  {'chiave': 'commenti', 'titolo': 'Commenti e risposte', 'spiega': 'Quando qualcuno commenta un tuo post o risponde a un tuo commento.', 'sempre': false, 'campanella': true, 'telefono': true},
+  {'chiave': 'reazioni', 'titolo': 'Reazioni', 'spiega': 'Quando qualcuno reagisce a un tuo post o a un tuo commento.', 'sempre': false, 'campanella': true, 'telefono': false},
+  {'chiave': 'menzioni', 'titolo': 'Menzioni', 'spiega': 'Quando qualcuno ti cita con @ e il tuo nome.', 'sempre': false, 'campanella': true, 'telefono': true},
+  {'chiave': 'follower', 'titolo': 'Nuovi follower', 'spiega': 'Quando qualcuno comincia a seguirti.', 'sempre': false, 'campanella': false, 'telefono': false},
+  {'chiave': 'residenza', 'titolo': 'Garanzie e residenza', 'spiega': 'Quando un vicino garantisce per te e quando diventi residente confermato. Riguarda il tuo account o tutta la comunità: in campanella resta sempre.', 'sempre': true, 'campanella': true, 'telefono': true},
+];

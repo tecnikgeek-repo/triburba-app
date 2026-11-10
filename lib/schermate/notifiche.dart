@@ -8,6 +8,7 @@ import '../tema.dart';
 import '../widget/faccia.dart';
 import '../widget/lista_post.dart';
 import 'naviga.dart';
+import 'preferenze_notifiche.dart';
 
 class SchermataNotifiche extends StatefulWidget {
   const SchermataNotifiche({super.key});
@@ -89,7 +90,14 @@ class SchermataNotificheState extends State<SchermataNotifiche> {
     return Scaffold(
       appBar: AppBar(
         title: const Text('Notifiche'),
-        actions: [if (n != null && n.any((x) => !x.letta)) TextButton(onPressed: _tutteLette, child: const Text('Segna tutte lette'))],
+        actions: [
+          if (n != null && n.any((x) => !x.letta)) TextButton(onPressed: _tutteLette, child: const Text('Segna tutte lette')),
+          IconButton(
+            tooltip: 'Scegli cosa ricevere',
+            icon: const Icon(Icons.tune_rounded),
+            onPressed: () => Navigator.of(context).push(MaterialPageRoute<void>(builder: (_) => const SchermataPreferenzeNotifiche())),
+          ),
+        ],
       ),
       body: n == null
           ? Center(
