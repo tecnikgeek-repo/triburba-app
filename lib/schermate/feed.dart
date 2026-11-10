@@ -116,6 +116,8 @@ class SchermataFeedState extends State<SchermataFeed> with TickerProviderStateMi
                                           if (k >= 0) _schede?.animateTo(k);
                                         },
                                       ),
+                                    // respiro tra la testata e il primo post
+                                    const SizedBox(height: 14),
                                   ],
                                 )
                               : null,
