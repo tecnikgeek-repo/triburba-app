@@ -195,6 +195,8 @@ class TestoHtml {
             fontWeight: grassetto > 0 ? FontWeight.w700 : null,
             fontStyle: corsivo > 0 ? FontStyle.italic : null,
             color: href != null ? golfo : (codice > 0 ? oro : null),
+            fontFamily: codice > 0 ? 'Inter' : null,
+            backgroundColor: codice > 0 ? superficie2 : null,
             decoration: href != null ? TextDecoration.underline : null,
           ),
           recognizer: href == null ? null : (TapGestureRecognizer()..onTap = () => _apri(context, href)),
