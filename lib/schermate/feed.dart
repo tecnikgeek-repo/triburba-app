@@ -5,6 +5,7 @@ import 'package:flutter/material.dart';
 import '../dati/stato.dart';
 import '../tema.dart';
 import '../widget/da_fare.dart';
+import '../widget/fascia_email.dart';
 import '../widget/lista_post.dart';
 import '../widget/primi_passi.dart';
 import 'cerca.dart';
@@ -103,6 +104,7 @@ class SchermataFeedState extends State<SchermataFeed> with TickerProviderStateMi
                               ? Column(
                                   crossAxisAlignment: CrossAxisAlignment.stretch,
                                   children: [
+                                    const FasciaEmail(),
                                     TestataHome(onScritto: aggiornaTutto),
                                     FilaDaFare(key: _fila),
                                     if (guidaVisibile)

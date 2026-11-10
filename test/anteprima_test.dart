@@ -33,6 +33,7 @@ import 'package:triburba/schermate/utente.dart';
 import 'package:triburba/tema.dart';
 import 'package:triburba/widget/emoji.dart';
 import 'package:triburba/widget/da_fare.dart';
+import 'package:triburba/widget/fascia_email.dart';
 import 'package:triburba/schermate/notifiche.dart';
 
 import 'caratteri.dart';
@@ -345,5 +346,11 @@ void main() {
         }
       },
     );
+
+    // email non ancora confermata: fascia in cima alla Home, e «Ti abbiamo scritto» dopo l'iscrizione
+    stato.entra(Io({...ioFinto, 'utente': <String, dynamic>{...(ioFinto['utente'] as Map<String, dynamic>), 'email_confermata': false}}));
+    await _scatta(t, const SchermataFeed(), '41-fascia-email');
+    stato.entra(Io(ioFinto));
+    await _scatta(t, const SchermataAccesso(), '43-accesso-password-dimenticata');
   });
 }

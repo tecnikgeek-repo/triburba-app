@@ -126,6 +126,13 @@ class Api {
 
   String get _piattaforma => Platform.isIOS ? 'ios' : 'android';
 
+  /// Rimanda il link di conferma dell'email (limite: uno ogni 2 minuti, 5 al giorno)
+  Future<String> rimandaEmail() async => ((await post('/app/v1/email/rimanda'))['msg'] ?? '').toString();
+
+  /// «Password dimenticata?»: il server risponde sempre allo stesso modo
+  Future<String> passwordDimenticata(String email) async =>
+      ((await post('/app/v1/password-dimenticata', {'email': email}))['msg'] ?? '').toString();
+
   Future<Io> accedi(String id, String password) async {
     final j = await post('/app/v1/accedi', {'id': id, 'password': password, 'piattaforma': _piattaforma, 'versione': versione});
     await _salvaToken(j['token'] as String);

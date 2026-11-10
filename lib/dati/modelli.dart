@@ -277,6 +277,7 @@ class Io {
   String? get sitoWeb => _s(_u['sito']);
   String? get copertina => _s(_u['copertina']);
   String get email => _s(_u['email']) ?? '';
+  bool get emailConfermata => _u['email_confermata'] != false;
   String get ruolo => _s(_u['ruolo']) ?? 'user';
 
   Map<String, dynamic>? get casa => j['casa'] as Map<String, dynamic>?;

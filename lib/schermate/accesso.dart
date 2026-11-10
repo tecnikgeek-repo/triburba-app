@@ -1,4 +1,5 @@
 // Benvenuto, accesso e iscrizione (stesse regole del sito: nome vero, quartiere o comune, 14 anni e consensi).
+import '../widget/fascia_email.dart';
 import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
 import 'package:url_launcher/url_launcher.dart';
@@ -170,8 +171,8 @@ class _SchermataAccessoState extends State<SchermataAccesso> {
         BottoneCaldo(testo: 'Entra', occupato: _invio, onPressed: _entra),
         const SizedBox(height: 12),
         TextButton(
-          onPressed: () => launchUrl(Uri.parse('mailto:info@triburba.it?subject=Password%20dimenticata')),
-          child: const Text('Password dimenticata? Scrivici'),
+          onPressed: () => passwordDimenticata(context, email: _id.text.trim()),
+          child: const Text('Password dimenticata?'),
         ),
       ],
     ),
@@ -261,6 +262,8 @@ class _SchermataIscrizioneState extends State<SchermataIscrizione> {
       if (!mounted) return;
       Navigator.of(context).popUntil((r) => r.isFirst);
       if (msg.isNotEmpty) messaggio(context, msg);
+      // la mail di conferma è partita: lo diciamo chiaro prima di entrare nella Home
+      if (!io.emailConfermata && mounted) await avvisoMailMandata(context, io.email);
     } on ErroreApi catch (e) {
       if (mounted) setState(() => _errore = e.messaggio);
     } finally {
