@@ -232,6 +232,11 @@ class _SchermataPostState extends State<SchermataPost> {
                       c.mia == null ? 'Mi piace' : nomiReazioni[c.mia]!,
                       () => _reagisci(c, c.mia ?? 'cuore'),
                       colore: c.mia == null ? muto : (c.mia == 'cuore' ? pompeiano : oro),
+                      // tenendo premuto «Mi piace» si sceglie l'emoji, come sul sito
+                      tenuto: () async {
+                        final r = await scegliReazione(context, attuale: c.mia);
+                        if (r != null) _reagisci(c, r);
+                      },
                     ),
                     if (_puoCommentare)
                       _azioncina('Rispondi', () {
@@ -255,8 +260,9 @@ class _SchermataPostState extends State<SchermataPost> {
     ),
   );
 
-  Widget _azioncina(String t, VoidCallback f, {Color colore = muto}) => InkWell(
+  Widget _azioncina(String t, VoidCallback f, {Color colore = muto, VoidCallback? tenuto}) => InkWell(
     onTap: f,
+    onLongPress: tenuto,
     child: Padding(
       padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
       child: Text(
