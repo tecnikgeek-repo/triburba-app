@@ -24,6 +24,7 @@ import 'package:triburba/schermate/post.dart';
 import 'package:triburba/schermate/primo_accesso.dart';
 import 'package:triburba/schermate/quartiere.dart';
 import 'package:triburba/schermate/scrivi.dart';
+import 'package:triburba/schermate/bloccati.dart';
 import 'package:triburba/schermate/moderazione.dart';
 import 'package:triburba/schermate/preferenze_notifiche.dart';
 import 'package:triburba/schermate/profilo.dart';
@@ -351,5 +352,15 @@ void main() {
     await _scatta(t, const SchermataFeed(), '41-fascia-email');
     stato.entra(Io(ioFinto));
     await _scatta(t, const SchermataAccesso(), '43-accesso-password-dimenticata');
+
+    // persone bloccate (requisito Play per i social)
+    await _scatta(
+      t,
+      SchermataBloccati(iniziali: [
+        {'username': 'gino.p', 'nome': 'Gino Palumbo', 'avatar': null},
+        {'username': 'offerte.top', 'nome': 'Offerte Top', 'avatar': null},
+      ]),
+      '44-persone-bloccate',
+    );
   });
 }

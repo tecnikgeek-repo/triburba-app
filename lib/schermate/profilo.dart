@@ -7,6 +7,7 @@ import 'package:flutter/material.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:share_plus/share_plus.dart';
 
+import 'bloccati.dart';
 import '../dati/api.dart';
 import '../dati/push.dart';
 import '../dati/stato.dart';
@@ -285,6 +286,13 @@ class SchermataImpostazioni extends StatelessWidget {
             subtitle: const Text('Cambiala quando vuoi', style: TextStyle(color: muto)),
             trailing: const Icon(Icons.chevron_right_rounded, color: muto),
             onTap: () => cambiaPassword(context),
+          ),
+          ListTile(
+            leading: const Icon(Icons.block_rounded),
+            title: const Text('Persone bloccate'),
+            subtitle: const Text('Chi hai bloccato non vede i tuoi post e tu non vedi i suoi', style: TextStyle(color: muto)),
+            trailing: const Icon(Icons.chevron_right_rounded, color: muto),
+            onTap: () => Navigator.of(context).push(MaterialPageRoute<void>(builder: (_) => const SchermataBloccati())),
           ),
           ListTile(
             leading: const Icon(Icons.download_outlined),

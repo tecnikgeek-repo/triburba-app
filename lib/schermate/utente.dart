@@ -9,6 +9,7 @@ import '../dati/stato.dart';
 import '../tema.dart';
 import '../widget/faccia.dart';
 import '../widget/lista_post.dart';
+import 'bloccati.dart';
 import 'naviga.dart';
 import 'profilo.dart';
 
@@ -78,6 +79,29 @@ class _SchermataUtenteState extends State<SchermataUtente> {
         automaticallyImplyLeading: !widget.mio,
         title: Text(widget.mio ? 'Profilo' : (u == null ? '' : '${u['nome']}')),
         actions: [
+          if (!widget.mio && u != null && u['io'] != true && widget.username != 'triburba.it')
+            PopupMenuButton<String>(
+              tooltip: 'Altre azioni',
+              onSelected: (v) async {
+                final sblocca = u['bloccato'] == true;
+                if (await bloccaPersona(context, widget.username, '${u['nome']}', sblocca: sblocca) && mounted) {
+                  setState(() => u['bloccato'] = !sblocca);
+                  _lista.currentState?.aggiorna();
+                }
+              },
+              itemBuilder: (_) => [
+                PopupMenuItem(
+                  value: 'blocca',
+                  child: Row(
+                    children: [
+                      Icon(u['bloccato'] == true ? Icons.lock_open_rounded : Icons.block_rounded, color: u['bloccato'] == true ? testo : pompeiano),
+                      const SizedBox(width: 10),
+                      Text(u['bloccato'] == true ? 'Sblocca' : 'Blocca'),
+                    ],
+                  ),
+                ),
+              ],
+            ),
           if (widget.mio)
             IconButton(
               tooltip: 'Impostazioni',

@@ -251,6 +251,12 @@ class Api {
 
   Future<Map<String, dynamic>> segui(String username) => post('/api/follow/toggle', {'username': username});
 
+  /// Blocca o sblocca una persona (requisito Play per i social: i suoi contenuti spariscono nei due sensi).
+  Future<Map<String, dynamic>> blocca(String username, {bool sblocca = false}) =>
+      post('/app/v1/blocca', {'username': username, 'azione': sblocca ? 'sblocca' : 'blocca'});
+
+  Future<Map<String, dynamic>> bloccati() => get('/app/v1/bloccati');
+
   Future<Map<String, dynamic>> cerca(String q) => get('/api/cerca', {'q': q});
 
   Future<Mappa> mappa() async => Mappa(await get('/app/v1/mappa'));

@@ -19,6 +19,7 @@ import 'bollino.dart';
 import '../schermate/moderazione.dart';
 import 'icona_tk.dart';
 import 'iniziativa.dart';
+import '../schermate/bloccati.dart';
 import 'tamtam.dart';
 import 'testo_ricco.dart';
 
@@ -92,6 +93,8 @@ class _PostCardState extends State<PostCard> {
             _voce(c, 'condividi', Icons.share_outlined, 'Condividi'),
             _voce(c, 'copia', Icons.link, 'Copia link'),
             if (p.puoSegnalare) _voce(c, 'segnala', Icons.flag_outlined, 'Segnala', pericolo: true),
+            if (stato.io != null && p.autore.username != stato.io!.username && p.autore.username != 'triburba.it')
+              _voce(c, 'blocca', Icons.block_rounded, 'Blocca @${p.autore.username}', pericolo: true),
             if (p.segnalato)
               const ListTile(
                 leading: Icon(Icons.check, color: golfo),
@@ -130,6 +133,8 @@ class _PostCardState extends State<PostCard> {
         await _segnaCondiviso('copia');
       case 'segnala':
         await _segnala();
+      case 'blocca':
+        if (await bloccaPersona(context, p.autore.username, p.autore.nome)) widget.onEliminato?.call();
     }
   }
 
