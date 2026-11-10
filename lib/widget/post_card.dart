@@ -437,7 +437,7 @@ class _PostCardState extends State<PostCard> {
     }
     return GestureDetector(
       onTap: (p.sfocata && !_mostraFoto) ? null : () => apriFoto(context, url),
-      onDoubleTap: () => _reagisci('cuore'),
+      onDoubleTap: () => _reagisci('tribu'),
       child: ConstrainedBox(constraints: const BoxConstraints(maxHeight: 560), child: img),
     );
   }
