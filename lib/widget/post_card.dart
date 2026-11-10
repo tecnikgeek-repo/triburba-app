@@ -357,6 +357,42 @@ class _PostCardState extends State<PostCard> {
     );
   }
 
+  bool _votando = false;
+
+  /// Voto segreto al candidato, dentro l'app: «Vota» oppure «Votato» (toccarlo di nuovo ritira il voto).
+  Widget _votoCandidato(Map<String, dynamic> c) {
+    final mio = c['mio'] == true;
+    Future<void> vota() async {
+      setState(() => _votando = true);
+      try {
+        final j = await stato.api.votaCandidato((c['quartiere_id'] as num).toInt(), (c['candidato_id'] as num).toInt());
+        if (!mounted) return;
+        setState(() {
+          c['mio'] = j['votato'] == true;
+          c['voti'] = (j['voti'] as num?)?.toInt() ?? c['voti'];
+          c['eletto'] = j['eletto'] == true;
+        });
+        messaggio(context, (j['msg'] ?? '').toString());
+      } on ErroreApi catch (e) {
+        if (mounted) messaggio(context, e.messaggio);
+      } finally {
+        if (mounted) setState(() => _votando = false);
+      }
+    }
+
+    return SizedBox(
+      width: 124,
+      child: mio
+          ? OutlinedButton.icon(
+              onPressed: _votando ? null : vota,
+              icon: const Icon(Icons.check_rounded, size: 18),
+              label: const Text('Votato', maxLines: 1, softWrap: false),
+                          style: OutlinedButton.styleFrom(padding: const EdgeInsets.symmetric(horizontal: 10)),
+            )
+          : BottoneCaldo(testo: 'Vota', icona: Icons.how_to_vote_outlined, occupato: _votando, onPressed: vota),
+    );
+  }
+
   Widget _candidatura() {
     final c = p.candidatura;
     final eletto = c?['eletto'] == true;
@@ -385,10 +421,12 @@ class _PostCardState extends State<PostCard> {
               ],
             ),
           ),
-          if (p.quartiere?.slug != null)
+          if (c != null && c['puo_votare'] == true)
+            _votoCandidato(c)
+          else if (c != null && p.quartiere?.slug != null && !eletto)
             TextButton(
-              onPressed: () => launchUrl(Uri.parse('$sito/q/${p.quartiere!.slug}?t=moderatori'), mode: LaunchMode.externalApplication),
-              child: const Text('Vota sul sito'),
+              onPressed: () => apriQuartiere(context, p.quartiere!.slug!),
+              child: const Text('Vedi la tribù'),
             ),
         ],
       ),

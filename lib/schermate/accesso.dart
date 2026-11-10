@@ -132,7 +132,7 @@ class _SchermataAccessoState extends State<SchermataAccesso> {
         Text('Bentornato', style: titolo(30), textAlign: TextAlign.center),
         const SizedBox(height: 6),
         const Text(
-          'Entra con lo stesso account del sito triburba.it.',
+          'Entra con il tuo account triburba.',
           style: TextStyle(color: muto),
           textAlign: TextAlign.center,
         ),

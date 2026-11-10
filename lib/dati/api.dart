@@ -74,7 +74,7 @@ class Api {
     }
     if (j == null) {
       throw ErroreApi(
-        r.statusCode >= 500 ? 'Il sito non risponde bene in questo momento: riprova tra poco.' : 'Risposta non valida dal sito.',
+        r.statusCode >= 500 ? 'triburba non risponde in questo momento: riprova tra poco.' : 'Qualcosa non è andato: riprova.',
         codice: r.statusCode,
       );
     }
@@ -94,7 +94,7 @@ class Api {
     } on HttpException {
       throw ErroreApi('Sei senza connessione: controlla la rete e riprova.');
     } on Exception {
-      throw ErroreApi('Il sito non risponde: riprova tra poco.');
+      throw ErroreApi('triburba non risponde in questo momento: riprova tra poco.');
     }
   }
 
@@ -270,6 +270,52 @@ class Api {
       get('/app/v1/utente/${Uri.encodeComponent(username)}', {if (prima > 0) 'prima': '$prima'});
 
   Future<Io> salvaProfilo(Map<String, String> dati) async => Io((await post('/app/v1/profilo', dati))['io']);
+
+  // ── Account: username, email, password, i miei dati ──
+
+  /// Ritorna (io aggiornato, messaggio).
+  Future<(Io, String)> cambiaUsername(String username) async {
+    final j = await post('/app/v1/account/username', {'username': username});
+    return (Io(j['io']), (j['msg'] ?? '').toString());
+  }
+
+  Future<(Io, String)> cambiaEmail(String email, String password) async {
+    final j = await post('/app/v1/account/email', {'email': email, 'password': password});
+    return (Io(j['io']), (j['msg'] ?? '').toString());
+  }
+
+  Future<String> cambiaPassword(String attuale, String nuova, String conferma) async =>
+      ((await post('/app/v1/account/password', {'attuale': attuale, 'nuova': nuova, 'conferma': conferma}))['msg'] ?? '').toString();
+
+  /// I miei dati in un file JSON: (nome del file, contenuto).
+  Future<(String, Map<String, dynamic>)> scaricaDati() async {
+    final j = await get('/app/v1/account/dati');
+    return ((j['nome_file'] ?? 'triburba-dati.json').toString(), (j['dati'] as Map).cast<String, dynamic>());
+  }
+
+  // ── Moderatori e moderazione del quartiere ──
+
+  Future<Map<String, dynamic>> moderazione(String slug) => get('/app/v1/quartiere/$slug/moderazione');
+
+  /// Voto segreto a un candidato (rifarlo lo ritira): {votato, voti, eletto, msg}.
+  Future<Map<String, dynamic>> votaCandidato(int quartiereId, int candidatoId) =>
+      post('/app/v1/candidatura/vota', {'quartiere_id': quartiereId, 'candidato_id': candidatoId});
+
+  /// Candidarsi o ritirare la candidatura: {candidato, msg}.
+  Future<Map<String, dynamic>> candidatura(int quartiereId, {String motivazione = ''}) =>
+      post('/app/v1/candidatura', {'quartiere_id': quartiereId, 'motivazione': motivazione});
+
+  Future<Map<String, dynamic>> sfiducia(int quartiereId, int moderatoreId) =>
+      post('/app/v1/moderatore/sfiducia', {'quartiere_id': quartiereId, 'moderatore_id': moderatoreId});
+
+  Future<String> salvaRegole(int quartiereId, String regole) async =>
+      ((await post('/app/v1/quartiere/regole', {'quartiere_id': quartiereId, 'regole': regole}))['msg'] ?? '').toString();
+
+  Future<String> ripristina(int quartiereId, int postId) async =>
+      ((await post('/app/v1/quartiere/ripristina', {'quartiere_id': quartiereId, 'post_id': postId}))['msg'] ?? '').toString();
+
+  Future<String> decidiProposta(int quartiereId, int postId, String livello, bool accetta) async =>
+      ((await post('/app/v1/quartiere/proposta', {'quartiere_id': quartiereId, 'post_id': postId, 'livello': livello, 'accetta': accetta}))['msg'] ?? '').toString();
 
   Future<Io> cambiaFoto(File foto, {bool copertina = false}) async =>
       Io((await invia('/app/v1/profilo/foto', {'tipo': copertina ? 'copertina' : 'avatar'}, campoFile: 'foto', file: foto))['io']);

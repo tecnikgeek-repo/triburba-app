@@ -1,8 +1,11 @@
 // Modifica del proprio profilo e impostazioni (regole, privacy, informazioni, esci, elimina account).
+import 'dart:convert';
 import 'dart:io';
+import 'dart:typed_data';
 
 import 'package:flutter/material.dart';
 import 'package:image_picker/image_picker.dart';
+import 'package:share_plus/share_plus.dart';
 import 'package:url_launcher/url_launcher.dart';
 
 import '../dati/api.dart';
@@ -148,7 +151,7 @@ class _SchermataModificaProfiloState extends State<SchermataModificaProfilo> {
           BottoneCaldo(testo: 'Salva', occupato: _salvo, onPressed: _salva),
           const SizedBox(height: 14),
           const Text(
-            'Username, email e password si cambiano dal sito, nelle impostazioni.',
+            'Username, email e password si cambiano da Impostazioni → Account.',
             style: TextStyle(color: muto, fontSize: 12.5),
             textAlign: TextAlign.center,
           ),
@@ -224,18 +227,32 @@ class SchermataImpostazioni extends StatelessWidget {
           ),
           _sezione('Account'),
           ListTile(
-            leading: const Icon(Icons.manage_accounts_outlined),
-            title: const Text('Username, email e password'),
-            subtitle: const Text('Sul sito triburba.it', style: TextStyle(color: muto)),
-            trailing: const Icon(Icons.open_in_new, size: 18, color: muto),
-            onTap: () => _apri('/settings'),
+            leading: const Icon(Icons.alternate_email_rounded),
+            title: const Text('Username'),
+            subtitle: Text(io != null ? '@${io.username}' : '', style: const TextStyle(color: muto)),
+            trailing: const Icon(Icons.chevron_right_rounded, color: muto),
+            onTap: () => cambiaUsername(context),
+          ),
+          ListTile(
+            leading: const Icon(Icons.mail_outline_rounded),
+            title: const Text('Email'),
+            subtitle: Text(io?.email ?? '', style: const TextStyle(color: muto)),
+            trailing: const Icon(Icons.chevron_right_rounded, color: muto),
+            onTap: () => cambiaEmail(context),
+          ),
+          ListTile(
+            leading: const Icon(Icons.lock_outline_rounded),
+            title: const Text('Password'),
+            subtitle: const Text('Cambiala quando vuoi', style: TextStyle(color: muto)),
+            trailing: const Icon(Icons.chevron_right_rounded, color: muto),
+            onTap: () => cambiaPassword(context),
           ),
           ListTile(
             leading: const Icon(Icons.download_outlined),
             title: const Text('Scarica i miei dati'),
-            subtitle: const Text('Dal sito, nelle impostazioni', style: TextStyle(color: muto)),
-            trailing: const Icon(Icons.open_in_new, size: 18, color: muto),
-            onTap: () => _apri('/settings#dati'),
+            subtitle: const Text('Un file con profilo, post, commenti e attività', style: TextStyle(color: muto)),
+            trailing: const Icon(Icons.chevron_right_rounded, color: muto),
+            onTap: () => scaricaDati(context),
           ),
           if (io?.admin == true)
             ListTile(
@@ -287,4 +304,112 @@ class SchermataImpostazioni extends StatelessWidget {
       style: const TextStyle(color: muto, fontSize: 12, fontWeight: FontWeight.w800, letterSpacing: .6),
     ),
   );
+}
+
+
+// ── Account: username, email, password e dati, tutto dentro l'app ──
+
+/// Piccolo modulo a più campi in una finestra; ritorna i valori scritti oppure null se annullato.
+Future<List<String>?> _modulo(
+  BuildContext context,
+  String titolo,
+  List<({String etichetta, bool password, String iniziale, TextInputType tipo})> campi, {
+  String ok = 'Salva',
+  String? nota,
+}) {
+  final cc = [for (final c in campi) TextEditingController(text: c.iniziale)];
+  return showDialog<List<String>>(
+    context: context,
+    builder: (c) => AlertDialog(
+      title: Text(titolo),
+      content: SingleChildScrollView(
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          crossAxisAlignment: CrossAxisAlignment.stretch,
+          children: [
+            if (nota != null) Padding(padding: const EdgeInsets.only(bottom: 10), child: Text(nota, style: const TextStyle(color: muto, height: 1.4))),
+            for (var i = 0; i < campi.length; i++)
+              Padding(
+                padding: const EdgeInsets.only(bottom: 10),
+                child: TextField(
+                  controller: cc[i],
+                  obscureText: campi[i].password,
+                  keyboardType: campi[i].tipo,
+                  autocorrect: false,
+                  enableSuggestions: !campi[i].password,
+                  autofocus: i == 0,
+                  decoration: InputDecoration(labelText: campi[i].etichetta),
+                ),
+              ),
+          ],
+        ),
+      ),
+      actions: [
+        TextButton(onPressed: () => Navigator.pop(c), child: const Text('Annulla')),
+        FilledButton(onPressed: () => Navigator.pop(c, [for (final x in cc) x.text]), child: Text(ok)),
+      ],
+    ),
+  );
+}
+
+Future<void> cambiaUsername(BuildContext context) async {
+  final v = await _modulo(context, 'Cambia username', [
+    (etichetta: 'Nuovo username', password: false, iniziale: stato.io?.username ?? '', tipo: TextInputType.text),
+  ], nota: 'Da 3 a 32 caratteri: lettere, numeri, punto e trattino basso. Il vecchio @nome non porterà più al tuo profilo.');
+  if (v == null || !context.mounted) return;
+  try {
+    final (io, msg) = await stato.api.cambiaUsername(v[0].trim());
+    stato.entra(io);
+    if (context.mounted) messaggio(context, msg);
+  } on ErroreApi catch (e) {
+    if (context.mounted) messaggio(context, e.messaggio);
+  }
+}
+
+Future<void> cambiaEmail(BuildContext context) async {
+  final v = await _modulo(context, 'Cambia email', [
+    (etichetta: 'Nuova email', password: false, iniziale: stato.io?.email ?? '', tipo: TextInputType.emailAddress),
+    (etichetta: 'La tua password', password: true, iniziale: '', tipo: TextInputType.visiblePassword),
+  ], nota: 'Per sicurezza serve la password. Con la nuova email potrai entrare al posto della vecchia.');
+  if (v == null || !context.mounted) return;
+  try {
+    final (io, msg) = await stato.api.cambiaEmail(v[0].trim(), v[1]);
+    stato.entra(io);
+    if (context.mounted) messaggio(context, msg);
+  } on ErroreApi catch (e) {
+    if (context.mounted) messaggio(context, e.messaggio);
+  }
+}
+
+Future<void> cambiaPassword(BuildContext context) async {
+  final v = await _modulo(context, 'Cambia password', [
+    (etichetta: 'Password attuale', password: true, iniziale: '', tipo: TextInputType.visiblePassword),
+    (etichetta: 'Nuova password (almeno 8 caratteri)', password: true, iniziale: '', tipo: TextInputType.visiblePassword),
+    (etichetta: 'Ripeti la nuova password', password: true, iniziale: '', tipo: TextInputType.visiblePassword),
+  ]);
+  if (v == null || !context.mounted) return;
+  try {
+    final msg = await stato.api.cambiaPassword(v[0], v[1], v[2]);
+    if (context.mounted) messaggio(context, msg);
+  } on ErroreApi catch (e) {
+    if (context.mounted) messaggio(context, e.messaggio);
+  }
+}
+
+/// I miei dati: il file arriva da triburba e si salva o si condivide con le app del telefono.
+Future<void> scaricaDati(BuildContext context) async {
+  messaggio(context, 'Preparo il file con i tuoi dati…');
+  try {
+    final (nome, dati) = await stato.api.scaricaDati();
+    final byte = Uint8List.fromList(utf8.encode(const JsonEncoder.withIndent('  ').convert(dati)));
+    await SharePlus.instance.share(ShareParams(
+      files: [XFile.fromData(byte, mimeType: 'application/json', name: nome)],
+      fileNameOverrides: [nome],
+      title: 'I miei dati di triburba',
+    ));
+  } on ErroreApi catch (e) {
+    if (context.mounted) messaggio(context, e.messaggio);
+  } catch (_) {
+    if (context.mounted) messaggio(context, 'Non sono riuscito a preparare il file: riprova.');
+  }
 }

@@ -22,7 +22,10 @@ import 'package:triburba/schermate/post.dart';
 import 'package:triburba/schermate/primo_accesso.dart';
 import 'package:triburba/schermate/quartiere.dart';
 import 'package:triburba/schermate/scrivi.dart';
+import 'package:triburba/schermate/moderazione.dart';
 import 'package:triburba/schermate/preferenze_notifiche.dart';
+import 'package:triburba/schermate/profilo.dart';
+import 'package:triburba/widget/post_card.dart';
 import 'package:triburba/schermate/tag.dart';
 import 'package:triburba/schermate/utente.dart';
 import 'package:triburba/tema.dart';
@@ -257,5 +260,32 @@ void main() {
       ),
       '23-barra-reazioni',
     );
+
+    // niente rimandi al sito: voto della candidatura, moderazione e account dentro l'app
+    await _scatta(t, Scaffold(body: ListView(children: [PostCard(post: Post(postCandidatura))])), '24-candidatura-vota');
+    await _scatta(t, SchermataModerazione(slug: 'borgo-fiorito', datiIniziali: moderazioneFinta), '25-moderazione-moderatori');
+    await _scatta(
+      t,
+      SchermataModerazione(slug: 'borgo-fiorito', datiIniziali: moderazioneFinta),
+      '26-moderazione-proposte',
+      prima: () async {
+        await t.tap(find.textContaining('Proposte'));
+        for (var i = 0; i < 8; i++) {
+          await t.pump(const Duration(milliseconds: 100));
+        }
+      },
+    );
+    await _scatta(
+      t,
+      SchermataModerazione(slug: 'borgo-fiorito', datiIniziali: moderazioneFinta),
+      '27-moderazione-nascosti',
+      prima: () async {
+        await t.tap(find.textContaining('Nascosti'));
+        for (var i = 0; i < 8; i++) {
+          await t.pump(const Duration(milliseconds: 100));
+        }
+      },
+    );
+    await _scatta(t, const SchermataImpostazioni(), '28-impostazioni-account');
   });
 }

@@ -2,7 +2,6 @@
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
-import 'package:url_launcher/url_launcher.dart';
 
 import '../dati/api.dart';
 import '../dati/modelli.dart';
@@ -11,6 +10,7 @@ import '../tema.dart';
 import '../widget/faccia.dart';
 import '../widget/lista_post.dart';
 import '../widget/tamtam.dart';
+import 'moderazione.dart';
 import 'naviga.dart';
 
 class SchermataQuartiere extends StatefulWidget {
@@ -289,15 +289,18 @@ class _SchermataQuartiereState extends State<SchermataQuartiere> {
               ),
             ),
           ),
-        if (q['puo_moderare'] == true)
-          Padding(
-            padding: const EdgeInsets.fromLTRB(14, 8, 14, 0),
-            child: TextButton.icon(
-              onPressed: () => launchUrl(Uri.parse('$sito/q/${q['slug']}?t=segnalati'), mode: LaunchMode.externalApplication),
-              icon: const Icon(Icons.shield_outlined, size: 18),
-              label: const Text('Moderazione sul sito'),
-            ),
+        // moderatori, candidature e voto per tutti; proposte, post nascosti e regole per chi può deciderli
+        Padding(
+          padding: const EdgeInsets.fromLTRB(14, 10, 14, 0),
+          child: OutlinedButton.icon(
+            onPressed: () async {
+              await Navigator.of(context).push(MaterialPageRoute<void>(builder: (_) => SchermataModerazione(slug: '${q['slug']}')));
+              _lista.currentState?.aggiorna();
+            },
+            icon: Icon(q['puo_moderare'] == true ? Icons.shield_outlined : Icons.how_to_vote_outlined, size: 18),
+            label: Text(q['puo_moderare'] == true ? 'Moderazione' : (q['residente'] == true ? 'Moderatori e voto' : 'Moderatori')),
           ),
+        ),
         const Padding(
           padding: EdgeInsets.fromLTRB(16, 18, 16, 8),
           child: Text(

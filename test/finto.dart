@@ -513,6 +513,39 @@ final postTag = {
   'miei_tamtam': ['c:1', 'm:7'],
 };
 
+// candidatura a moderatore in bacheca: si vota dentro l'app
+final postCandidatura = {
+  ...post(31, 'Sono nato in questo quartiere e ci vivo tutt\'ora.', autore: faccia('marco.e', 'Marco Esposito', colori: ['#1aa39a', '#2b6cb0'])),
+  'tipo': 'candidatura',
+  'candidatura': {'voti': 2, 'mio': false, 'eletto': false, 'puo_votare': true, 'quartiere_id': 23, 'candidato_id': 9},
+};
+
+// schermata Moderazione di un moderatore residente
+final moderazioneFinta = <String, dynamic>{
+  'ok': true,
+  'quartiere': {'id': 23, 'nome': 'Borgo Fiorito', 'slug': 'borgo-fiorito', 'municipalita': 'VII Municipalità', 'regole': 'Niente pubblicità e niente annunci di vendita.\nRispetto per tutti.'},
+  'residente': true,
+  'puo_moderare': true,
+  'candidato': true,
+  'bloccato_fino': null,
+  'voti_min': 2,
+  'max_moderatori': 3,
+  'candidati': [
+    {...faccia('anna.rossi', 'Anna Rossi'), 'id': 1, 'motivazione': 'Conosco tutti in piazza e voglio dare una mano.', 'voti': 4, 'mio_voto': true, 'eletto': true, 'io': false,
+     'sfiducie': 0, 'mia_sfiducia': false, 'sfiducie_servono': 4, 'sfiducia_dal': null, 'puo_sfiduciare': true},
+    {...faccia('marco.e', 'Marco Esposito', colori: ['#1aa39a', '#2b6cb0']), 'id': 9, 'motivazione': null, 'voti': 2, 'mio_voto': false, 'eletto': true, 'io': true,
+     'sfiducie': 0, 'mia_sfiducia': false, 'sfiducie_servono': 3, 'sfiducia_dal': '09/12/2026', 'puo_sfiduciare': false},
+    {...faccia('lucia.b', 'Lucia Bianchi', colori: ['#7b4bd6', '#e0663a']), 'id': 12, 'motivazione': 'Mi occupo del giardinetto da anni.', 'voti': 1, 'mio_voto': false, 'eletto': false, 'io': false,
+     'sfiducie': 0, 'mia_sfiducia': false, 'sfiducie_servono': null, 'sfiducia_dal': null, 'puo_sfiduciare': false},
+  ],
+  'proposte': [
+    {'post_id': 40, 'livello': 'quartiere', 'testo': 'Domenica mercatino del riuso in piazza: portate quello che non usate più!', 'autore': faccia('gino.p', 'Gino Palumbo', colori: ['#ef4b3f', '#e0663a']), 'da': 'Secondigliano', 'quando': '2 h', 'portato_da': 'gino.p'},
+  ],
+  'nascosti': [
+    {'post_id': 41, 'testo': 'Vendo telefoni a metà prezzo, scrivetemi in privato', 'autore': faccia('spam.x', 'Offerte Top', colori: ['#c2410c', '#e0663a']), 'segnalazioni': 3, 'motivi': 'Spam o pubblicità', 'quando': '5 h'},
+  ],
+};
+
 final tagFinto = {'ok': true, 'tag': 'festadelquartiere', 'post': [postTag], 'n_post': 1, 'seguaci': 4, 'seguo': false};
 
 /// Forme vere della mappa (zone spente, regione, San Pietro a Patierno acceso) prese dal server il 09/11/2026.
