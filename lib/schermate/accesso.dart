@@ -8,6 +8,7 @@ import '../dati/modelli.dart';
 import '../dati/push.dart';
 import '../dati/stato.dart';
 import '../tema.dart';
+import 'legale.dart';
 
 class SchermataBenvenuto extends StatelessWidget {
   const SchermataBenvenuto({super.key});
@@ -268,7 +269,10 @@ class _SchermataIscrizioneState extends State<SchermataIscrizione> {
   }
 
   TapGestureRecognizer _link(String percorso) {
-    final t = TapGestureRecognizer()..onTap = () => launchUrl(Uri.parse('$sito$percorso'), mode: LaunchMode.externalApplication);
+    // regolamento, termini e privacy si leggono dentro l'app
+    final pagina = percorso.replaceAll('/', '');
+    final t = TapGestureRecognizer()
+      ..onTap = () => pagineLegali.containsKey(pagina) ? apriLegale(context, pagina) : launchUrl(Uri.parse('$sito$percorso'), mode: LaunchMode.externalApplication);
     _tocchi.add(t);
     return t;
   }

@@ -293,6 +293,33 @@ class Api {
     return ((j['nome_file'] ?? 'triburba-dati.json').toString(), (j['dati'] as Map).cast<String, dynamic>());
   }
 
+  // ── Pannello admin (solo staff) e pagine legali ──
+
+  Map<String, String> _q(Map<String, Object?> m) => {
+    for (final e in m.entries)
+      if (e.value != null && '${e.value}' != '') e.key: '${e.value}',
+  };
+
+  Future<Map<String, dynamic>> adminGestione({int pu = 1, int pp = 1, bool post7 = false}) =>
+      get('/app/v1/admin/gestione', _q({'pu': pu, 'pp': pp, 'post7': post7 ? 1 : null}));
+  Future<Map<String, dynamic>> adminSospendi(int userId, bool ban) => post('/app/v1/admin/utente/sospendi', {'user_id': userId, 'ban': ban ? 1 : 0});
+  Future<Map<String, dynamic>> adminRuolo(int userId, String ruolo) => post('/app/v1/admin/utente/ruolo', {'user_id': userId, 'role': ruolo});
+  Future<Map<String, dynamic>> adminEliminaPost(int postId) => post('/app/v1/admin/post/elimina', {'post_id': postId});
+  Future<Map<String, dynamic>> adminImmagine(int postId, String azione) => post('/app/v1/admin/immagine', {'post_id': postId, 'azione': azione});
+  Future<Map<String, dynamic>> adminResidente(int userId) => post('/app/v1/admin/residente', {'user_id': userId});
+  Future<Map<String, dynamic>> adminZona(String tipo, int id, bool acceso) => post('/app/v1/admin/zona', {'tipo': tipo, 'id': id, 'acceso': acceso ? 1 : 0});
+  Future<Map<String, dynamic>> adminSoglie(Map<String, int> valori) => post('/app/v1/admin/soglie', {'valori': valori});
+  Future<Map<String, dynamic>> adminPubblicazione(Map<String, String> valori) => post('/app/v1/admin/pubblicazione', {'valori': valori});
+  Future<Map<String, dynamic>> adminStatistiche() => get('/app/v1/admin/statistiche');
+  Future<Map<String, dynamic>> adminIscritti({int giorni = 30, String cerca = '', int pn = 1, int pv = 1}) =>
+      get('/app/v1/admin/iscritti', _q({'giorni': giorni, 'q': cerca, 'pn': pn, 'pv': pv}));
+  Future<Map<String, dynamic>> adminVisite({int giorni = 30, String ordine = 'ultimo', int pa = 1}) =>
+      get('/app/v1/admin/visite', _q({'giorni': giorni, 'ordine': ordine, 'pa': pa}));
+  Future<Map<String, dynamic>> adminRegistro({String azione = '', int pg = 1}) => get('/app/v1/admin/registro', _q({'azione': azione, 'pg': pg}));
+  Future<Map<String, dynamic>> adminCommenti({int pc = 1}) => get('/app/v1/admin/commenti', _q({'pc': pc}));
+  Future<Map<String, dynamic>> adminEliminaCommento(int id) => post('/app/v1/admin/commento/elimina', {'comment_id': id});
+  Future<Map<String, dynamic>> legale(String pagina) => get('/app/v1/legale/$pagina');
+
   // ── Moderatori e moderazione del quartiere ──
 
   Future<Map<String, dynamic>> moderazione(String slug) => get('/app/v1/quartiere/$slug/moderazione');

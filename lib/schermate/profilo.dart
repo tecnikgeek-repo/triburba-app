@@ -6,13 +6,14 @@ import 'dart:typed_data';
 import 'package:flutter/material.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:share_plus/share_plus.dart';
-import 'package:url_launcher/url_launcher.dart';
 
 import '../dati/api.dart';
 import '../dati/push.dart';
 import '../dati/stato.dart';
 import '../tema.dart';
 import '../widget/faccia.dart';
+import 'admin.dart';
+import 'legale.dart';
 import 'preferenze_notifiche.dart';
 
 class SchermataModificaProfilo extends StatefulWidget {
@@ -164,7 +165,6 @@ class _SchermataModificaProfiloState extends State<SchermataModificaProfilo> {
 class SchermataImpostazioni extends StatelessWidget {
   const SchermataImpostazioni({super.key});
 
-  void _apri(String percorso) => launchUrl(Uri.parse('$sito$percorso'), mode: LaunchMode.externalApplication);
 
   Future<void> _esci(BuildContext context) async {
     if (!await conferma(
@@ -258,14 +258,15 @@ class SchermataImpostazioni extends StatelessWidget {
             ListTile(
               leading: const Icon(Icons.admin_panel_settings_outlined, color: oro),
               title: const Text('Pannello admin'),
-              trailing: const Icon(Icons.open_in_new, size: 18, color: muto),
-              onTap: () => _apri('/admin'),
+              subtitle: const Text('Gestione, statistiche, iscritti, visite e registro', style: TextStyle(color: muto)),
+              trailing: const Icon(Icons.chevron_right_rounded, color: muto),
+              onTap: () => Navigator.of(context).push(MaterialPageRoute<void>(builder: (_) => const SchermataAdmin())),
             ),
           _sezione('Regole e privacy'),
-          ListTile(leading: const Icon(Icons.gavel_rounded), title: const Text('Regolamento'), onTap: () => _apri('/regolamento')),
-          ListTile(leading: const Icon(Icons.description_outlined), title: const Text('Termini'), onTap: () => _apri('/termini')),
-          ListTile(leading: const Icon(Icons.privacy_tip_outlined), title: const Text('Privacy'), onTap: () => _apri('/privacy')),
-          ListTile(leading: const Icon(Icons.cookie_outlined), title: const Text('Cookie'), onTap: () => _apri('/cookie')),
+          ListTile(leading: const Icon(Icons.gavel_rounded), title: const Text('Regolamento'), onTap: () => apriLegale(context, 'regolamento')),
+          ListTile(leading: const Icon(Icons.description_outlined), title: const Text('Termini'), onTap: () => apriLegale(context, 'termini')),
+          ListTile(leading: const Icon(Icons.privacy_tip_outlined), title: const Text('Privacy'), onTap: () => apriLegale(context, 'privacy')),
+          ListTile(leading: const Icon(Icons.cookie_outlined), title: const Text('Cookie'), onTap: () => apriLegale(context, 'cookie')),
           _sezione('App'),
           ListTile(
             leading: const Icon(Icons.info_outline),

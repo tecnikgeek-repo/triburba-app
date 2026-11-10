@@ -13,6 +13,8 @@ import 'package:triburba/dati/api.dart';
 import 'package:triburba/dati/modelli.dart';
 import 'package:triburba/dati/stato.dart';
 import 'package:triburba/main.dart';
+import 'package:triburba/schermate/admin.dart';
+import 'package:triburba/schermate/legale.dart';
 import 'package:triburba/schermate/accesso.dart';
 import 'package:triburba/schermate/feed.dart';
 import 'package:triburba/schermate/follow.dart';
@@ -32,6 +34,7 @@ import 'package:triburba/tema.dart';
 import 'package:triburba/widget/emoji.dart';
 
 import 'caratteri.dart';
+import 'admin_finto.dart';
 import 'finto.dart';
 import 'package:triburba/widget/mappa_disegno.dart';
 
@@ -287,5 +290,20 @@ void main() {
       },
     );
     await _scatta(t, const SchermataImpostazioni(), '28-impostazioni-account');
+
+    // pannello admin dentro l'app e pagine legali
+    final adm = {
+      'gestione': adminGestioneFinta,
+      'statistiche': adminStatisticheFinte,
+      'iscritti': adminIscrittiFinti,
+      'visite': adminVisiteFinte,
+      'registro': adminRegistroFinto,
+    };
+    await _scatta(t, SchermataAdmin(iniziali: adm), '29-admin-gestione');
+    await _scatta(t, SchermataAdmin(iniziali: adm, scheda: 1), '30-admin-statistiche');
+    await _scatta(t, SchermataAdmin(iniziali: adm, scheda: 2), '31-admin-iscritti');
+    await _scatta(t, SchermataAdmin(iniziali: adm, scheda: 3), '32-admin-visite');
+    await _scatta(t, SchermataAdmin(iniziali: adm, scheda: 4), '33-admin-registro');
+    await _scatta(t, SchermataLegale(pagina: 'cookie', iniziali: legaleFinta), '34-legale-cookie');
   });
 }
