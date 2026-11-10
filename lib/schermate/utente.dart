@@ -120,7 +120,10 @@ class _SchermataUtenteState extends State<SchermataUtente> {
               Positioned.fill(
                 bottom: 40,
                 child: copertina != null
-                    ? CachedNetworkImage(imageUrl: copertina, fit: BoxFit.cover)
+                    ? GestureDetector(
+                    onTap: () => apriFoto(context, copertina),
+                    child: CachedNetworkImage(imageUrl: copertina, fit: BoxFit.cover),
+                  )
                     : const DecoratedBox(decoration: BoxDecoration(gradient: gradiente)),
               ),
               Positioned(
@@ -129,7 +132,14 @@ class _SchermataUtenteState extends State<SchermataUtente> {
                 child: Container(
                   padding: const EdgeInsets.all(3),
                   decoration: const BoxDecoration(color: vernice, shape: BoxShape.circle),
-                  child: FotoProfilo(faccia: f, lato: 88, anello: true),
+                  // tocco sulla foto: si apre grande (le iniziali senza foto non si aprono)
+                  child: GestureDetector(
+                    onTap: () {
+                      final a = img(f.foto);
+                      if (a != null && !a.startsWith('data:')) apriFoto(context, a);
+                    },
+                    child: FotoProfilo(faccia: f, lato: 88, anello: true),
+                  ),
                 ),
               ),
               Positioned(

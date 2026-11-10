@@ -135,8 +135,10 @@ class _PostCardState extends State<PostCard> {
 
   /// Condivide il post con le app del telefono e lo conta (come sul sito: una volta per persona).
   Future<void> _condividi() async {
-    await SharePlus.instance.share(ShareParams(text: '${senzaFormato(p.testo).characters.take(140)}\n\n$sito${p.url}'));
-    await _segnaCondiviso('app');
+    final r = await SharePlus.instance.share(ShareParams(text: '${senzaFormato(p.testo).characters.take(140)}\n\n$sito${p.url}'));
+    // si conta solo se è stata scelta davvero un'app (WhatsApp, Telegram…): chiudere il foglio non vale
+    if (r.status != ShareResultStatus.success) return;
+    await _segnaCondiviso(r.raw.isNotEmpty ? r.raw.split('.').last.toLowerCase().replaceAll(RegExp(r'[^a-z]'), '') : 'app');
   }
 
   Future<void> _segnaCondiviso(String canale) async {
