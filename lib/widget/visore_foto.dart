@@ -177,8 +177,9 @@ class _VisoreFotoState extends State<VisoreFoto> with SingleTickerProviderStateM
                             ],
                             const SizedBox(height: 10),
                             const Text(
-                              'Doppio tocco per ingrandire · trascina giù per chiudere',
-                              style: TextStyle(color: Color(0x99F6EDE4), fontFamily: 'Inter', fontSize: 11.5),
+                              'Tocca due volte per ingrandire\nTrascina giù per chiudere',
+                              textAlign: TextAlign.center,
+                              style: TextStyle(color: Color(0x99F6EDE4), fontFamily: 'Inter', fontSize: 12, height: 1.45),
                             ),
                           ],
                         ),
