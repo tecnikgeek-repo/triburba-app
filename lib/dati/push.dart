@@ -119,7 +119,11 @@ Future<void> collegaPush() async {
     // ignore: deprecated_member_use
     _registrazione ??= fm.onTokenRefresh.listen((t) => _invia(t));
     // quando l'app torna in primo piano ricontrollo (al massimo ogni 6 ore), così il sito ha sempre l'indirizzo giusto
-    _ciclo ??= AppLifecycleListener(onResume: () => _mandaToken());
+    // tornando nell'app: token aggiornato e contatore (e numero sull'icona) riallineato
+    _ciclo ??= AppLifecycleListener(onResume: () {
+      _mandaToken();
+      stato.ricarica();
+    });
   } catch (e) {
     debugPrint('push non collegate: $e');
   }

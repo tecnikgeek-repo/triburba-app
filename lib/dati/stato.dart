@@ -1,6 +1,7 @@
 // Stato condiviso dell'app: chi è collegato, quante notifiche nuove, e la richiesta di aprire una schermata
 // (da una notifica push o da un link triburba.it).
 import 'package:flutter/foundation.dart';
+import 'package:flutter/services.dart' show MethodChannel;
 
 import 'api.dart';
 import 'modelli.dart';
@@ -26,6 +27,7 @@ class Stato extends ChangeNotifier {
   void entra(Io nuovo) {
     io = nuovo;
     notifiche = nuovo.notifiche;
+    _icona(notifiche);
     notifyListeners();
   }
 
@@ -36,6 +38,7 @@ class Stato extends ChangeNotifier {
   }
 
   void impostaNotifiche(int n) {
+    _icona(n);
     if (n == notifiche) return;
     notifiche = n;
     notifyListeners();
@@ -50,7 +53,15 @@ class Stato extends ChangeNotifier {
     await api.esci();
     io = null;
     notifiche = 0;
+    _icona(0);
     notifyListeners();
+  }
+
+  /// iPhone: il numero rosso sull'icona lo scrive il push e resterebbe fermo; qui segue le notifiche non lette.
+  static const _badge = MethodChannel('triburba/badge');
+  void _icona(int n) {
+    if (kIsWeb || defaultTargetPlatform != TargetPlatform.iOS) return;
+    _badge.invokeMethod('imposta', n).catchError((_) {});
   }
 }
 
