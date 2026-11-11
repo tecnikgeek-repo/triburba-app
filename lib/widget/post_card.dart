@@ -242,10 +242,11 @@ class _PostCardState extends State<PostCard> {
           _testa(),
           if (p.quartiere != null || p.portate.isNotEmpty || p.rilanci > 0 || p.citta || p.area) _dove(),
           if (p.candidatura != null || p.tipo == 'candidatura') _candidatura(),
+          if (_testoVisto.trim().isNotEmpty)
           Padding(
             padding: const EdgeInsets.fromLTRB(14, 8, 14, 10),
             child: TestoRicco(
-              p.testo,
+              _testoVisto,
               stile:
                   (p.immagine == null &&
                       p.attivita == null &&
@@ -498,57 +499,105 @@ class _PostCardState extends State<PostCard> {
     );
   }
 
-  Widget _anteprimaLink(AnteprimaLink l) => GestureDetector(
-    onTap: () => launchUrl(Uri.parse(l.url), mode: LaunchMode.externalApplication),
-    child: Container(
-      margin: const EdgeInsets.fromLTRB(14, 0, 14, 10),
+  /// Il testo come si vede: se sotto c'è il riquadro del link, il link scritto in fondo non si ripete
+  String get _testoVisto => (p.link != null && p.immagine == null) ? p.link!.togliDa(p.testo) : p.testo;
+
+  Future<void> _togliAnteprima() async {
+    try {
+      await stato.api.togliAnteprima(p.id);
+      if (!mounted) return;
+      setState(() => p.link = null);
+      messaggio(context, 'Anteprima tolta');
+    } on ErroreApi catch (e) {
+      if (mounted) messaggio(context, e.messaggio);
+    }
+  }
+
+  Widget _anteprimaLink(AnteprimaLink l) {
+    final dominio = (Uri.tryParse(l.url)?.host ?? l.sito ?? '').replaceFirst(RegExp(r'^www\.'), '');
+    final quadra = l.immagine != null && l.forma != 'larga';
+    final foto = l.immagine == null
+        ? null
+        : CachedNetworkImage(
+            imageUrl: assoluto(l.immagine)!,
+            fit: BoxFit.cover,
+            errorWidget: (_, _, _) => Container(color: superficie),
+          );
+    final testi = Padding(
+      padding: EdgeInsets.fromLTRB(12, 10, p.puoModificare && quadra ? 44 : 12, 11),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          Text(dominio, maxLines: 1, overflow: TextOverflow.ellipsis, style: const TextStyle(color: muto, fontSize: 12)),
+          const SizedBox(height: 2),
+          if (l.titolo != null)
+            Text(l.titolo!, maxLines: 2, overflow: TextOverflow.ellipsis, style: const TextStyle(fontWeight: FontWeight.w700, fontSize: 15, height: 1.3)),
+          if (l.descrizione != null)
+            Padding(
+              padding: const EdgeInsets.only(top: 2),
+              child: Text(l.descrizione!, maxLines: 2, overflow: TextOverflow.ellipsis, style: const TextStyle(color: testo2, fontSize: 13, height: 1.4)),
+            ),
+        ],
+      ),
+    );
+    final riquadro = Container(
       decoration: BoxDecoration(
         color: superficie2,
-        borderRadius: BorderRadius.circular(10),
+        borderRadius: BorderRadius.circular(12),
         border: Border.all(color: linea),
       ),
       clipBehavior: Clip.antiAlias,
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          if (l.immagine != null)
-            CachedNetworkImage(
-              imageUrl: assoluto(l.immagine)!,
-              height: 170,
-              width: double.infinity,
-              fit: BoxFit.cover,
-              errorWidget: (_, _, _) => const SizedBox.shrink(),
-            ),
-          Padding(
-            padding: const EdgeInsets.all(10),
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
+      child: quadra
+          ? IntrinsicHeight(
+              child: Row(
+                crossAxisAlignment: CrossAxisAlignment.stretch,
+                children: [
+                  ConstrainedBox(constraints: const BoxConstraints(minHeight: 92), child: SizedBox(width: 92, child: foto)),
+                  Expanded(child: testi),
+                ],
+              ),
+            )
+          : Column(
+              crossAxisAlignment: CrossAxisAlignment.stretch,
               children: [
-                Text(
-                  (l.sito ?? '').toUpperCase(),
-                  style: const TextStyle(color: muto, fontSize: 11, fontWeight: FontWeight.w700, letterSpacing: .4),
-                ),
-                if (l.titolo != null)
-                  Text(
-                    l.titolo!,
-                    maxLines: 2,
-                    overflow: TextOverflow.ellipsis,
-                    style: const TextStyle(fontWeight: FontWeight.w700),
-                  ),
-                if (l.descrizione != null)
-                  Text(
-                    l.descrizione!,
-                    maxLines: 2,
-                    overflow: TextOverflow.ellipsis,
-                    style: const TextStyle(color: testo2, fontSize: 13),
-                  ),
+                if (foto != null) AspectRatio(aspectRatio: 1.91, child: foto),
+                testi,
               ],
             ),
+    );
+    return Padding(
+      padding: const EdgeInsets.fromLTRB(14, 0, 14, 10),
+      child: Stack(
+        children: [
+          GestureDetector(
+            onTap: () => launchUrl(Uri.parse(l.url), mode: LaunchMode.externalApplication),
+            child: riquadro,
           ),
+          if (p.puoModificare)
+            Positioned(
+              top: quadra || foto == null ? 0 : 6,
+              bottom: quadra || foto == null ? 0 : null,
+              right: 6,
+              child: Center(
+                child: Material(
+                  color: quadra || foto == null ? linea2 : Colors.black54,
+                  shape: const CircleBorder(),
+                  child: InkWell(
+                    customBorder: const CircleBorder(),
+                    onTap: _togliAnteprima,
+                    child: Padding(
+                      padding: const EdgeInsets.all(6),
+                      child: Icon(Icons.close_rounded, size: 18, color: quadra || foto == null ? testo2 : Colors.white),
+                    ),
+                  ),
+                ),
+              ),
+            ),
         ],
       ),
-    ),
-  );
+    );
+  }
 
   Widget _numeri() {
     if (p.reazioni.n == 0) return const SizedBox(height: 4);

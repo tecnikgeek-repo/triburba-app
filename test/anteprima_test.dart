@@ -276,6 +276,8 @@ void main() {
 
     // niente rimandi al sito: voto della candidatura, moderazione e account dentro l'app
     await _scatta(t, Scaffold(body: ListView(children: [PostCard(post: Post(postCandidatura))])), '24-candidatura-vota');
+    // card del link senza foto (le foto dal web nei test non si scaricano): link tolto dal testo e X per l'autore
+    await _scatta(t, Scaffold(body: ListView(children: [PostCard(post: Post({...post(92, 'Riaperta la biblioteca! https://example.org/biblioteca', autore: faccia('anna.rossi', 'Anna Rossi')), 'puo': {'modifica': true, 'elimina': true}, 'link': {'url': 'https://example.org/biblioteca', 'titolo': 'La biblioteca riapre con la sala studio', 'descrizione': 'Nuovi orari dal lunedì al sabato, prestito libri e corsi gratuiti.', 'immagine': null, 'sito': 'example.org', 'forma': 'nessuna', 'in_coda': true}}))])), '39-link');
     await _scatta(t, SchermataModerazione(slug: 'borgo-fiorito', datiIniziali: moderazioneFinta), '25-moderazione-moderatori');
     await _scatta(
       t,

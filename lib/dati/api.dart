@@ -199,6 +199,7 @@ class Api {
   }
 
   Future<void> elimina(int postId) => post('/app/v1/post/elimina', {'post_id': postId});
+  Future<void> togliAnteprima(int postId) => post('/app/v1/post/togli-anteprima', {'post_id': postId});
 
   /// Ci sarò / mi ritiro da un'attività. Ritorna il messaggio.
   Future<String> partecipa(int postId) async => ((await post('/api/attivita/partecipa', {'post_id': postId}))['msg'] ?? '').toString();

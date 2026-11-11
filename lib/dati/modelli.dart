@@ -64,10 +64,25 @@ class AnteprimaLink {
       titolo = _s(j['titolo']),
       descrizione = _s(j['descrizione']),
       immagine = _s(j['immagine']),
-      sito = _s(j['sito']);
+      sito = _s(j['sito']),
+      forma = _s(j['forma']) ?? 'larga',
+      inCoda = j['in_coda'] == true;
 
   final String url;
   final String? titolo, descrizione, immagine, sito;
+  /// «larga»: foto grande sopra il testo; «quadra»: miniatura di fianco (foto verticali o piccole)
+  final String forma;
+  /// il link è scritto in fondo al post: col riquadro sotto non si ripete nel testo
+  final bool inCoda;
+
+  String togliDa(String testo) {
+    if (!inCoda) return testo;
+    var t = testo.trimRight();
+    while (t.isNotEmpty && '.,;:!?)»”\''.contains(t[t.length - 1])) {
+      t = t.substring(0, t.length - 1);
+    }
+    return t.endsWith(url) ? t.substring(0, t.length - url.length).trimRight() : testo;
+  }
 }
 
 class CommentoBreve {
@@ -137,7 +152,7 @@ class Post {
   final List<Portata> portate;
   int rilanci, soglia;
   bool mioRilancio, segnalato, puoSegnalare;
-  final AnteprimaLink? link;
+  AnteprimaLink? link;
   final Map<String, dynamic>? candidatura;
 
   /// Attività o sondaggio: cambiano dopo «Ci sarò» o un voto (si rilegge il post).
