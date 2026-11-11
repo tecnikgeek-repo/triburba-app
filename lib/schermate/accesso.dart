@@ -1,4 +1,5 @@
-// Benvenuto, accesso e iscrizione (stesse regole del sito: nome vero, quartiere o comune, 14 anni e consensi).
+// Benvenuto, accesso e iscrizione (stesse regole del sito: nome vero, quartiere o comune, data di nascita con almeno 14 anni e consensi).
+import '../widget/nascita.dart';
 import '../widget/fascia_email.dart';
 import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
@@ -196,7 +197,8 @@ class _SchermataIscrizioneState extends State<SchermataIscrizione> {
   DatiIscrizione? _dati;
   String? _scelta; // id quartiere, «c<id>» comune spento, «altro»
   String? _sceltaNome;
-  bool _eta = false, _consenso = false, _invio = false, _vedi = false;
+  bool _pubblico = false, _consenso = false, _invio = false, _vedi = false;
+  DateTime? _nascita;
   String? _errore;
   final _tocchi = <TapGestureRecognizer>[];
 
@@ -254,7 +256,8 @@ class _SchermataIscrizioneState extends State<SchermataIscrizione> {
         'password': _pw.text,
         'quartiere': _scelta ?? '',
         'citta_altro': _altro.text.trim(),
-        'eta': _eta ? 1 : 0,
+        'data_nascita': dataIso(_nascita),
+        'compleanno_pubblico': _pubblico ? 1 : 0,
         'consenso': _consenso ? 1 : 0,
       });
       stato.entra(io);
@@ -369,12 +372,15 @@ class _SchermataIscrizioneState extends State<SchermataIscrizione> {
             ),
           ),
           const SizedBox(height: 10),
+          const SizedBox(height: 12),
+          CampoNascita(valore: _nascita, aiuto: 'Serve almeno $etaMinima anni', onCambia: (d) => setState(() => _nascita = d)),
           CheckboxListTile(
             contentPadding: EdgeInsets.zero,
             controlAffinity: ListTileControlAffinity.leading,
-            value: _eta,
-            onChanged: (v) => setState(() => _eta = v == true),
-            title: const Text('Ho almeno 14 anni', style: TextStyle(fontSize: 14)),
+            value: _pubblico,
+            onChanged: (v) => setState(() => _pubblico = v == true),
+            title: const Text('Fai sapere ai vicini quando è il mio compleanno, così possono farmi gli auguri (solo giorno e mese, mai l\'anno)',
+                style: TextStyle(fontSize: 14, height: 1.35)),
           ),
           CheckboxListTile(
             contentPadding: EdgeInsets.zero,
@@ -401,7 +407,7 @@ class _SchermataIscrizioneState extends State<SchermataIscrizione> {
               child: Text(_errore!, style: const TextStyle(color: pompeiano)),
             ),
           const SizedBox(height: 16),
-          BottoneCaldo(testo: 'Crea il mio account', occupato: _invio, onPressed: (_eta && _consenso) ? _iscriviti : null),
+          BottoneCaldo(testo: 'Crea il mio account', occupato: _invio, onPressed: (_nascita != null && _consenso) ? _iscriviti : null),
         ],
       ),
     );

@@ -288,6 +288,8 @@ class Io {
   String get nome => _s(_u['nome']) ?? username;
   String? get bio => _s(_u['bio']);
   String? get lavoro => _s(_u['lavoro']);
+  String? get dataNascita => _s(_u['data_nascita']);
+  bool get compleannoPubblico => _u['compleanno_pubblico'] == true;
   String? get luogo => _s(_u['luogo']);
   String? get sitoWeb => _s(_u['sito']);
   String? get copertina => _s(_u['copertina']);

@@ -74,6 +74,7 @@ class SchermataNotificheState extends State<SchermataNotifiche> {
     'vote' => Icons.how_to_vote_rounded,
     'sparkle' => Icons.auto_awesome_rounded,
     'camera' => Icons.photo_camera_rounded,
+    'cake' => Icons.cake_rounded,
     'map' || 'pin' => Icons.place_rounded,
     _ => Icons.notifications_rounded,
   };
@@ -83,6 +84,7 @@ class SchermataNotificheState extends State<SchermataNotifiche> {
     'comment' || 'chat' => golfo,
     'check' || 'handshake' => oro,
     'eye-off' => muto,
+    'cake' => const Color(0xFFD94F7A),
     _ => terracotta,
   };
 

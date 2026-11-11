@@ -200,6 +200,9 @@ class Api {
 
   Future<void> elimina(int postId) => post('/app/v1/post/elimina', {'post_id': postId});
   Future<void> togliAnteprima(int postId) => post('/app/v1/post/togli-anteprima', {'post_id': postId});
+  Future<Map<String, dynamic>> compleanni() => get('/app/v1/compleanni');
+  Future<String> auguri(int userId) async => '${(await post('/app/v1/compleanno/auguri', {'user_id': userId}))['msg'] ?? 'Auguri fatti!'}';
+  Future<String> compleannoPubblico(bool si) async => '${(await post('/app/v1/compleanno/pubblico', {'si': si ? 1 : 0}))['msg'] ?? ''}';
 
   /// Ci sarò / mi ritiro da un'attività. Ritorna il messaggio.
   Future<String> partecipa(int postId) async => ((await post('/api/attivita/partecipa', {'post_id': postId}))['msg'] ?? '').toString();

@@ -34,6 +34,7 @@ import 'package:triburba/schermate/utente.dart';
 import 'package:triburba/tema.dart';
 import 'package:triburba/widget/emoji.dart';
 import 'package:triburba/widget/da_fare.dart';
+import 'package:triburba/widget/compleanni.dart';
 import 'package:triburba/schermate/notifiche.dart';
 
 import 'caratteri.dart';
@@ -278,6 +279,33 @@ void main() {
     await _scatta(t, Scaffold(body: ListView(children: [PostCard(post: Post(postCandidatura))])), '24-candidatura-vota');
     // card del link senza foto (le foto dal web nei test non si scaricano): link tolto dal testo e X per l'autore
     await _scatta(t, Scaffold(body: ListView(children: [PostCard(post: Post({...post(92, 'Riaperta la biblioteca! https://example.org/biblioteca', autore: faccia('anna.rossi', 'Anna Rossi')), 'puo': {'modifica': true, 'elimina': true}, 'link': {'url': 'https://example.org/biblioteca', 'titolo': 'La biblioteca riapre con la sala studio', 'descrizione': 'Nuovi orari dal lunedì al sabato, prestito libri e corsi gratuiti.', 'immagine': null, 'sito': 'example.org', 'forma': 'nessuna', 'in_coda': true}}))])), '39-link');
+    // festa del compleanno in Home (dati pronti, niente rete)
+    await _scatta(
+      t,
+      const Scaffold(
+        body: SingleChildScrollView(
+          child: FestaCompleanni(
+            dati: {
+              'mio': {
+                'nome': 'Anna',
+                'pubblico': true,
+                'auguri': 3,
+                'chi': [
+                  {'username': 'luca.m', 'nome': 'Luca Marino', 'iniziali': 'LM', 'colori': ['#138a82', '#f0b34a']},
+                  {'username': 'sara.e', 'nome': 'Sara Esposito', 'iniziali': 'SE', 'colori': ['#7b4bd6', '#e0663a']},
+                  {'username': 'gino.r', 'nome': 'Gino Russo', 'iniziali': 'GR', 'colori': ['#ef4b3f', '#e0663a']},
+                ],
+              },
+              'amici': [
+                {'id': 7, 'username': 'marco.e', 'nome': 'Marco Esposito', 'iniziali': 'ME', 'colori': ['#1aa39a', '#2b6cb0'], 'fatto': false},
+                {'id': 8, 'username': 'carla.c', 'nome': 'Carla Coppola', 'iniziali': 'CC', 'colori': ['#c2410c', '#e0663a'], 'fatto': true},
+              ],
+            },
+          ),
+        ),
+      ),
+      '40-compleanno',
+    );
     await _scatta(t, SchermataModerazione(slug: 'borgo-fiorito', datiIniziali: moderazioneFinta), '25-moderazione-moderatori');
     await _scatta(
       t,

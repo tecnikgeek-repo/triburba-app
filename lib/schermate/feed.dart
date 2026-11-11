@@ -4,6 +4,7 @@ import 'package:flutter/material.dart';
 
 import '../dati/stato.dart';
 import '../tema.dart';
+import '../widget/compleanni.dart';
 import '../widget/da_fare.dart';
 import '../widget/fascia_email.dart';
 import '../widget/lista_post.dart';
@@ -23,6 +24,7 @@ class SchermataFeedState extends State<SchermataFeed> with TickerProviderStateMi
   List<(String, String)> _elenco = const [];
   final _liste = <String, GlobalKey<ListaPostState>>{};
   final _fila = GlobalKey<FilaDaFareState>();
+  final _festa = GlobalKey<FestaCompleanniState>();
 
   @override
   void initState() {
@@ -56,6 +58,7 @@ class SchermataFeedState extends State<SchermataFeed> with TickerProviderStateMi
   void aggiornaTutto() {
     _schede?.animateTo(0);
     _fila.currentState?.aggiorna();
+    _festa.currentState?.aggiorna();
     for (final k in _liste.values) {
       k.currentState?.aggiorna();
     }
@@ -105,6 +108,7 @@ class SchermataFeedState extends State<SchermataFeed> with TickerProviderStateMi
                                   crossAxisAlignment: CrossAxisAlignment.stretch,
                                   children: [
                                     const FasciaEmail(),
+                                    FestaCompleanni(key: _festa),
                                     TestataHome(onScritto: aggiornaTutto),
                                     FilaDaFare(key: _fila),
                                     if (guidaVisibile)

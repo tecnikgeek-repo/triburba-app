@@ -13,6 +13,7 @@ import '../dati/push.dart';
 import '../dati/stato.dart';
 import '../tema.dart';
 import '../widget/faccia.dart';
+import '../widget/nascita.dart';
 import 'admin.dart';
 import 'legale.dart';
 import 'preferenze_notifiche.dart';
@@ -33,6 +34,8 @@ class _SchermataModificaProfiloState extends State<SchermataModificaProfilo> {
   late final _lavoro = TextEditingController(text: stato.io?.lavoro);
   late final _luogo = TextEditingController(text: stato.io?.luogo);
   late final _sito = TextEditingController(text: stato.io?.sitoWeb);
+  late DateTime? _nascita = daIso(stato.io?.dataNascita);
+  late bool _pubblico = stato.io?.compleannoPubblico ?? false;
   bool _salvo = false;
   bool _foto = false;
   final _fuocoBio = FocusNode();
@@ -76,6 +79,8 @@ class _SchermataModificaProfiloState extends State<SchermataModificaProfilo> {
         'lavoro': _lavoro.text.trim(),
         'luogo': _luogo.text.trim(),
         'sito': _sito.text.trim(),
+        if (_nascita != null) 'data_nascita': dataIso(_nascita)!,
+        if (_nascita != null) 'compleanno_pubblico': _pubblico ? '1' : '0',
       });
       stato.entra(io);
       if (mounted) {
@@ -174,6 +179,15 @@ class _SchermataModificaProfiloState extends State<SchermataModificaProfilo> {
             focusNode: _fuocoLavoro,
             maxLength: 80,
             decoration: const InputDecoration(labelText: 'Lavoro'),
+          ),
+          const SizedBox(height: 8),
+          CampoNascita(valore: _nascita, aiuto: 'Privata: non la vede nessuno', onCambia: (d) => setState(() => _nascita = d)),
+          SwitchListTile(
+            contentPadding: EdgeInsets.zero,
+            value: _pubblico,
+            onChanged: _nascita == null ? null : (v) => setState(() => _pubblico = v),
+            title: const Text('Fai sapere ai vicini quando è il mio compleanno', style: TextStyle(fontSize: 14.5)),
+            subtitle: const Text('Solo giorno e mese, mai l\'anno: quel giorno possono farti gli auguri', style: TextStyle(fontSize: 12.5)),
           ),
           const SizedBox(height: 8),
           TextField(

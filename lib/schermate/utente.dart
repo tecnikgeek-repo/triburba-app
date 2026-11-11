@@ -278,6 +278,7 @@ class _SchermataUtenteState extends State<SchermataUtente> {
                 ],
               ),
               Text('@${f.username}', style: const TextStyle(color: muto)),
+              if (u['compleanno'] is Map) _compleanno(u, io, f),
               if ((u['bio'] as String?)?.isNotEmpty == true) ...[
                 const SizedBox(height: 8),
                 Text('${u['bio']}', style: const TextStyle(height: 1.4)),
@@ -323,6 +324,64 @@ class _SchermataUtenteState extends State<SchermataUtente> {
           ),
         ),
       ],
+    );
+  }
+
+  /// Il giorno del compleanno: pillola festosa e, per gli altri, il tasto «Fai gli auguri»
+  Widget _compleanno(Map<String, dynamic> u, bool io, Faccia f) {
+    final c = u['compleanno'] as Map<String, dynamic>;
+    final fatto = c['fatto'] == true;
+    return Padding(
+      padding: const EdgeInsets.only(top: 8),
+      child: Wrap(
+        spacing: 10,
+        runSpacing: 8,
+        crossAxisAlignment: WrapCrossAlignment.center,
+        children: [
+          Container(
+            padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
+            decoration: BoxDecoration(
+              borderRadius: BorderRadius.circular(99),
+              gradient: const LinearGradient(colors: [terracotta, Color(0xFFD94F7A)]),
+            ),
+            child: Row(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                const Icon(Icons.cake_rounded, size: 16, color: bianco),
+                const SizedBox(width: 6),
+                Text(io ? 'Oggi è il tuo compleanno!' : 'Oggi compie gli anni',
+                    style: const TextStyle(color: bianco, fontWeight: FontWeight.w700, fontSize: 13.5)),
+              ],
+            ),
+          ),
+          if (c['auguri_possibili'] == true)
+            fatto
+                ? const Row(
+                    mainAxisSize: MainAxisSize.min,
+                    children: [
+                      Icon(Icons.check_rounded, size: 18, color: Color(0xFF7FD6A6)),
+                      SizedBox(width: 4),
+                      Text('Auguri fatti', style: TextStyle(color: Color(0xFF7FD6A6), fontWeight: FontWeight.w700)),
+                    ],
+                  )
+                : FilledButton.icon(
+                    style: FilledButton.styleFrom(backgroundColor: terracotta, foregroundColor: bianco, visualDensity: VisualDensity.compact),
+                    onPressed: () async {
+                      setState(() => c['fatto'] = true);
+                      try {
+                        final msg = await stato.api.auguri((c['id'] as num?)?.toInt() ?? 0);
+                        if (mounted) messaggio(context, msg);
+                      } on ErroreApi catch (e) {
+                        if (!mounted) return;
+                        setState(() => c['fatto'] = false);
+                        messaggio(context, e.messaggio);
+                      }
+                    },
+                    icon: const Icon(Icons.cake_outlined, size: 17),
+                    label: Text('Fai gli auguri a ${f.nome.split(' ').first}'),
+                  ),
+        ],
+      ),
     );
   }
 
