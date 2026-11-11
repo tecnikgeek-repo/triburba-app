@@ -70,8 +70,10 @@ class AnteprimaLink {
 
   final String url;
   final String? titolo, descrizione, immagine, sito;
+
   /// «larga»: foto grande sopra il testo; «quadra»: miniatura di fianco (foto verticali o piccole)
   final String forma;
+
   /// il link è scritto in fondo al post: col riquadro sotto non si ripete nel testo
   final bool inCoda;
 
@@ -241,6 +243,7 @@ class Commento {
       autoreDelPost = j['autore'] == true,
       mio = j['mio'] == true,
       puoEliminare = j['elimina'] == true,
+      nascosto = j['nascosto'] == true,
       bot = j['bot'] == true,
       stemma = j['stemma'] is Map ? Stemma(j['stemma'] as Map<String, dynamic>) : null;
 
@@ -252,7 +255,7 @@ class Commento {
   int likes;
   String? mia;
   List<String> top;
-  final bool autoreDelPost, mio, puoEliminare, bot;
+  final bool autoreDelPost, mio, puoEliminare, nascosto, bot;
   final Stemma? stemma;
 }
 

@@ -9,6 +9,7 @@ import '../dati/stato.dart';
 import '../tema.dart';
 import '../widget/faccia.dart';
 import '../widget/lista_post.dart';
+import '../widget/segnala.dart';
 import 'bloccati.dart';
 import 'naviga.dart';
 import 'profilo.dart';
@@ -83,6 +84,10 @@ class _SchermataUtenteState extends State<SchermataUtente> {
             PopupMenuButton<String>(
               tooltip: 'Altre azioni',
               onSelected: (v) async {
+                if (v == 'segnala') {
+                  await segnalaPersona(context, widget.username);
+                  return;
+                }
                 final sblocca = u['bloccato'] == true;
                 if (await bloccaPersona(context, widget.username, '${u['nome']}', sblocca: sblocca) && mounted) {
                   setState(() => u['bloccato'] = !sblocca);
@@ -90,11 +95,24 @@ class _SchermataUtenteState extends State<SchermataUtente> {
                 }
               },
               itemBuilder: (_) => [
+                const PopupMenuItem(
+                  value: 'segnala',
+                  child: Row(
+                    children: [
+                      Icon(Icons.flag_outlined, color: pompeiano),
+                      SizedBox(width: 10),
+                      Text('Segnala il profilo'),
+                    ],
+                  ),
+                ),
                 PopupMenuItem(
                   value: 'blocca',
                   child: Row(
                     children: [
-                      Icon(u['bloccato'] == true ? Icons.lock_open_rounded : Icons.block_rounded, color: u['bloccato'] == true ? testo : pompeiano),
+                      Icon(
+                        u['bloccato'] == true ? Icons.lock_open_rounded : Icons.block_rounded,
+                        color: u['bloccato'] == true ? testo : pompeiano,
+                      ),
                       const SizedBox(width: 10),
                       Text(u['bloccato'] == true ? 'Sblocca' : 'Blocca'),
                     ],
@@ -142,7 +160,11 @@ class _SchermataUtenteState extends State<SchermataUtente> {
     return Container(
       margin: const EdgeInsets.fromLTRB(12, 10, 12, 10),
       padding: const EdgeInsets.fromLTRB(14, 12, 14, 12),
-      decoration: BoxDecoration(color: superficie, borderRadius: BorderRadius.circular(14), border: Border.all(color: linea)),
+      decoration: BoxDecoration(
+        color: superficie,
+        borderRadius: BorderRadius.circular(14),
+        border: Border.all(color: linea),
+      ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
@@ -153,10 +175,15 @@ class _SchermataUtenteState extends State<SchermataUtente> {
               Expanded(
                 child: ClipRRect(
                   borderRadius: BorderRadius.circular(99),
-                  child: Stack(children: [
-                    Container(height: 6, color: linea2),
-                    FractionallySizedBox(widthFactor: perc / 100, child: Container(height: 6, decoration: const BoxDecoration(gradient: gradiente))),
-                  ]),
+                  child: Stack(
+                    children: [
+                      Container(height: 6, color: linea2),
+                      FractionallySizedBox(
+                        widthFactor: perc / 100,
+                        child: Container(height: 6, decoration: const BoxDecoration(gradient: gradiente)),
+                      ),
+                    ],
+                  ),
                 ),
               ),
             ],
@@ -349,8 +376,10 @@ class _SchermataUtenteState extends State<SchermataUtente> {
               children: [
                 const Icon(Icons.cake_rounded, size: 16, color: bianco),
                 const SizedBox(width: 6),
-                Text(io ? 'Oggi è il tuo compleanno!' : 'Oggi compie gli anni',
-                    style: const TextStyle(color: bianco, fontWeight: FontWeight.w700, fontSize: 13.5)),
+                Text(
+                  io ? 'Oggi è il tuo compleanno!' : 'Oggi compie gli anni',
+                  style: const TextStyle(color: bianco, fontWeight: FontWeight.w700, fontSize: 13.5),
+                ),
               ],
             ),
           ),
@@ -361,11 +390,18 @@ class _SchermataUtenteState extends State<SchermataUtente> {
                     children: [
                       Icon(Icons.check_rounded, size: 18, color: Color(0xFF7FD6A6)),
                       SizedBox(width: 4),
-                      Text('Auguri fatti', style: TextStyle(color: Color(0xFF7FD6A6), fontWeight: FontWeight.w700)),
+                      Text(
+                        'Auguri fatti',
+                        style: TextStyle(color: Color(0xFF7FD6A6), fontWeight: FontWeight.w700),
+                      ),
                     ],
                   )
                 : FilledButton.icon(
-                    style: FilledButton.styleFrom(backgroundColor: terracotta, foregroundColor: bianco, visualDensity: VisualDensity.compact),
+                    style: FilledButton.styleFrom(
+                      backgroundColor: terracotta,
+                      foregroundColor: bianco,
+                      visualDensity: VisualDensity.compact,
+                    ),
                     onPressed: () async {
                       setState(() => c['fatto'] = true);
                       try {

@@ -248,6 +248,21 @@ class Api {
 
   Future<Map<String, dynamic>> seguiTag(String tag) => post('/api/hashtag/segui', {'tag': tag});
 
+  /// Segnala un commento (come Facebook: Nascondi · Segnala · Blocca)
+  Future<String> segnalaCommento(int commentoId, String motivo) async =>
+      ((await post('/api/commento/segnala', {'comment_id': commentoId, 'motivo': motivo}))['msg'] ?? '').toString();
+
+  /// Nasconde un commento solo per me
+  Future<String> nascondiCommento(int commentoId) async =>
+      ((await post('/api/commento/nascondi', {'comment_id': commentoId}))['msg'] ?? '').toString();
+
+  /// Segnala una persona allo staff
+  Future<String> segnalaPersona(String username, String motivo) async =>
+      ((await post('/api/persona/segnala', {'username': username, 'motivo': motivo}))['msg'] ?? '').toString();
+
+  /// Motivi per segnalare commenti e persone
+  Future<Map<String, dynamic>> motiviSegnalazione() => get('/app/v1/segnala/motivi');
+
   Future<String> segnala(int postId, String motivo) async =>
       ((await post('/api/segnala', {'post_id': postId, 'motivo': motivo}))['msg'] ?? '').toString();
 
@@ -323,12 +338,16 @@ class Api {
 
   Future<Map<String, dynamic>> adminGestione({int pu = 1, int pp = 1, bool post7 = false}) =>
       get('/app/v1/admin/gestione', _q({'pu': pu, 'pp': pp, 'post7': post7 ? 1 : null}));
-  Future<Map<String, dynamic>> adminSospendi(int userId, bool ban) => post('/app/v1/admin/utente/sospendi', {'user_id': userId, 'ban': ban ? 1 : 0});
-  Future<Map<String, dynamic>> adminRuolo(int userId, String ruolo) => post('/app/v1/admin/utente/ruolo', {'user_id': userId, 'role': ruolo});
+  Future<Map<String, dynamic>> adminSospendi(int userId, bool ban) =>
+      post('/app/v1/admin/utente/sospendi', {'user_id': userId, 'ban': ban ? 1 : 0});
+  Future<Map<String, dynamic>> adminRuolo(int userId, String ruolo) =>
+      post('/app/v1/admin/utente/ruolo', {'user_id': userId, 'role': ruolo});
   Future<Map<String, dynamic>> adminEliminaPost(int postId) => post('/app/v1/admin/post/elimina', {'post_id': postId});
-  Future<Map<String, dynamic>> adminImmagine(int postId, String azione) => post('/app/v1/admin/immagine', {'post_id': postId, 'azione': azione});
+  Future<Map<String, dynamic>> adminImmagine(int postId, String azione) =>
+      post('/app/v1/admin/immagine', {'post_id': postId, 'azione': azione});
   Future<Map<String, dynamic>> adminResidente(int userId) => post('/app/v1/admin/residente', {'user_id': userId});
-  Future<Map<String, dynamic>> adminZona(String tipo, int id, bool acceso) => post('/app/v1/admin/zona', {'tipo': tipo, 'id': id, 'acceso': acceso ? 1 : 0});
+  Future<Map<String, dynamic>> adminZona(String tipo, int id, bool acceso) =>
+      post('/app/v1/admin/zona', {'tipo': tipo, 'id': id, 'acceso': acceso ? 1 : 0});
   Future<Map<String, dynamic>> adminSoglie(Map<String, int> valori) => post('/app/v1/admin/soglie', {'valori': valori});
   Future<Map<String, dynamic>> adminPubblicazione(Map<String, String> valori) => post('/app/v1/admin/pubblicazione', {'valori': valori});
   Future<Map<String, dynamic>> adminStatistiche() => get('/app/v1/admin/statistiche');
@@ -336,7 +355,8 @@ class Api {
       get('/app/v1/admin/iscritti', _q({'giorni': giorni, 'q': cerca, 'pn': pn, 'pv': pv}));
   Future<Map<String, dynamic>> adminVisite({int giorni = 30, String ordine = 'ultimo', int pa = 1}) =>
       get('/app/v1/admin/visite', _q({'giorni': giorni, 'ordine': ordine, 'pa': pa}));
-  Future<Map<String, dynamic>> adminRegistro({String azione = '', int pg = 1}) => get('/app/v1/admin/registro', _q({'azione': azione, 'pg': pg}));
+  Future<Map<String, dynamic>> adminRegistro({String azione = '', int pg = 1}) =>
+      get('/app/v1/admin/registro', _q({'azione': azione, 'pg': pg}));
   Future<Map<String, dynamic>> adminCommenti({int pc = 1}) => get('/app/v1/admin/commenti', _q({'pc': pc}));
   Future<Map<String, dynamic>> adminEliminaCommento(int id) => post('/app/v1/admin/commento/elimina', {'comment_id': id});
   Future<Map<String, dynamic>> legale(String pagina) => get('/app/v1/legale/$pagina');
@@ -344,8 +364,7 @@ class Api {
   // ── Da fare, nuovi vicini e benvenuto ──
 
   /// La fila «Da fare» di chi è collegato (uguale alla Home del sito): {voci: [...]}.
-  Future<List<Map<String, dynamic>>> daFare() async =>
-      ((await get('/app/v1/da-fare'))['voci'] as List).cast<Map<String, dynamic>>();
+  Future<List<Map<String, dynamic>>> daFare() async => ((await get('/app/v1/da-fare'))['voci'] as List).cast<Map<String, dynamic>>();
 
   /// Chi è arrivato nel mio quartiere negli ultimi 7 giorni: [{id, faccia, quando, salutato}].
   Future<List<Map<String, dynamic>>> nuoviVicini() async =>
@@ -376,7 +395,14 @@ class Api {
       ((await post('/app/v1/quartiere/ripristina', {'quartiere_id': quartiereId, 'post_id': postId}))['msg'] ?? '').toString();
 
   Future<String> decidiProposta(int quartiereId, int postId, String livello, bool accetta) async =>
-      ((await post('/app/v1/quartiere/proposta', {'quartiere_id': quartiereId, 'post_id': postId, 'livello': livello, 'accetta': accetta}))['msg'] ?? '').toString();
+      ((await post('/app/v1/quartiere/proposta', {
+                'quartiere_id': quartiereId,
+                'post_id': postId,
+                'livello': livello,
+                'accetta': accetta,
+              }))['msg'] ??
+              '')
+          .toString();
 
   Future<Io> cambiaFoto(File foto, {bool copertina = false}) async =>
       Io((await invia('/app/v1/profilo/foto', {'tipo': copertina ? 'copertina' : 'avatar'}, campoFile: 'foto', file: foto))['io']);

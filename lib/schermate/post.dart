@@ -9,6 +9,8 @@ import '../widget/emoji.dart';
 import '../widget/faccia.dart';
 import '../widget/menzioni.dart';
 import '../widget/post_card.dart';
+import '../widget/segnala.dart';
+import 'bloccati.dart';
 import '../widget/testo_ricco.dart';
 import 'naviga.dart';
 
@@ -95,6 +97,72 @@ class _SchermataPostState extends State<SchermataPost> {
         c.top = (j['top'] as List).map((e) => '$e').toList();
       });
       if (c.mia != null) esplodiEmoji(context, c.mia!);
+    } on ErroreApi catch (e) {
+      if (mounted) messaggio(context, e.messaggio);
+    }
+  }
+
+  /// «⋯» su un commento degli altri: Nascondi · Segnala · Blocca (come Facebook)
+  Future<void> _menuCommento(Commento c) async {
+    final scelta = await showModalBottomSheet<String>(
+      context: context,
+      builder: (s) => SafeArea(
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            ListTile(
+              leading: const Icon(Icons.visibility_off_outlined),
+              title: const Text('Nascondi commento'),
+              subtitle: const Text('Non lo vedrai più', style: TextStyle(color: muto, fontSize: 12.5)),
+              onTap: () => Navigator.pop(s, 'nascondi'),
+            ),
+            ListTile(
+              leading: const Icon(Icons.flag_outlined, color: pompeiano),
+              title: const Text(
+                'Segnala commento',
+                style: TextStyle(color: pompeiano, fontWeight: FontWeight.w600),
+              ),
+              onTap: () => Navigator.pop(s, 'segnala'),
+            ),
+            ListTile(
+              leading: const Icon(Icons.block_rounded, color: pompeiano),
+              title: Text(
+                'Blocca @${c.username}',
+                style: const TextStyle(color: pompeiano, fontWeight: FontWeight.w600),
+              ),
+              onTap: () => Navigator.pop(s, 'blocca'),
+            ),
+            const SizedBox(height: 8),
+          ],
+        ),
+      ),
+    );
+    if (scelta == null || !mounted) return;
+    try {
+      if (scelta == 'blocca') {
+        if (await bloccaPersona(context, c.username, c.nome) && mounted) _carica();
+        return;
+      }
+      String msg;
+      if (scelta == 'nascondi') {
+        msg = await stato.api.nascondiCommento(c.id);
+      } else {
+        final m = await scegliMotivo(
+          context,
+          intestazione: 'Perché segnali il commento?',
+          spiega: 'La segnalazione è anonima. Lo staff la controlla entro 24 ore; se la confermano abbastanza residenti, il commento sparisce subito.',
+          motivi: stato.io?.motivi ?? const [],
+        );
+        if (m == null || !mounted) return;
+        msg = await stato.api.segnalaCommento(c.id, m);
+      }
+      if (!mounted) return;
+      setState(() {
+        final tolti = _commenti!.where((x) => x.id == c.id || x.padre == c.id).length;
+        _commenti!.removeWhere((x) => x.id == c.id || x.padre == c.id);
+        _post?.commenti -= tolti;
+      });
+      messaggio(context, msg);
     } on ErroreApi catch (e) {
       if (mounted) messaggio(context, e.messaggio);
     }
@@ -245,12 +313,29 @@ class _SchermataPostState extends State<SchermataPost> {
                         _fuoco.requestFocus();
                       }),
                     if (c.puoEliminare) _azioncina('Elimina', () => _elimina(c)),
+                    if (c.mio && c.nascosto)
+                      const Padding(
+                        padding: EdgeInsets.only(left: 10),
+                        child: Text(
+                          'Nascosto agli altri',
+                          style: TextStyle(color: pompeiano, fontSize: 12, fontWeight: FontWeight.w700),
+                        ),
+                      ),
                     const Spacer(),
                     if (c.likes > 0) ...[
                       PilaEmoji(c.top.isEmpty && c.mia != null ? [c.mia!] : c.top, lato: 15),
                       const SizedBox(width: 3),
                       Text('${c.likes}', style: const TextStyle(color: muto, fontSize: 12)),
                     ],
+                    if (!c.mio)
+                      InkResponse(
+                        onTap: () => _menuCommento(c),
+                        radius: 20,
+                        child: const Padding(
+                          padding: EdgeInsets.fromLTRB(10, 2, 2, 2),
+                          child: Icon(Icons.more_horiz_rounded, size: 20, color: muto, semanticLabel: 'Nascondi o segnala'),
+                        ),
+                      ),
                   ],
                 ),
               ),
