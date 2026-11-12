@@ -108,7 +108,8 @@ class _PostCardState extends State<PostCard> {
     if (!mounted || scelta == null) return;
     switch (scelta) {
       case 'modifica':
-        final nuovo = await modificaTesto(context, p.testo, stato.io?.maxPost ?? 3000);
+        final nuovo = await modificaTesto(context, p.testo, stato.io?.maxPost ?? 3000,
+            anteprima: p.immagine == null ? p.link : null, togliAnteprima: _togliAnteprima);
         if (nuovo == null || nuovo == p.testo || !mounted) return;
         try {
           await stato.api.modifica(p.id, nuovo);
@@ -524,7 +525,7 @@ class _PostCardState extends State<PostCard> {
             errorWidget: (_, _, _) => Container(color: superficie),
           );
     final testi = Padding(
-      padding: EdgeInsets.fromLTRB(12, 10, p.puoModificare && quadra ? 44 : 12, 11),
+      padding: const EdgeInsets.fromLTRB(12, 10, 12, 11),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         mainAxisSize: MainAxisSize.min,
@@ -566,35 +567,12 @@ class _PostCardState extends State<PostCard> {
               ],
             ),
     );
+    // la X per togliere l'anteprima c'è solo mentre si modifica il post (modificaTesto), mai sul post pubblicato
     return Padding(
       padding: const EdgeInsets.fromLTRB(14, 0, 14, 10),
-      child: Stack(
-        children: [
-          GestureDetector(
-            onTap: () => launchUrl(Uri.parse(l.url), mode: LaunchMode.externalApplication),
-            child: riquadro,
-          ),
-          if (p.puoModificare)
-            Positioned(
-              top: quadra || foto == null ? 0 : 6,
-              bottom: quadra || foto == null ? 0 : null,
-              right: 6,
-              child: Center(
-                child: Material(
-                  color: quadra || foto == null ? linea2 : Colors.black54,
-                  shape: const CircleBorder(),
-                  child: InkWell(
-                    customBorder: const CircleBorder(),
-                    onTap: _togliAnteprima,
-                    child: Padding(
-                      padding: const EdgeInsets.all(6),
-                      child: Icon(Icons.close_rounded, size: 18, color: quadra || foto == null ? testo2 : Colors.white),
-                    ),
-                  ),
-                ),
-              ),
-            ),
-        ],
+      child: GestureDetector(
+        onTap: () => launchUrl(Uri.parse(l.url), mode: LaunchMode.externalApplication),
+        child: riquadro,
       ),
     );
   }
@@ -760,8 +738,11 @@ class _PostCardState extends State<PostCard> {
 }
 
 /// Finestra per modificare il testo di un post.
-Future<String?> modificaTesto(BuildContext context, String attuale, int max) async {
+/// Se il post ha l'anteprima di un link, qui (e solo qui) c'è la X per toglierla.
+Future<String?> modificaTesto(BuildContext context, String attuale, int max,
+    {AnteprimaLink? anteprima, Future<void> Function()? togliAnteprima}) async {
   final c = TextEditingController(text: attuale);
+  var conAnteprima = anteprima != null && togliAnteprima != null;
   final r = await showModalBottomSheet<String>(
     context: context,
     isScrollControlled: true,
@@ -774,6 +755,34 @@ Future<String?> modificaTesto(BuildContext context, String attuale, int max) asy
           Text('Modifica il post', style: titolo(20)),
           const SizedBox(height: 12),
           TextField(controller: c, maxLines: 8, minLines: 3, maxLength: max, autofocus: true),
+          if (anteprima != null && togliAnteprima != null)
+            StatefulBuilder(
+              builder: (ctx2, aggiorna) => !conAnteprima
+                  ? const SizedBox.shrink()
+                  : Container(
+                      margin: const EdgeInsets.only(bottom: 8),
+                      padding: const EdgeInsets.fromLTRB(12, 8, 4, 8),
+                      decoration: BoxDecoration(color: superficie2, borderRadius: BorderRadius.circular(12), border: Border.all(color: linea)),
+                      child: Row(
+                        children: [
+                          const Icon(Icons.link_rounded, size: 18, color: muto),
+                          const SizedBox(width: 8),
+                          Expanded(
+                            child: Text(anteprima.titolo ?? anteprima.url, maxLines: 2, overflow: TextOverflow.ellipsis,
+                                style: const TextStyle(fontWeight: FontWeight.w600, fontSize: 13.5, height: 1.3)),
+                          ),
+                          IconButton(
+                            tooltip: "Togli l'anteprima",
+                            icon: const Icon(Icons.close_rounded, size: 20, color: testo2),
+                            onPressed: () async {
+                              await togliAnteprima();
+                              aggiorna(() => conAnteprima = false);
+                            },
+                          ),
+                        ],
+                      ),
+                    ),
+            ),
           const SizedBox(height: 8),
           FilledButton(onPressed: () => Navigator.pop(ctx, c.text.trim()), child: const Text('Salva')),
         ],
