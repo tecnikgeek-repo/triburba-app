@@ -1039,7 +1039,7 @@ class _IscrittiState extends State<_Iscritti> with AutomaticKeepAliveClientMixin
                 title: Text(_s(u['display_name']).isEmpty ? '@${u['username']}' : _s(u['display_name']), style: const TextStyle(fontWeight: FontWeight.w700)),
                 subtitle: Text(
                   '@${u['username']} · ${_s(u['q_nome']).isEmpty ? 'senza quartiere' : '${u['q_nome']} (${_s(u['residenza']) == 'confermata' ? 'residente' : 'in attesa'})'}\n'
-                  '${quandoAdmin(u['created_at'])} · ${_s(u['iscritto_da']) == 'app' ? 'dall\'app' : (_s(u['iscritto_da']).isEmpty ? '' : 'dal sito web')}'
+                  '${quandoAdmin(u['created_at'])} · ${_s(u['iscritto_da']) == 'app' ? 'dall\'app' : (_s(u['iscritto_da']).isEmpty ? '' : 'dalla versione web')}'
                   '${_s(u['ultimo_accesso']).isEmpty ? '' : ' · ultimo accesso ${quandoAdmin(u['ultimo_accesso'])}'}',
                   style: const TextStyle(color: muto, fontSize: 12.5, height: 1.35),
                 ),
@@ -1205,7 +1205,7 @@ class _VisiteState extends State<_Visite> with AutomaticKeepAliveClientMixin {
         _Sezione(
           icona: Icons.check_rounded,
           intestazione: 'Iscritti attivi al giorno',
-          spiega: 'Iscritti che sono entrati almeno una volta, dal sito o dall\'app.',
+          spiega: 'Iscritti che sono entrati almeno una volta, dalla versione web o dall\'app.',
           figli: [GraficoBarre(a: serieDa(r['attivi_giorni']))],
         ),
         _Sezione(icona: Icons.menu_book_outlined, intestazione: 'Pagine più viste', figli: [Classifica(righe: _righe(r['pagine']), nomi: _nomi(d, 'nomi_pagine'))]),
@@ -1217,7 +1217,7 @@ class _VisiteState extends State<_Visite> with AutomaticKeepAliveClientMixin {
         ),
         _Sezione(
           icona: Icons.devices_outlined,
-          intestazione: 'Sito web o app, telefono o computer',
+          intestazione: 'Versione web o app, telefono o computer',
           spiega: 'Pagine viste.',
           figli: [
             Classifica(righe: _righe(r['canali']), nomi: _nomi(d, 'nomi_canali')),
