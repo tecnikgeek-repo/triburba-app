@@ -148,6 +148,27 @@ class Api {
     return (Io(j['io']), (j['msg'] ?? '').toString());
   }
 
+  /// Client web di Google che il server accetta (null = accesso con Google spento).
+  Future<String?> clientGoogle() async {
+    final g = (await get('/app/v1/accesso'))['google'];
+    return g is String && g.isNotEmpty ? g : null;
+  }
+
+  /// Accesso con l'id_token di Google: entra subito (io) oppure va completata l'iscrizione (biglietto + proposta).
+  Future<({Io? io, String? biglietto, Map<String, dynamic>? proposta})> accediGoogle(String idToken) async {
+    final j = await post('/app/v1/accedi/google', {'id_token': idToken, 'piattaforma': _piattaforma, 'versione': versione});
+    if (j['nuovo'] == true) return (io: null, biglietto: j['biglietto'] as String, proposta: j['proposta'] as Map<String, dynamic>);
+    await _salvaToken(j['token'] as String);
+    return (io: Io(j['io']), biglietto: null, proposta: null);
+  }
+
+  /// Ultimo passo dell'iscrizione dopo Google. Ritorna (io, messaggio di benvenuto).
+  Future<(Io, String)> iscrivitiGoogle(Map<String, dynamic> dati) async {
+    final j = await post('/app/v1/iscriviti/google', {...dati, 'piattaforma': _piattaforma, 'versione': versione});
+    await _salvaToken(j['token'] as String);
+    return (Io(j['io']), (j['msg'] ?? '').toString());
+  }
+
   Future<void> esci() async {
     try {
       await post('/app/v1/esci');

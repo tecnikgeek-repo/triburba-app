@@ -1,6 +1,8 @@
 // Benvenuto, accesso e iscrizione (stesse regole del sito: nome vero, quartiere o comune, data di nascita con almeno 14 anni e consensi).
 import '../widget/nascita.dart';
 import '../widget/fascia_email.dart';
+import '../widget/tasto_google.dart';
+
 import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
 import 'package:url_launcher/url_launcher.dart';
@@ -68,6 +70,7 @@ class SchermataBenvenuto extends StatelessWidget {
                   style: TextStyle(color: muto, height: 1.45, fontSize: 14),
                 ),
                 const Spacer(flex: 2),
+                const TastoGoogle(),
                 BottoneCaldo(
                   testo: 'Iscriviti',
                   onPressed: () => Navigator.of(context).push(MaterialPageRoute<void>(builder: (_) => const SchermataIscrizione())),
@@ -140,6 +143,7 @@ class _SchermataAccessoState extends State<SchermataAccesso> {
           textAlign: TextAlign.center,
         ),
         const SizedBox(height: 24),
+        const TastoGoogle(),
         TextField(
           controller: _id,
           autofillHints: const [AutofillHints.username, AutofillHints.email],
@@ -181,7 +185,10 @@ class _SchermataAccessoState extends State<SchermataAccesso> {
 }
 
 class SchermataIscrizione extends StatefulWidget {
-  const SchermataIscrizione({super.key});
+  const SchermataIscrizione({super.key, this.google});
+
+  /// Arrivo da «Continua con Google»: email già confermata, niente password; nome, cognome e username proposti.
+  final ({String biglietto, Map<String, dynamic> proposta})? google;
 
   @override
   State<SchermataIscrizione> createState() => _SchermataIscrizioneState();
@@ -205,6 +212,12 @@ class _SchermataIscrizioneState extends State<SchermataIscrizione> {
   @override
   void initState() {
     super.initState();
+    final g = widget.google?.proposta;
+    if (g != null) {
+      _nome.text = '${g['nome'] ?? ''}';
+      _cognome.text = '${g['cognome'] ?? ''}';
+      _user.text = '${g['username'] ?? ''}';
+    }
     stato.api
         .datiIscrizione()
         .then((d) {
@@ -248,18 +261,20 @@ class _SchermataIscrizioneState extends State<SchermataIscrizione> {
       _errore = null;
     });
     try {
-      final (io, msg) = await stato.api.iscriviti({
+      final dati = <String, dynamic>{
         'nome': _nome.text.trim(),
         'cognome': _cognome.text.trim(),
         'username': _user.text.trim(),
-        'email': _email.text.trim(),
-        'password': _pw.text,
         'quartiere': _scelta ?? '',
         'citta_altro': _altro.text.trim(),
         'data_nascita': dataIso(_nascita),
         'compleanno_pubblico': _pubblico ? 1 : 0,
         'consenso': _consenso ? 1 : 0,
-      });
+      };
+      final g = widget.google;
+      final (io, msg) = g != null
+          ? await stato.api.iscrivitiGoogle({...dati, 'biglietto': g.biglietto})
+          : await stato.api.iscriviti({...dati, 'email': _email.text.trim(), 'password': _pw.text});
       stato.entra(io);
       collegaPush();
       if (!mounted) return;
@@ -278,7 +293,9 @@ class _SchermataIscrizioneState extends State<SchermataIscrizione> {
     // regolamento, termini e privacy si leggono dentro l'app
     final pagina = percorso.replaceAll('/', '');
     final t = TapGestureRecognizer()
-      ..onTap = () => pagineLegali.containsKey(pagina) ? apriLegale(context, pagina) : launchUrl(Uri.parse('$sito$percorso'), mode: LaunchMode.externalApplication);
+      ..onTap = () => pagineLegali.containsKey(pagina)
+          ? apriLegale(context, pagina)
+          : launchUrl(Uri.parse('$sito$percorso'), mode: LaunchMode.externalApplication);
     _tocchi.add(t);
     return t;
   }
@@ -287,10 +304,40 @@ class _SchermataIscrizioneState extends State<SchermataIscrizione> {
   Widget build(BuildContext context) {
     const stileLink = TextStyle(color: golfo, fontWeight: FontWeight.w700);
     return Scaffold(
-      appBar: AppBar(title: const Text('Iscriviti')),
+      appBar: AppBar(title: Text(widget.google != null ? 'Ultimo passo' : 'Iscriviti')),
       body: ListView(
         padding: const EdgeInsets.fromLTRB(20, 4, 20, 30),
         children: [
+          if (widget.google != null) ...[
+            Container(
+              padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 12),
+              decoration: BoxDecoration(
+                color: superficie2,
+                borderRadius: BorderRadius.circular(12),
+                border: Border.all(color: linea2),
+              ),
+              child: Row(
+                children: [
+                  logoGoogle(),
+                  const SizedBox(width: 10),
+                  Expanded(
+                    child: Text(
+                      '${widget.google!.proposta['email'] ?? ''}',
+                      style: const TextStyle(fontWeight: FontWeight.w700),
+                      overflow: TextOverflow.ellipsis,
+                    ),
+                  ),
+                  const SizedBox(width: 8),
+                  const Text(
+                    'email confermata',
+                    style: TextStyle(color: Color(0xFF22C55E), fontSize: 12, fontWeight: FontWeight.w600),
+                  ),
+                ],
+              ),
+            ),
+            const SizedBox(height: 14),
+          ] else
+            const TastoGoogle(),
           const Text(
             'Su triburba si usa il nome vero: i vicini devono riconoscerti per garantire che abiti davvero lì.',
             style: TextStyle(color: testo2, height: 1.4),
@@ -350,27 +397,29 @@ class _SchermataIscrizioneState extends State<SchermataIscrizione> {
             autocorrect: false,
             decoration: const InputDecoration(labelText: 'Username', helperText: '3-32 caratteri: lettere, numeri, punto e trattino basso'),
           ),
-          const SizedBox(height: 12),
-          TextField(
-            controller: _email,
-            keyboardType: TextInputType.emailAddress,
-            autocorrect: false,
-            decoration: const InputDecoration(labelText: 'Email'),
-          ),
-          const SizedBox(height: 12),
-          TextField(
-            controller: _pw,
-            obscureText: !_vedi,
-            decoration: InputDecoration(
-              labelText: 'Password',
-              helperText: 'Almeno 8 caratteri',
-              suffixIcon: IconButton(
-                onPressed: () => setState(() => _vedi = !_vedi),
-                icon: Icon(_vedi ? Icons.visibility_off_outlined : Icons.visibility_outlined),
-                tooltip: _vedi ? 'Nascondi la password' : 'Mostra la password',
+          if (widget.google == null) ...[
+            const SizedBox(height: 12),
+            TextField(
+              controller: _email,
+              keyboardType: TextInputType.emailAddress,
+              autocorrect: false,
+              decoration: const InputDecoration(labelText: 'Email'),
+            ),
+            const SizedBox(height: 12),
+            TextField(
+              controller: _pw,
+              obscureText: !_vedi,
+              decoration: InputDecoration(
+                labelText: 'Password',
+                helperText: 'Almeno 8 caratteri',
+                suffixIcon: IconButton(
+                  onPressed: () => setState(() => _vedi = !_vedi),
+                  icon: Icon(_vedi ? Icons.visibility_off_outlined : Icons.visibility_outlined),
+                  tooltip: _vedi ? 'Nascondi la password' : 'Mostra la password',
+                ),
               ),
             ),
-          ),
+          ],
           const SizedBox(height: 10),
           const SizedBox(height: 12),
           CampoNascita(valore: _nascita, aiuto: 'Serve almeno $etaMinima anni', onCambia: (d) => setState(() => _nascita = d)),
@@ -379,8 +428,10 @@ class _SchermataIscrizioneState extends State<SchermataIscrizione> {
             controlAffinity: ListTileControlAffinity.leading,
             value: _pubblico,
             onChanged: (v) => setState(() => _pubblico = v == true),
-            title: const Text('Fai sapere ai vicini quando è il mio compleanno, così possono farmi gli auguri (solo giorno e mese, mai l\'anno)',
-                style: TextStyle(fontSize: 14, height: 1.35)),
+            title: const Text(
+              'Fai sapere ai vicini quando è il mio compleanno, così possono farmi gli auguri (solo giorno e mese, mai l\'anno)',
+              style: TextStyle(fontSize: 14, height: 1.35),
+            ),
           ),
           CheckboxListTile(
             contentPadding: EdgeInsets.zero,
