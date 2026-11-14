@@ -333,7 +333,7 @@ class _PostCardState extends State<PostCard> {
       );
     }
     // arrivato a tutta Napoli o all'area metropolitana: resta solo il quartiere/comune da cui è partito
-    for (final x in (p.citta || p.area) ? const <Portata>[] : p.portate) {
+    for (final x in (p.citta || p.area || p.tutti) ? const <Portata>[] : p.portate) {
       if (x.attesa) {
         chips.add(Chip2(testo: 'In attesa: ${x.nome}', icona: Icons.schedule, colore: muto, tenue: true));
       } else if (x.livello == 'quartiere') {
@@ -349,6 +349,8 @@ class _PostCardState extends State<PostCard> {
         chips.add(Chip2(testo: x.nome, icona: Icons.layers_outlined, colore: golfo));
       }
     }
+    // stesse diciture della versione web
+    if (p.tutti) chips.add(const Chip2(testo: 'Tutta triburba', icona: Icons.map_outlined, colore: oro));
     if (p.area) chips.add(const Chip2(testo: 'Area metropolitana', icona: Icons.map_outlined, colore: oro));
     if (p.citta) {
       chips.add(const Chip2(testo: 'Tutta Napoli', icona: Icons.location_city, colore: oro));

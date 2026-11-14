@@ -118,6 +118,7 @@ class Post {
       portate = (j['portate'] as List? ?? []).map((p) => Portata(p as Map<String, dynamic>)).toList(),
       citta = j['citta'] == true,
       area = j['area'] == true,
+      tutti = j['tutti'] == true,
       rilanci = _i(j['rilanci']),
       mioRilancio = j['mio_rilancio'] == true,
       mieiTamtam = (j['miei_tamtam'] as List? ?? []).map((e) => '$e').toList(),
@@ -139,7 +140,7 @@ class Post {
   String testo;
   final Faccia autore;
   final QuartiereBreve? quartiere;
-  final bool daComune, sfocata, area, puoModificare, puoEliminare, puoTamtam;
+  final bool daComune, sfocata, area, tutti, puoModificare, puoEliminare, puoTamtam;
   bool citta;
   final String? immagine, nascosto;
   final Reazioni reazioni;
