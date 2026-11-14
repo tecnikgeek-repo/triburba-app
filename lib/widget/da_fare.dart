@@ -53,7 +53,7 @@ class TestataHome extends StatelessWidget {
     if (io == null || !io.puoPubblicare) return const SizedBox.shrink();
     final dove = io.casa?['nome'];
     return Container(
-      margin: const EdgeInsets.fromLTRB(12, 12, 12, 0),
+      margin: const EdgeInsets.fromLTRB(10, 12, 10, 0),
       padding: const EdgeInsets.fromLTRB(12, 12, 12, 8),
       decoration: BoxDecoration(color: superficie, borderRadius: BorderRadius.circular(16), border: Border.all(color: linea)),
       child: Column(
@@ -81,7 +81,9 @@ class TestataHome extends StatelessWidget {
             ],
           ),
           const SizedBox(height: 6),
+          // tre voci a distanze uguali (con tre terzi uguali «Foto» corta e «Sondaggio» lunga sembravano spostate a destra)
           Row(
+            mainAxisAlignment: MainAxisAlignment.spaceEvenly,
             children: [
               _scorciatoia(context, Icons.image_outlined, 'Foto', golfo, () => _scrivi(context, foto: true)),
               _scorciatoia(context, Icons.handshake_outlined, 'Attività', terracotta, () => _scrivi(context, tipo: 'attivita')),
@@ -93,14 +95,14 @@ class TestataHome extends StatelessWidget {
     );
   }
 
-  Widget _scorciatoia(BuildContext context, IconData i, String t, Color c, VoidCallback f) => Expanded(
+  Widget _scorciatoia(BuildContext context, IconData i, String t, Color c, VoidCallback f) => Flexible(
     child: InkWell(
       borderRadius: BorderRadius.circular(10),
       onTap: f,
       child: Padding(
-        padding: const EdgeInsets.symmetric(vertical: 8),
+        padding: const EdgeInsets.symmetric(vertical: 8, horizontal: 6),
         child: Row(
-          mainAxisAlignment: MainAxisAlignment.center,
+          mainAxisSize: MainAxisSize.min,
           children: [
             Icon(i, size: 20, color: c),
             const SizedBox(width: 6),
@@ -176,7 +178,7 @@ class FilaDaFareState extends State<FilaDaFare> {
             height: 206,
             child: ListView.separated(
               scrollDirection: Axis.horizontal,
-              padding: const EdgeInsets.symmetric(horizontal: 12),
+              padding: const EdgeInsets.symmetric(horizontal: 10),
               itemCount: voci.length,
               separatorBuilder: (_, _) => const SizedBox(width: 10),
               itemBuilder: (_, i) => _carta(voci[i]),

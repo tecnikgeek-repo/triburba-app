@@ -68,7 +68,7 @@ class FestaCompleanniState extends State<FestaCompleanni> {
         if (mio != null) _CartaFesta(mio: mio, onPubblico: aggiorna),
         if (amici.isNotEmpty)
           Container(
-            margin: const EdgeInsets.fromLTRB(12, 12, 12, 0),
+            margin: const EdgeInsets.fromLTRB(10, 12, 10, 0),
             padding: const EdgeInsets.fromLTRB(14, 12, 14, 10),
             decoration: BoxDecoration(color: superficie, borderRadius: BorderRadius.circular(16), border: Border.all(color: linea)),
             child: Column(
@@ -278,7 +278,7 @@ class _CartaFestaState extends State<_CartaFesta> with TickerProviderStateMixin 
     final chi = (mio['chi'] as List? ?? []).cast<Map<String, dynamic>>().map(Faccia.new).toList();
     final pubblico = mio['pubblico'] == true;
     return Container(
-      margin: const EdgeInsets.fromLTRB(12, 12, 12, 0),
+      margin: const EdgeInsets.fromLTRB(10, 12, 10, 0),
       clipBehavior: Clip.antiAlias,
       decoration: BoxDecoration(
         borderRadius: BorderRadius.circular(18),

@@ -46,7 +46,7 @@ class _FasciaEmailState extends State<FasciaEmail> {
     final io = stato.io;
     if (io == null || io.emailConfermata) return const SizedBox.shrink();
     return Container(
-      margin: const EdgeInsets.fromLTRB(12, 10, 12, 4),
+      margin: const EdgeInsets.fromLTRB(10, 10, 10, 4),
       padding: const EdgeInsets.all(14),
       decoration: BoxDecoration(
         borderRadius: BorderRadius.circular(14),
