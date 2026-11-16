@@ -1,8 +1,8 @@
-name: triburba
+﻿name: triburba
 description: "triburba per Android e iPhone: il social dei quartieri. Ogni quartiere una voce, insieme una città. Software libero AGPL-3.0."
 publish_to: 'none'
 
-version: 1.0.37+38
+version: 1.0.38+39
 
 environment:
   sdk: ^3.13.4

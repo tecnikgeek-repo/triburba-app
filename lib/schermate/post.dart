@@ -15,11 +15,16 @@ import '../widget/testo_ricco.dart';
 import 'naviga.dart';
 
 class SchermataPost extends StatefulWidget {
-  const SchermataPost({super.key, required this.id, this.post, this.scrivi = false});
+  const SchermataPost({super.key, required this.id, this.post, this.scrivi = false, this.commenti = false});
 
   final int id;
   final Post? post;
+
+  /// Apre la tastiera per commentare (post senza commenti).
   final bool scrivi;
+
+  /// Porta ai commenti da leggere, senza tastiera.
+  final bool commenti;
 
   @override
   State<SchermataPost> createState() => _SchermataPostState();
@@ -34,6 +39,18 @@ class _SchermataPostState extends State<SchermataPost> {
   final _fuoco = FocusNode();
   Commento? _rispostaA;
   bool _invio = false;
+  final _inizioCommenti = GlobalKey();
+  bool _scesoAiCommenti = false;
+
+  /// Scorre fino ai commenti; se non ce ne sono, apre la casella per scrivere il primo.
+  void _vaiAiCommenti() {
+    final ctx = _inizioCommenti.currentContext;
+    if (_commenti != null && _commenti!.isEmpty) {
+      _fuoco.requestFocus();
+    } else if (ctx != null) {
+      Scrollable.ensureVisible(ctx, duration: const Duration(milliseconds: 350), curve: Curves.easeOutCubic);
+    }
+  }
 
   @override
   void initState() {
@@ -61,6 +78,12 @@ class _SchermataPostState extends State<SchermataPost> {
         _puoCommentare = puo;
         _errore = null;
       });
+      if (widget.commenti && !_scesoAiCommenti) {
+        _scesoAiCommenti = true;
+        WidgetsBinding.instance.addPostFrameCallback((_) {
+          if (mounted) _vaiAiCommenti();
+        });
+      }
     } on ErroreApi catch (e) {
       if (mounted) setState(() => _errore = e.messaggio);
     }
@@ -205,12 +228,8 @@ class _SchermataPostState extends State<SchermataPost> {
                     child: ListView(
                       padding: const EdgeInsets.fromLTRB(12, 4, 12, 12),
                       children: [
-                        PostCard(
-                          post: p,
-                          dettaglio: true,
-                          onCommenta: () => _fuoco.requestFocus(),
-                          onEliminato: () => Navigator.pop(context),
-                        ),
+                        PostCard(post: p, dettaglio: true, onCommenta: _vaiAiCommenti, onEliminato: () => Navigator.pop(context)),
+                        SizedBox(key: _inizioCommenti, height: 0),
                         if (_commenti == null)
                           const Padding(
                             padding: EdgeInsets.all(20),

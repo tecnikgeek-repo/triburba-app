@@ -8,6 +8,7 @@ import '../tema.dart';
 import '../widget/emoji.dart';
 import '../widget/faccia.dart';
 import '../widget/visore_foto.dart';
+
 import 'package:share_plus/share_plus.dart';
 
 import '../widget/da_fare.dart';
@@ -32,13 +33,20 @@ Future<void> apriFollow(BuildContext context, String username, String nome, {boo
 
 Future<void> apriQuartiere(BuildContext context, String slug) => Navigator.of(context).push(_via(SchermataQuartiere(slug: slug)));
 
-Future<void> apriPost(BuildContext context, int id, {Post? post, bool scrivi = false}) =>
-    Navigator.of(context).push(_via(SchermataPost(id: id, post: post, scrivi: scrivi)));
+Future<void> apriPost(BuildContext context, int id, {Post? post, bool scrivi = false, bool commenti = false}) =>
+    Navigator.of(context).push(_via(SchermataPost(id: id, post: post, scrivi: scrivi, commenti: commenti)));
 
 Future<void> apriTag(BuildContext context, String tag) => Navigator.of(context).push(_via(SchermataTag(tag: tag)));
 
 /// Schede della moderazione a cui si arriva dai link «?t=…» del sito e dalla fila «Da fare».
-const schedeModerazione = {'moderatori': 'moderatori', 'proposti': 'proposte', 'proposte': 'proposte', 'segnalati': 'nascosti', 'nascosti': 'nascosti', 'regole': 'regole'};
+const schedeModerazione = {
+  'moderatori': 'moderatori',
+  'proposti': 'proposte',
+  'proposte': 'proposte',
+  'segnalati': 'nascosti',
+  'nascosti': 'nascosti',
+  'regole': 'regole',
+};
 
 /// Destinazione da notifica, link o scheda «Da fare»: porta sempre dritta alla schermata dell'azione.
 /// {tipo: post|utente|quartiere (+scheda)|moderazione (+scheda)|tag|modifica_profilo (+campo)|admin|mappa|notifiche|
@@ -57,7 +65,8 @@ Future<void> apriDestinazione(BuildContext context, Map<String, dynamic> vai) as
         await Navigator.of(context).push(_via(SchermataQuartiere(slug: '${vai['slug']}', apriResidenti: scheda == 'residenti')));
       }
     case 'moderazione':
-      await Navigator.of(context).push(_via(SchermataModerazione(slug: '${vai['slug']}', scheda: schedeModerazione['${vai['scheda']}'] ?? 'moderatori')));
+      await Navigator.of(context)
+          .push(_via(SchermataModerazione(slug: '${vai['slug']}', scheda: schedeModerazione['${vai['scheda']}'] ?? 'moderatori')));
     case 'tag':
       await apriTag(context, '${vai['tag']}');
     case 'modifica_profilo':
@@ -71,9 +80,11 @@ Future<void> apriDestinazione(BuildContext context, Map<String, dynamic> vai) as
     case 'nuovi_vicini':
       await Navigator.of(context).push(_via(const SchermataNuoviVicini()));
     case 'invito':
-      final r = await SharePlus.instance.share(ShareParams(
-        text: 'Ti aspetto su triburba, il social dei quartieri nato a Napoli: iscriviti e scegli il tuo quartiere.\n\n$sito/register',
-      ));
+      final r = await SharePlus.instance.share(
+        ShareParams(
+          text: 'Ti aspetto su triburba, il social dei quartieri nato a Napoli: iscriviti e scegli il tuo quartiere.\n\n$sito/register',
+        ),
+      );
       if (r.status == ShareResultStatus.success) {
         try {
           await stato.api.guida('invito');
@@ -96,7 +107,10 @@ Future<void> apriFoto(BuildContext context, String url, {String? titolo, String?
         transitionDuration: const Duration(milliseconds: 320),
         reverseTransitionDuration: const Duration(milliseconds: 240),
         pageBuilder: (c, _, _) => VisoreFoto(url: url, titolo: titolo, sottotitolo: sottotitolo, tondo: tondo),
-        transitionsBuilder: (_, a, _, child) => FadeTransition(opacity: CurvedAnimation(parent: a, curve: Curves.easeOut), child: child),
+        transitionsBuilder: (_, a, _, child) => FadeTransition(
+          opacity: CurvedAnimation(parent: a, curve: Curves.easeOut),
+          child: child,
+        ),
       ),
     );
 

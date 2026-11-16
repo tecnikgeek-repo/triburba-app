@@ -108,8 +108,13 @@ class _PostCardState extends State<PostCard> {
     if (!mounted || scelta == null) return;
     switch (scelta) {
       case 'modifica':
-        final nuovo = await modificaTesto(context, p.testo, stato.io?.maxPost ?? 3000,
-            anteprima: p.immagine == null ? p.link : null, togliAnteprima: _togliAnteprima);
+        final nuovo = await modificaTesto(
+          context,
+          p.testo,
+          stato.io?.maxPost ?? 3000,
+          anteprima: p.immagine == null ? p.link : null,
+          togliAnteprima: _togliAnteprima,
+        );
         if (nuovo == null || nuovo == p.testo || !mounted) return;
         try {
           await stato.api.modifica(p.id, nuovo);
@@ -244,20 +249,20 @@ class _PostCardState extends State<PostCard> {
           if (p.quartiere != null || p.portate.isNotEmpty || p.rilanci > 0 || p.citta || p.area) _dove(),
           if (p.candidatura != null || p.tipo == 'candidatura') _candidatura(),
           if (_testoVisto.trim().isNotEmpty)
-          Padding(
-            padding: const EdgeInsets.fromLTRB(14, 8, 14, 10),
-            child: TestoRicco(
-              _testoVisto,
-              stile:
-                  (p.immagine == null &&
-                      p.attivita == null &&
-                      p.sondaggio == null &&
-                      p.testo.length <= 120 &&
-                      '\n'.allMatches(p.testo).length < 3)
-                  ? const TextStyle(fontSize: 20, height: 1.35, color: testo, fontWeight: FontWeight.w500)
-                  : null,
+            Padding(
+              padding: const EdgeInsets.fromLTRB(14, 8, 14, 10),
+              child: TestoRicco(
+                _testoVisto,
+                stile:
+                    (p.immagine == null &&
+                        p.attivita == null &&
+                        p.sondaggio == null &&
+                        p.testo.length <= 120 &&
+                        '\n'.allMatches(p.testo).length < 3)
+                    ? const TextStyle(fontSize: 20, height: 1.35, color: testo, fontWeight: FontWeight.w500)
+                    : null,
+              ),
             ),
-          ),
           if (p.attivita != null || p.sondaggio != null) BloccoIniziativa(post: p, onCambiato: () => setState(() {})),
           if (p.immagine != null) _foto(),
           if (p.link != null && p.immagine == null) _anteprimaLink(p.link!),
@@ -400,7 +405,7 @@ class _PostCardState extends State<PostCard> {
               onPressed: _votando ? null : vota,
               icon: const Icon(Icons.check_rounded, size: 18),
               label: const Text('Votato', maxLines: 1, softWrap: false),
-                          style: OutlinedButton.styleFrom(padding: const EdgeInsets.symmetric(horizontal: 10)),
+              style: OutlinedButton.styleFrom(padding: const EdgeInsets.symmetric(horizontal: 10)),
             )
           : BottoneCaldo(testo: 'Vota', icona: Icons.how_to_vote_outlined, occupato: _votando, onPressed: vota),
     );
@@ -440,15 +445,11 @@ class _PostCardState extends State<PostCard> {
             // porta dritto ai candidati e ai voti (scheda Moderatori), non alla pagina generica del quartiere
             TextButton(
               onPressed: () async {
-                await Navigator.of(context).push(
-                  MaterialPageRoute<void>(builder: (_) => SchermataModerazione(slug: p.quartiere!.slug!)),
-                );
+                await Navigator.of(context).push(MaterialPageRoute<void>(builder: (_) => SchermataModerazione(slug: p.quartiere!.slug!)));
                 if (mounted) setState(() {});
               },
               child: Text(
-                (c['candidato_id'] as num?)?.toInt() == stato.io?.id
-                    ? 'I tuoi voti'
-                    : (eletto ? 'Moderatori' : 'Vedi i candidati'),
+                (c['candidato_id'] as num?)?.toInt() == stato.io?.id ? 'I tuoi voti' : (eletto ? 'Moderatori' : 'Vedi i candidati'),
               ),
             ),
         ],
@@ -533,14 +534,29 @@ class _PostCardState extends State<PostCard> {
         crossAxisAlignment: CrossAxisAlignment.start,
         mainAxisSize: MainAxisSize.min,
         children: [
-          Text(dominio, maxLines: 1, overflow: TextOverflow.ellipsis, style: const TextStyle(color: muto, fontSize: 12)),
+          Text(
+            dominio,
+            maxLines: 1,
+            overflow: TextOverflow.ellipsis,
+            style: const TextStyle(color: muto, fontSize: 12),
+          ),
           const SizedBox(height: 2),
           if (l.titolo != null)
-            Text(l.titolo!, maxLines: 2, overflow: TextOverflow.ellipsis, style: const TextStyle(fontWeight: FontWeight.w700, fontSize: 15, height: 1.3)),
+            Text(
+              l.titolo!,
+              maxLines: 2,
+              overflow: TextOverflow.ellipsis,
+              style: const TextStyle(fontWeight: FontWeight.w700, fontSize: 15, height: 1.3),
+            ),
           if (l.descrizione != null)
             Padding(
               padding: const EdgeInsets.only(top: 2),
-              child: Text(l.descrizione!, maxLines: 2, overflow: TextOverflow.ellipsis, style: const TextStyle(color: testo2, fontSize: 13, height: 1.4)),
+              child: Text(
+                l.descrizione!,
+                maxLines: 2,
+                overflow: TextOverflow.ellipsis,
+                style: const TextStyle(color: testo2, fontSize: 13, height: 1.4),
+              ),
             ),
         ],
       ),
@@ -557,7 +573,10 @@ class _PostCardState extends State<PostCard> {
               child: Row(
                 crossAxisAlignment: CrossAxisAlignment.stretch,
                 children: [
-                  ConstrainedBox(constraints: const BoxConstraints(minHeight: 92), child: SizedBox(width: 92, child: foto)),
+                  ConstrainedBox(
+                    constraints: const BoxConstraints(minHeight: 92),
+                    child: SizedBox(width: 92, child: foto),
+                  ),
                   Expanded(child: testi),
                 ],
               ),
@@ -587,24 +606,24 @@ class _PostCardState extends State<PostCard> {
       child: Row(
         children: [
           Expanded(
-              child: GestureDetector(
-                onTap: () => apriChiHaReagito(context, p.id),
-                child: Row(
-                  children: [
-                    PilaEmoji(p.reazioni.top.isEmpty && p.reazioni.mia != null ? [p.reazioni.mia!] : p.reazioni.top),
-                    const SizedBox(width: 6),
-                    Flexible(
-                      child: Text(
-                        p.reazioni.chi.isEmpty ? '${p.reazioni.n}' : p.reazioni.chi,
-                        maxLines: 1,
-                        overflow: TextOverflow.ellipsis,
-                        style: const TextStyle(color: testo2, fontSize: 13),
-                      ),
+            child: GestureDetector(
+              onTap: () => apriChiHaReagito(context, p.id),
+              child: Row(
+                children: [
+                  PilaEmoji(p.reazioni.top.isEmpty && p.reazioni.mia != null ? [p.reazioni.mia!] : p.reazioni.top),
+                  const SizedBox(width: 6),
+                  Flexible(
+                    child: Text(
+                      p.reazioni.chi.isEmpty ? '${p.reazioni.n}' : p.reazioni.chi,
+                      maxLines: 1,
+                      overflow: TextOverflow.ellipsis,
+                      style: const TextStyle(color: testo2, fontSize: 13),
                     ),
-                  ],
-                ),
+                  ),
+                ],
               ),
             ),
+          ),
         ],
       ),
     );
@@ -614,7 +633,8 @@ class _PostCardState extends State<PostCard> {
     if (widget.onCommenta != null) {
       widget.onCommenta!();
     } else {
-      apriPost(context, p.id, post: p, scrivi: true);
+      // con commenti: si aprono da leggere; senza: tastiera pronta per scrivere il primo
+      apriPost(context, p.id, post: p, scrivi: p.commenti == 0, commenti: p.commenti > 0);
     }
   }
 
@@ -625,7 +645,36 @@ class _PostCardState extends State<PostCard> {
       child: Row(
         children: [
           _azione(
-            icona: mia == null ? const Opacity(opacity: .6, child: ColorFiltered(colorFilter: ColorFilter.matrix(<double>[.33, .33, .33, 0, 30, .33, .33, .33, 0, 30, .33, .33, .33, 0, 30, 0, 0, 0, 1, 0]), child: Emoji('tribu', lato: 22))) : Emoji(mia, lato: 22),
+            icona: mia == null
+                ? const Opacity(
+                    opacity: .6,
+                    child: ColorFiltered(
+                      colorFilter: ColorFilter.matrix(<double>[
+                        .33,
+                        .33,
+                        .33,
+                        0,
+                        30,
+                        .33,
+                        .33,
+                        .33,
+                        0,
+                        30,
+                        .33,
+                        .33,
+                        .33,
+                        0,
+                        30,
+                        0,
+                        0,
+                        0,
+                        1,
+                        0,
+                      ]),
+                      child: Emoji('tribu', lato: 22),
+                    ),
+                  )
+                : Emoji(mia, lato: 22),
             testo: mia == null ? 'Mi piace' : (nomiReazioni[mia] ?? 'Mi piace'),
             colore: mia == null ? testo2 : (mia == 'cuore' ? pompeiano : terracotta),
             onTap: () => _reagisci(mia ?? reazioneRapida),
@@ -742,8 +791,13 @@ class _PostCardState extends State<PostCard> {
 
 /// Finestra per modificare il testo di un post.
 /// Se il post ha l'anteprima di un link, qui (e solo qui) c'è la X per toglierla.
-Future<String?> modificaTesto(BuildContext context, String attuale, int max,
-    {AnteprimaLink? anteprima, Future<void> Function()? togliAnteprima}) async {
+Future<String?> modificaTesto(
+  BuildContext context,
+  String attuale,
+  int max, {
+  AnteprimaLink? anteprima,
+  Future<void> Function()? togliAnteprima,
+}) async {
   final c = TextEditingController(text: attuale);
   var conAnteprima = anteprima != null && togliAnteprima != null;
   final r = await showModalBottomSheet<String>(
@@ -765,14 +819,22 @@ Future<String?> modificaTesto(BuildContext context, String attuale, int max,
                   : Container(
                       margin: const EdgeInsets.only(bottom: 8),
                       padding: const EdgeInsets.fromLTRB(12, 8, 4, 8),
-                      decoration: BoxDecoration(color: superficie2, borderRadius: BorderRadius.circular(12), border: Border.all(color: linea)),
+                      decoration: BoxDecoration(
+                        color: superficie2,
+                        borderRadius: BorderRadius.circular(12),
+                        border: Border.all(color: linea),
+                      ),
                       child: Row(
                         children: [
                           const Icon(Icons.link_rounded, size: 18, color: muto),
                           const SizedBox(width: 8),
                           Expanded(
-                            child: Text(anteprima.titolo ?? anteprima.url, maxLines: 2, overflow: TextOverflow.ellipsis,
-                                style: const TextStyle(fontWeight: FontWeight.w600, fontSize: 13.5, height: 1.3)),
+                            child: Text(
+                              anteprima.titolo ?? anteprima.url,
+                              maxLines: 2,
+                              overflow: TextOverflow.ellipsis,
+                              style: const TextStyle(fontWeight: FontWeight.w600, fontSize: 13.5, height: 1.3),
+                            ),
                           ),
                           IconButton(
                             tooltip: "Togli l'anteprima",
