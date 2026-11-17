@@ -533,7 +533,8 @@ class ChatAperta {
       fotoPermesse = j['foto_permesse'] == true,
       messaggi = (j['messaggi'] as List? ?? []).map((m) => Messaggio((m as Map).cast<String, dynamic>())).toList(),
       altriPrima = j['altri_prima'] == true,
-      lettoAltro = _i(j['letto_altro']);
+      lettoAltro = _i(j['letto_altro']),
+      cambiati = (j['cambiati'] as List? ?? []).map((e) => (id: _i((e as Map)['id']), sparito: e['sparito'] == true)).toList();
 
   final int? convId;
   final Faccia persona;
@@ -541,4 +542,7 @@ class ChatAperta {
   final bool richiestaRicevuta, puoScrivere, fotoPermesse, altriPrima;
   final List<Messaggio> messaggi;
   final int lettoAltro;
+
+  /// Messaggi già a schermo eliminati da poco: sparito = ritirato (da togliere), altrimenti «Messaggio eliminato»
+  final List<({int id, bool sparito})> cambiati;
 }

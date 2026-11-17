@@ -443,7 +443,10 @@ class Api {
 
   Future<String> rispondiRichiesta(int convId, bool accetta) async =>
       '${(await post('/api/messaggi/richiesta', {'conv_id': convId, 'azione': accetta ? 'accetta' : 'rifiuta'}))['msg'] ?? ''}';
-  Future<void> eliminaMessaggio(int id) => post('/api/messaggi/elimina', {'id': id});
+
+  /// Elimina per tutti: ritorna true se è sparito senza traccia (entro un minuto dall'invio)
+  Future<bool> eliminaMessaggio(int id) async => (await post('/api/messaggi/elimina', {'id': id}))['sparito'] == true;
+  Future<void> nascondiMessaggio(int id) => post('/api/messaggi/nascondi', {'id': id});
   Future<void> cancellaChat(int convId) => post('/api/messaggi/cancella', {'conv_id': convId});
   Future<String> segnalaMessaggio(int id, String motivo) async =>
       '${(await post('/api/messaggi/segnala', {'id': id, 'motivo': motivo}))['msg'] ?? ''}';

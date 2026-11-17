@@ -310,7 +310,24 @@ class _SchermataChatState extends State<SchermataChat> with WidgetsBindingObserv
         return;
       }
       final nuovi = n.messaggi.where((m) => !_msg.any((x) => x.id == m.id)).toList();
-      if (nuovi.isEmpty && n.lettoAltro == _lettoAltro) return;
+      // eliminati dall'altro mentre guardo: ritirati spariscono, gli altri diventano «Messaggio eliminato»
+      var cambiato = false;
+      for (final c in n.cambiati) {
+        final i = _msg.indexWhere((x) => x.id == c.id);
+        if (i < 0) continue;
+        if (c.sparito) {
+          _msg.removeAt(i);
+          cambiato = true;
+        } else if (!_msg[i].eliminato) {
+          _msg[i]
+            ..eliminato = true
+            ..testo = ''
+            ..foto = null
+            ..audio = null;
+          cambiato = true;
+        }
+      }
+      if (nuovi.isEmpty && n.lettoAltro == _lettoAltro && !cambiato) return;
       setState(() {
         _msg.addAll(nuovi);
         _lettoAltro = n.lettoAltro;
@@ -494,32 +511,32 @@ class _SchermataChatState extends State<SchermataChat> with WidgetsBindingObserv
   }
 
   Future<void> _azioniMessaggio(Messaggio m) async {
-    if (m.eliminato) return;
+    Widget voce(String chiave, IconData ico, String titolo, String sotto, {bool rosso = false}) => ListTile(
+      leading: Icon(ico, color: rosso ? pompeiano : testo2),
+      title: Text(
+        titolo,
+        style: TextStyle(color: rosso ? pompeiano : testo, fontWeight: FontWeight.w600),
+      ),
+      subtitle: Text(sotto, style: const TextStyle(color: muto, fontSize: 12.5)),
+      onTap: () => Navigator.pop(context, chiave),
+    );
     final scelta = await showModalBottomSheet<String>(
       context: context,
       builder: (s) => SafeArea(
         child: Column(
           mainAxisSize: MainAxisSize.min,
           children: [
-            if (m.mio)
-              ListTile(
-                leading: const Icon(Icons.delete_outline, color: pompeiano),
-                title: const Text(
-                  'Elimina per tutti',
-                  style: TextStyle(color: pompeiano, fontWeight: FontWeight.w600),
-                ),
-                onTap: () => Navigator.pop(s, 'elimina'),
-              )
-            else
-              ListTile(
-                leading: const Icon(Icons.flag_outlined, color: pompeiano),
-                title: const Text(
-                  'Segnala il messaggio',
-                  style: TextStyle(color: pompeiano, fontWeight: FontWeight.w600),
-                ),
-                subtitle: const Text('Lo staff legge solo i messaggi segnalati', style: TextStyle(color: muto, fontSize: 12.5)),
-                onTap: () => Navigator.pop(s, 'segnala'),
+            if (m.mio && !m.eliminato)
+              voce(
+                'tutti',
+                Icons.delete_outline,
+                'Elimina per tutti',
+                'Entro un minuto dall\'invio sparisce senza lasciare traccia; dopo resta «Messaggio eliminato».',
+                rosso: true,
               ),
+            voce('me', Icons.visibility_off_outlined, 'Elimina per me', 'Sparisce solo dalla tua chat.'),
+            if (!m.mio && !m.eliminato)
+              voce('segnala', Icons.flag_outlined, 'Segnala il messaggio', 'Lo staff legge solo i messaggi segnalati.', rosso: true),
             const SizedBox(height: 8),
           ],
         ),
@@ -527,28 +544,37 @@ class _SchermataChatState extends State<SchermataChat> with WidgetsBindingObserv
     );
     if (scelta == null || !mounted) return;
     try {
-      if (scelta == 'elimina') {
-        if (!await conferma(context, 'Eliminare il messaggio?', 'Sparisce per tutti e due.')) return;
-        await stato.api.eliminaMessaggio(m.id);
-        if (mounted) {
+      switch (scelta) {
+        case 'tutti':
+          final sparito = await stato.api.eliminaMessaggio(m.id);
+          if (!mounted) return;
           setState(() {
-            m.eliminato = true;
-            m.testo = '';
-            m.foto = null;
+            if (sparito) {
+              _msg.removeWhere((x) => x.id == m.id);
+            } else {
+              m
+                ..eliminato = true
+                ..testo = ''
+                ..foto = null
+                ..audio = null;
+            }
           });
-        }
-      } else {
-        final motivi = await stato.api.motiviMessaggio();
-        if (!mounted) return;
-        final motivo = await scegliMotivo(
-          context,
-          intestazione: 'Perché segnali il messaggio?',
-          spiega: 'La segnalazione arriva allo staff entro 24 ore. Chi l\'ha scritto non lo sa.',
-          motivi: motivi,
-        );
-        if (motivo == null || !mounted) return;
-        final msg = await stato.api.segnalaMessaggio(m.id, motivo);
-        if (mounted) messaggio(context, msg);
+          messaggio(context, sparito ? 'Messaggio ritirato: non resta traccia.' : 'Messaggio eliminato per tutti.');
+        case 'me':
+          await stato.api.nascondiMessaggio(m.id);
+          if (mounted) setState(() => _msg.removeWhere((x) => x.id == m.id));
+        case 'segnala':
+          final motivi = await stato.api.motiviMessaggio();
+          if (!mounted) return;
+          final motivo = await scegliMotivo(
+            context,
+            intestazione: 'Perché segnali il messaggio?',
+            spiega: 'La segnalazione arriva allo staff entro 24 ore. Chi l\'ha scritto non lo sa.',
+            motivi: motivi,
+          );
+          if (motivo == null || !mounted) return;
+          final msg = await stato.api.segnalaMessaggio(m.id, motivo);
+          if (mounted) messaggio(context, msg);
       }
     } on ErroreApi catch (e) {
       if (mounted) messaggio(context, e.messaggio);
