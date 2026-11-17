@@ -17,6 +17,13 @@ class Stato extends ChangeNotifier {
   final Api api;
   Io? io;
   int notifiche = 0;
+  int messaggi = 0;
+
+  /// La chat aperta in questo momento (le sue push non si mostrano: i messaggi arrivano già a schermo)
+  int? chatAperta;
+
+  /// Si accende a ogni push di un messaggio: la chat aperta e l'elenco si aggiornano subito
+  final arrivoMessaggi = ValueNotifier<int>(0);
 
   /// Destinazione da aprire appena c'è la home: {tipo: post|utente|quartiere, …}
   Map<String, dynamic>? daAprire;
@@ -27,6 +34,7 @@ class Stato extends ChangeNotifier {
   void entra(Io nuovo) {
     io = nuovo;
     notifiche = nuovo.notifiche;
+    messaggi = nuovo.messaggi;
     _icona(notifiche);
     notifyListeners();
   }
@@ -44,6 +52,12 @@ class Stato extends ChangeNotifier {
     notifyListeners();
   }
 
+  void impostaMessaggi(int n) {
+    if (n == messaggi) return;
+    messaggi = n;
+    notifyListeners();
+  }
+
   void apri(Map<String, dynamic> vai) {
     daAprire = vai;
     notifyListeners();
@@ -53,6 +67,7 @@ class Stato extends ChangeNotifier {
     await api.esci();
     io = null;
     notifiche = 0;
+    messaggi = 0;
     _icona(0);
     notifyListeners();
   }
@@ -85,6 +100,11 @@ Map<String, dynamic>? destinazioneDaLink(String link) {
   if (st != null) return {'tipo': 'modifica_profilo', 'campo': st.group(1) ?? ''};
   if (l.startsWith('/admin')) return {'tipo': 'admin'};
   if (l.startsWith('/notifiche')) return {'tipo': 'notifiche'};
+  final ms = RegExp(r'^/messaggi/(\d+)').firstMatch(l);
+  if (ms != null) return {'tipo': 'chat', 'id': int.parse(ms.group(1)!)};
+  final mc = RegExp(r'^/messaggi/con/([^/?#]+)').firstMatch(l);
+  if (mc != null) return {'tipo': 'chat_con', 'username': Uri.decodeComponent(mc.group(1)!)};
+  if (l.startsWith('/messaggi')) return {'tipo': 'messaggi'};
   if (l == '/quartieri' || l.startsWith('/mappa')) return {'tipo': 'mappa'};
   if (l.startsWith('/#compose')) return {'tipo': 'scrivi'};
   return null;

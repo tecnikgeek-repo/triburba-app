@@ -9,9 +9,12 @@ import 'package:share_plus/share_plus.dart';
 import '../tema.dart';
 
 class VisoreFoto extends StatefulWidget {
-  const VisoreFoto({super.key, required this.url, this.titolo, this.sottotitolo, this.tondo = false});
+  const VisoreFoto({super.key, required this.url, this.titolo, this.sottotitolo, this.tondo = false, this.testate});
 
   final String url;
+
+  /// Per le foto private (messaggi): il token di chi guarda
+  final Map<String, String>? testate;
   final String? titolo, sottotitolo;
 
   /// foto profilo: entra dal cerchio e si apre quadrata
@@ -64,10 +67,14 @@ class _VisoreFotoState extends State<VisoreFoto> with SingleTickerProviderStateM
     final avanzamento = (_giu.abs() / 300).clamp(0.0, 1.0);
     final img = CachedNetworkImage(
       imageUrl: widget.url,
+      httpHeaders: widget.testate,
       fit: BoxFit.contain,
       placeholder: (_, _) => const Center(child: CircularProgressIndicator(color: terracotta)),
       errorWidget: (_, _, _) => const Center(
-        child: Text('Foto non disponibile', style: TextStyle(color: bianco, fontFamily: 'Inter')),
+        child: Text(
+          'Foto non disponibile',
+          style: TextStyle(color: bianco, fontFamily: 'Inter'),
+        ),
       ),
     );
     return Scaffold(
@@ -83,7 +90,12 @@ class _VisoreFotoState extends State<VisoreFoto> with SingleTickerProviderStateM
               children: [
                 ImageFiltered(
                   imageFilter: ImageFilter.blur(sigmaX: 40, sigmaY: 40),
-                  child: CachedNetworkImage(imageUrl: widget.url, fit: BoxFit.cover, errorWidget: (_, _, _) => const SizedBox()),
+                  child: CachedNetworkImage(
+                    imageUrl: widget.url,
+                    httpHeaders: widget.testate,
+                    fit: BoxFit.cover,
+                    errorWidget: (_, _, _) => const SizedBox(),
+                  ),
                 ),
                 const DecoratedBox(
                   decoration: BoxDecoration(
@@ -129,7 +141,9 @@ class _VisoreFotoState extends State<VisoreFoto> with SingleTickerProviderStateM
                           borderRadius: BorderRadius.circular(widget.tondo ? 24 : 14),
                           child: DecoratedBox(
                             decoration: BoxDecoration(
-                              boxShadow: [BoxShadow(color: Colors.black.withValues(alpha: .55), blurRadius: 40, offset: const Offset(0, 18))],
+                              boxShadow: [
+                                BoxShadow(color: Colors.black.withValues(alpha: .55), blurRadius: 40, offset: const Offset(0, 18)),
+                              ],
                             ),
                             child: img,
                           ),
@@ -156,7 +170,11 @@ class _VisoreFotoState extends State<VisoreFoto> with SingleTickerProviderStateM
                         children: [
                           _tasto(Icons.close_rounded, 'Chiudi', () => Navigator.of(context).maybePop()),
                           const Spacer(),
-                          _tasto(Icons.ios_share_rounded, 'Condividi', () => SharePlus.instance.share(ShareParams(uri: Uri.parse(widget.url)))),
+                          _tasto(
+                            Icons.ios_share_rounded,
+                            'Condividi',
+                            () => SharePlus.instance.share(ShareParams(uri: Uri.parse(widget.url))),
+                          ),
                         ],
                       ),
                     ),
@@ -173,7 +191,10 @@ class _VisoreFotoState extends State<VisoreFoto> with SingleTickerProviderStateM
                             ),
                             if (widget.sottotitolo != null) ...[
                               const SizedBox(height: 2),
-                              Text(widget.sottotitolo!, style: const TextStyle(color: Color(0xFFCDBCAE), fontFamily: 'Inter', fontSize: 13.5)),
+                              Text(
+                                widget.sottotitolo!,
+                                style: const TextStyle(color: Color(0xFFCDBCAE), fontFamily: 'Inter', fontSize: 13.5),
+                              ),
                             ],
                             const SizedBox(height: 10),
                             const Text(

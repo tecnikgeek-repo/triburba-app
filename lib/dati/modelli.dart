@@ -329,6 +329,7 @@ class Io {
   int get maxPost => _i((j['limiti'] as Map?)?['post']);
   int get maxCommento => _i((j['limiti'] as Map?)?['commento']);
   int get notifiche => _i(j['notifiche']);
+  int get messaggi => _i(j['messaggi']);
   Map<String, dynamic> get conti => (j['conti'] as Map?)?.cast<String, dynamic>() ?? const {};
 
   List<(String, String)> get schede => (j['schede'] as List? ?? []).map((s) => ('${(s as Map)['id']}', '${s['nome']}')).toList();
@@ -475,4 +476,63 @@ class Guida {
   final bool benvenuto, nascosta, completa;
   final int fatti, totale;
   final List<PassoGuida> passi;
+}
+
+// ── Messaggi privati ──
+
+/// Una chat nell'elenco (o una richiesta ricevuta)
+class VoceChat {
+  VoceChat(Map<String, dynamic> j)
+    : id = _i(j['id']),
+      persona = Faccia((j['persona'] as Map).cast<String, dynamic>()),
+      anteprima = _s(j['anteprima']) ?? '',
+      mio = j['mio'] == true,
+      quando = _s(j['quando']) ?? '',
+      nonLetti = _i(j['non_letti']),
+      stato = _s(j['stato']) ?? 'attiva';
+
+  final int id, nonLetti;
+  final Faccia persona;
+  final String anteprima, quando, stato;
+  final bool mio;
+}
+
+class Messaggio {
+  Messaggio(Map<String, dynamic> j)
+    : id = _i(j['id']),
+      mio = j['mio'] == true,
+      testo = _s(j['testo']) ?? '',
+      foto = _s(j['foto']),
+      eliminato = j['eliminato'] == true,
+      ora = _s(j['ora']) ?? '',
+      giorno = _s(j['giorno']) ?? '';
+
+  final int id;
+  final bool mio;
+  String testo;
+  String? foto;
+  bool eliminato;
+  final String ora, giorno;
+}
+
+/// Una chat aperta: persona, messaggi e cosa si può fare
+class ChatAperta {
+  ChatAperta(Map<String, dynamic> j)
+    : convId = j['conv_id'] == null ? null : _i(j['conv_id']),
+      persona = Faccia((j['persona'] as Map).cast<String, dynamic>()),
+      stato = _s(j['stato']) ?? 'nuova',
+      richiestaRicevuta = j['richiesta_ricevuta'] == true,
+      puoScrivere = j['puo_scrivere'] == true,
+      avviso = _s(j['avviso']) ?? '',
+      fotoPermesse = j['foto_permesse'] == true,
+      messaggi = (j['messaggi'] as List? ?? []).map((m) => Messaggio((m as Map).cast<String, dynamic>())).toList(),
+      altriPrima = j['altri_prima'] == true,
+      lettoAltro = _i(j['letto_altro']);
+
+  final int? convId;
+  final Faccia persona;
+  final String stato, avviso;
+  final bool richiestaRicevuta, puoScrivere, fotoPermesse, altriPrima;
+  final List<Messaggio> messaggi;
+  final int lettoAltro;
 }

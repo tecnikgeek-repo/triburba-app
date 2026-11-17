@@ -394,6 +394,47 @@ class Api {
   /// Benvenuto a un nuovo vicino (una volta sola): {msg}.
   Future<Map<String, dynamic>> benvenuto(int userId) => post('/app/v1/benvenuto', {'user_id': userId});
 
+  // ── Messaggi privati (stesse API del sito, col token) ──
+
+  /// Testate per scaricare le foto dei messaggi (le vede solo chi è nella chat)
+  Map<String, String> get testateFoto => {'X-Token': ?token};
+
+  Future<(List<VoceChat>, int, int)> chat({bool richieste = false}) async {
+    final j = await get('/api/messaggi', {'tipo': richieste ? 'richieste' : 'chat'});
+    final c = (j['conta'] as Map?) ?? const {};
+    return (
+      (j['chat'] as List).map((e) => VoceChat((e as Map).cast<String, dynamic>())).toList(),
+      (c['chat'] as num?)?.toInt() ?? 0,
+      (c['richieste'] as num?)?.toInt() ?? 0,
+    );
+  }
+
+  Future<ChatAperta> apriChat({int? convId, String? username, int dopo = 0, int prima = 0}) async {
+    final j = convId != null
+        ? await get('/api/messaggi/$convId', {if (dopo > 0) 'dopo': '$dopo', if (prima > 0) 'prima': '$prima'})
+        : await get('/api/messaggi/con/${Uri.encodeComponent(username ?? '')}');
+    return ChatAperta(j);
+  }
+
+  /// Manda un messaggio: ritorna (id della chat, messaggio, stato della chat)
+  Future<(int, Messaggio, String)> mandaMessaggio({int? convId, String? username, String testo = '', File? foto}) async {
+    final j = await invia(
+      '/api/messaggi/invia',
+      {'testo': testo, if (convId != null) 'conv_id': '$convId' else 'username': username ?? ''},
+      campoFile: foto == null ? null : 'foto',
+      file: foto,
+    );
+    return ((j['conv_id'] as num).toInt(), Messaggio((j['messaggio'] as Map).cast<String, dynamic>()), '${j['stato'] ?? 'attiva'}');
+  }
+
+  Future<String> rispondiRichiesta(int convId, bool accetta) async =>
+      '${(await post('/api/messaggi/richiesta', {'conv_id': convId, 'azione': accetta ? 'accetta' : 'rifiuta'}))['msg'] ?? ''}';
+  Future<void> eliminaMessaggio(int id) => post('/api/messaggi/elimina', {'id': id});
+  Future<void> cancellaChat(int convId) => post('/api/messaggi/cancella', {'conv_id': convId});
+  Future<String> segnalaMessaggio(int id, String motivo) async =>
+      '${(await post('/api/messaggi/segnala', {'id': id, 'motivo': motivo}))['msg'] ?? ''}';
+  Future<List<String>> motiviMessaggio() async => ((await get('/api/messaggi/motivi'))['motivi'] as List).map((e) => '$e').toList();
+
   // ── Moderatori e moderazione del quartiere ──
 
   Future<Map<String, dynamic>> moderazione(String slug) => get('/app/v1/quartiere/$slug/moderazione');

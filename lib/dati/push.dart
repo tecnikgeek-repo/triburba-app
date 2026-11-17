@@ -73,6 +73,12 @@ Future<void> preparaPush() async {
   FirebaseMessaging.onMessage.listen((m) {
     final n = int.tryParse(m.data['nuove'] ?? '');
     if (n != null) stato.impostaNotifiche(n);
+    if (m.data['tipo'] == 'messaggio') {
+      stato.arrivoMessaggi.value++;
+      stato.ricarica();
+      // la chat è già aperta: il messaggio compare lì, niente notifica
+      if (stato.chatAperta != null && m.data['chiave'] == 'msg-${stato.chatAperta}') return;
+    }
     final t = m.notification;
     if (t == null) return;
     _locali.show(
@@ -120,10 +126,12 @@ Future<void> collegaPush() async {
     _registrazione ??= fm.onTokenRefresh.listen((t) => _invia(t));
     // quando l'app torna in primo piano ricontrollo (al massimo ogni 6 ore), così il sito ha sempre l'indirizzo giusto
     // tornando nell'app: token aggiornato e contatore (e numero sull'icona) riallineato
-    _ciclo ??= AppLifecycleListener(onResume: () {
-      _mandaToken();
-      stato.ricarica();
-    });
+    _ciclo ??= AppLifecycleListener(
+      onResume: () {
+        _mandaToken();
+        stato.ricarica();
+      },
+    );
   } catch (e) {
     debugPrint('push non collegate: $e');
   }

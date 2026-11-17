@@ -13,6 +13,7 @@ import 'package:triburba/dati/api.dart';
 import 'package:triburba/dati/modelli.dart';
 import 'package:triburba/dati/stato.dart';
 import 'package:triburba/main.dart';
+import 'package:triburba/schermate/messaggi.dart';
 import 'package:triburba/schermate/admin.dart';
 import 'package:triburba/schermate/legale.dart';
 import 'package:triburba/schermate/accesso.dart';
@@ -40,6 +41,7 @@ import 'package:triburba/schermate/notifiche.dart';
 import 'caratteri.dart';
 import 'admin_finto.dart';
 import 'finto.dart';
+
 import 'package:triburba/widget/mappa_disegno.dart';
 
 Future<void> _scatta(WidgetTester t, Widget w, String nome, {Future<void> Function()? prima}) async {
@@ -249,7 +251,12 @@ void main() {
       },
     );
     // compositore del super admin: «Ovunque»
-    stato.entra(Io({...ioFinto, 'puo': {...(ioFinto['puo'] as Map), 'superadmin': true}}));
+    stato.entra(
+      Io({
+        ...ioFinto,
+        'puo': {...(ioFinto['puo'] as Map), 'superadmin': true},
+      }),
+    );
     await _scatta(
       t,
       const SchermataScrivi(),
@@ -269,16 +276,48 @@ void main() {
       Scaffold(
         body: Align(
           alignment: Alignment.bottomCenter,
-          child: SafeArea(child: BarraReazioni(attuale: 'capito', onScelta: (_) {})),
+          child: SafeArea(
+            child: BarraReazioni(attuale: 'capito', onScelta: (_) {}),
+          ),
         ),
       ),
       '23-barra-reazioni',
     );
 
     // niente rimandi al sito: voto della candidatura, moderazione e account dentro l'app
-    await _scatta(t, Scaffold(body: ListView(children: [PostCard(post: Post(postCandidatura))])), '24-candidatura-vota');
+    await _scatta(
+      t,
+      Scaffold(
+        body: ListView(children: [PostCard(post: Post(postCandidatura))]),
+      ),
+      '24-candidatura-vota',
+    );
     // card del link senza foto (le foto dal web nei test non si scaricano): link tolto dal testo e X per l'autore
-    await _scatta(t, Scaffold(body: ListView(children: [PostCard(post: Post({...post(92, 'Riaperta la biblioteca! https://example.org/biblioteca', autore: faccia('anna.rossi', 'Anna Rossi')), 'puo': {'modifica': true, 'elimina': true}, 'link': {'url': 'https://example.org/biblioteca', 'titolo': 'La biblioteca riapre con la sala studio', 'descrizione': 'Nuovi orari dal lunedì al sabato, prestito libri e corsi gratuiti.', 'immagine': null, 'sito': 'example.org', 'forma': 'nessuna', 'in_coda': true}}))])), '39-link');
+    await _scatta(
+      t,
+      Scaffold(
+        body: ListView(
+          children: [
+            PostCard(
+              post: Post({
+                ...post(92, 'Riaperta la biblioteca! https://example.org/biblioteca', autore: faccia('anna.rossi', 'Anna Rossi')),
+                'puo': {'modifica': true, 'elimina': true},
+                'link': {
+                  'url': 'https://example.org/biblioteca',
+                  'titolo': 'La biblioteca riapre con la sala studio',
+                  'descrizione': 'Nuovi orari dal lunedì al sabato, prestito libri e corsi gratuiti.',
+                  'immagine': null,
+                  'sito': 'example.org',
+                  'forma': 'nessuna',
+                  'in_coda': true,
+                },
+              }),
+            ),
+          ],
+        ),
+      ),
+      '39-link',
+    );
     // festa del compleanno in Home (dati pronti, niente rete)
     await _scatta(
       t,
@@ -291,14 +330,43 @@ void main() {
                 'pubblico': true,
                 'auguri': 3,
                 'chi': [
-                  {'username': 'luca.m', 'nome': 'Luca Marino', 'iniziali': 'LM', 'colori': ['#138a82', '#f0b34a']},
-                  {'username': 'sara.e', 'nome': 'Sara Esposito', 'iniziali': 'SE', 'colori': ['#7b4bd6', '#e0663a']},
-                  {'username': 'gino.r', 'nome': 'Gino Russo', 'iniziali': 'GR', 'colori': ['#ef4b3f', '#e0663a']},
+                  {
+                    'username': 'luca.m',
+                    'nome': 'Luca Marino',
+                    'iniziali': 'LM',
+                    'colori': ['#138a82', '#f0b34a'],
+                  },
+                  {
+                    'username': 'sara.e',
+                    'nome': 'Sara Esposito',
+                    'iniziali': 'SE',
+                    'colori': ['#7b4bd6', '#e0663a'],
+                  },
+                  {
+                    'username': 'gino.r',
+                    'nome': 'Gino Russo',
+                    'iniziali': 'GR',
+                    'colori': ['#ef4b3f', '#e0663a'],
+                  },
                 ],
               },
               'amici': [
-                {'id': 7, 'username': 'marco.e', 'nome': 'Marco Esposito', 'iniziali': 'ME', 'colori': ['#1aa39a', '#2b6cb0'], 'fatto': false},
-                {'id': 8, 'username': 'carla.c', 'nome': 'Carla Coppola', 'iniziali': 'CC', 'colori': ['#c2410c', '#e0663a'], 'fatto': true},
+                {
+                  'id': 7,
+                  'username': 'marco.e',
+                  'nome': 'Marco Esposito',
+                  'iniziali': 'ME',
+                  'colori': ['#1aa39a', '#2b6cb0'],
+                  'fatto': false,
+                },
+                {
+                  'id': 8,
+                  'username': 'carla.c',
+                  'nome': 'Carla Coppola',
+                  'iniziali': 'CC',
+                  'colori': ['#c2410c', '#e0663a'],
+                  'fatto': true,
+                },
               ],
             },
           ),
@@ -351,7 +419,10 @@ void main() {
     // chi si è appena iscritto (non può ancora scrivere): solo la fila
     await _scatta(
       t,
-      Scaffold(appBar: AppBar(title: const Text('Per te')), body: ListView(children: [FilaDaFare(voci: daFareNuovo)])),
+      Scaffold(
+        appBar: AppBar(title: const Text('Per te')),
+        body: ListView(children: [FilaDaFare(voci: daFareNuovo)]),
+      ),
       '36-da-fare-nuovo-iscritto',
     );
     await _scatta(t, const SchermataQuartiere(slug: 'borgo-fiorito'), '37-quartiere-pallini');
@@ -378,7 +449,12 @@ void main() {
     );
 
     // email non ancora confermata: fascia in cima alla Home, e «Ti abbiamo scritto» dopo l'iscrizione
-    stato.entra(Io({...ioFinto, 'utente': <String, dynamic>{...(ioFinto['utente'] as Map<String, dynamic>), 'email_confermata': false}}));
+    stato.entra(
+      Io({
+        ...ioFinto,
+        'utente': <String, dynamic>{...(ioFinto['utente'] as Map<String, dynamic>), 'email_confermata': false},
+      }),
+    );
     await _scatta(t, const SchermataFeed(), '41-fascia-email');
     stato.entra(Io(ioFinto));
     await _scatta(t, const SchermataAccesso(), '43-accesso-password-dimenticata');
@@ -386,11 +462,18 @@ void main() {
     // persone bloccate (requisito Play per i social)
     await _scatta(
       t,
-      SchermataBloccati(iniziali: [
-        {'username': 'gino.p', 'nome': 'Gino Palumbo', 'avatar': null},
-        {'username': 'offerte.top', 'nome': 'Offerte Top', 'avatar': null},
-      ]),
+      SchermataBloccati(
+        iniziali: [
+          {'username': 'gino.p', 'nome': 'Gino Palumbo', 'avatar': null},
+          {'username': 'offerte.top', 'nome': 'Offerte Top', 'avatar': null},
+        ],
+      ),
       '44-persone-bloccate',
     );
+
+    // messaggi privati: elenco, chat, richiesta ricevuta
+    await _scatta(t, const SchermataMessaggi(), '45-messaggi');
+    await _scatta(t, const SchermataChat(convId: 5), '46-chat');
+    await _scatta(t, const SchermataChat(convId: 6), '47-chat-richiesta');
   });
 }

@@ -14,6 +14,7 @@ import 'package:share_plus/share_plus.dart';
 import '../widget/da_fare.dart';
 import 'admin.dart';
 import 'follow.dart';
+import 'messaggi.dart';
 import 'moderazione.dart';
 import 'profilo.dart';
 import 'scrivi.dart';
@@ -35,6 +36,11 @@ Future<void> apriQuartiere(BuildContext context, String slug) => Navigator.of(co
 
 Future<void> apriPost(BuildContext context, int id, {Post? post, bool scrivi = false, bool commenti = false}) =>
     Navigator.of(context).push(_via(SchermataPost(id: id, post: post, scrivi: scrivi, commenti: commenti)));
+
+Future<void> apriMessaggi(BuildContext context) => Navigator.of(context).push(_via(const SchermataMessaggi()));
+
+Future<void> apriChat(BuildContext context, {int? convId, String? username}) =>
+    Navigator.of(context).push(_via(SchermataChat(convId: convId, username: username)));
 
 Future<void> apriTag(BuildContext context, String tag) => Navigator.of(context).push(_via(SchermataTag(tag: tag)));
 
@@ -73,6 +79,12 @@ Future<void> apriDestinazione(BuildContext context, Map<String, dynamic> vai) as
       await Navigator.of(context).push(_via(SchermataModificaProfilo(campo: '${vai['campo'] ?? ''}')));
     case 'admin':
       if (stato.io?.admin == true) await Navigator.of(context).push(_via(const SchermataAdmin()));
+    case 'chat':
+      await apriChat(context, convId: (vai['id'] as num).toInt());
+    case 'chat_con':
+      await apriChat(context, username: '${vai['username']}');
+    case 'messaggi':
+      await apriMessaggi(context);
     case 'mappa' || 'notifiche':
       stato.apri({'tipo': vai['tipo']});
     case 'scrivi':
@@ -99,20 +111,26 @@ Future<void> apriDestinazione(BuildContext context, Map<String, dynamic> vai) as
 }
 
 /// Foto a tutto schermo con il visore «wouuu» (animazione dalla foto toccata, sfondo sfocato, zoom, trascina giù).
-Future<void> apriFoto(BuildContext context, String url, {String? titolo, String? sottotitolo, bool tondo = false}) =>
-    Navigator.of(context).push(
-      PageRouteBuilder(
-        opaque: false,
-        barrierColor: Colors.transparent,
-        transitionDuration: const Duration(milliseconds: 320),
-        reverseTransitionDuration: const Duration(milliseconds: 240),
-        pageBuilder: (c, _, _) => VisoreFoto(url: url, titolo: titolo, sottotitolo: sottotitolo, tondo: tondo),
-        transitionsBuilder: (_, a, _, child) => FadeTransition(
-          opacity: CurvedAnimation(parent: a, curve: Curves.easeOut),
-          child: child,
-        ),
-      ),
-    );
+Future<void> apriFoto(
+  BuildContext context,
+  String url, {
+  String? titolo,
+  String? sottotitolo,
+  bool tondo = false,
+  Map<String, String>? testate,
+}) => Navigator.of(context).push(
+  PageRouteBuilder(
+    opaque: false,
+    barrierColor: Colors.transparent,
+    transitionDuration: const Duration(milliseconds: 320),
+    reverseTransitionDuration: const Duration(milliseconds: 240),
+    pageBuilder: (c, _, _) => VisoreFoto(url: url, titolo: titolo, sottotitolo: sottotitolo, tondo: tondo, testate: testate),
+    transitionsBuilder: (_, a, _, child) => FadeTransition(
+      opacity: CurvedAnimation(parent: a, curve: Curves.easeOut),
+      child: child,
+    ),
+  ),
+);
 
 /// Chi ha reagito a un post, con la sua emoji e il quartiere.
 Future<void> apriChiHaReagito(BuildContext context, int postId) => showModalBottomSheet<void>(

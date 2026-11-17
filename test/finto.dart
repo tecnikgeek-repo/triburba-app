@@ -447,7 +447,18 @@ final quartiereFinto = {
   'altri': false,
   'post': feedFinto.take(2).toList(),
   'quartiere': {
-    'da_fare': {'garantire': 2, 'candidati': 3, 'votato': false, 'senza_mod': false, 'proposte': 1, 'segnalati': 1, 'regole_vuote': false, 'nuovi': 1, 'residente': true, 'mod': true},
+    'da_fare': {
+      'garantire': 2,
+      'candidati': 3,
+      'votato': false,
+      'senza_mod': false,
+      'proposte': 1,
+      'segnalati': 1,
+      'regole_vuote': false,
+      'nuovi': 1,
+      'residente': true,
+      'mod': true,
+    },
     'id': 23,
     'nome': 'Borgo Fiorito',
     'slug': 'borgo-fiorito',
@@ -516,7 +527,11 @@ final postTag = {
 
 // candidatura a moderatore in bacheca: si vota dentro l'app
 final postCandidatura = {
-  ...post(31, 'Sono nato in questo quartiere e ci vivo tutt\'ora.', autore: faccia('marco.e', 'Marco Esposito', colori: ['#1aa39a', '#2b6cb0'])),
+  ...post(
+    31,
+    'Sono nato in questo quartiere e ci vivo tutt\'ora.',
+    autore: faccia('marco.e', 'Marco Esposito', colori: ['#1aa39a', '#2b6cb0']),
+  ),
   'tipo': 'candidatura',
   'candidatura': {'voti': 2, 'mio': false, 'eletto': false, 'puo_votare': true, 'quartiere_id': 23, 'candidato_id': 9},
 };
@@ -524,7 +539,13 @@ final postCandidatura = {
 // schermata Moderazione di un moderatore residente
 final moderazioneFinta = <String, dynamic>{
   'ok': true,
-  'quartiere': {'id': 23, 'nome': 'Borgo Fiorito', 'slug': 'borgo-fiorito', 'municipalita': 'VII Municipalità', 'regole': 'Niente pubblicità e niente annunci di vendita.\nRispetto per tutti.'},
+  'quartiere': {
+    'id': 23,
+    'nome': 'Borgo Fiorito',
+    'slug': 'borgo-fiorito',
+    'municipalita': 'VII Municipalità',
+    'regole': 'Niente pubblicità e niente annunci di vendita.\nRispetto per tutti.',
+  },
   'residente': true,
   'puo_moderare': true,
   'candidato': true,
@@ -532,22 +553,80 @@ final moderazioneFinta = <String, dynamic>{
   'voti_min': 2,
   'max_moderatori': 3,
   'candidati': [
-    {...faccia('anna.rossi', 'Anna Rossi'), 'id': 1, 'motivazione': 'Conosco tutti in piazza e voglio dare una mano.', 'voti': 4, 'mio_voto': true, 'eletto': true, 'io': false,
-     'sfiducie': 0, 'mia_sfiducia': false, 'sfiducie_servono': 4, 'sfiducia_dal': null, 'puo_sfiduciare': true},
-    {...faccia('marco.e', 'Marco Esposito', colori: ['#1aa39a', '#2b6cb0']), 'id': 9, 'motivazione': null, 'voti': 2, 'mio_voto': false, 'eletto': true, 'io': true,
-     'sfiducie': 0, 'mia_sfiducia': false, 'sfiducie_servono': 3, 'sfiducia_dal': '09/12/2026', 'puo_sfiduciare': false},
-    {...faccia('lucia.b', 'Lucia Bianchi', colori: ['#7b4bd6', '#e0663a']), 'id': 12, 'motivazione': 'Mi occupo del giardinetto da anni.', 'voti': 1, 'mio_voto': false, 'eletto': false, 'io': false,
-     'sfiducie': 0, 'mia_sfiducia': false, 'sfiducie_servono': null, 'sfiducia_dal': null, 'puo_sfiduciare': false},
+    {
+      ...faccia('anna.rossi', 'Anna Rossi'),
+      'id': 1,
+      'motivazione': 'Conosco tutti in piazza e voglio dare una mano.',
+      'voti': 4,
+      'mio_voto': true,
+      'eletto': true,
+      'io': false,
+      'sfiducie': 0,
+      'mia_sfiducia': false,
+      'sfiducie_servono': 4,
+      'sfiducia_dal': null,
+      'puo_sfiduciare': true,
+    },
+    {
+      ...faccia('marco.e', 'Marco Esposito', colori: ['#1aa39a', '#2b6cb0']),
+      'id': 9,
+      'motivazione': null,
+      'voti': 2,
+      'mio_voto': false,
+      'eletto': true,
+      'io': true,
+      'sfiducie': 0,
+      'mia_sfiducia': false,
+      'sfiducie_servono': 3,
+      'sfiducia_dal': '09/12/2026',
+      'puo_sfiduciare': false,
+    },
+    {
+      ...faccia('lucia.b', 'Lucia Bianchi', colori: ['#7b4bd6', '#e0663a']),
+      'id': 12,
+      'motivazione': 'Mi occupo del giardinetto da anni.',
+      'voti': 1,
+      'mio_voto': false,
+      'eletto': false,
+      'io': false,
+      'sfiducie': 0,
+      'mia_sfiducia': false,
+      'sfiducie_servono': null,
+      'sfiducia_dal': null,
+      'puo_sfiduciare': false,
+    },
   ],
   'proposte': [
-    {'post_id': 40, 'livello': 'quartiere', 'testo': 'Domenica mercatino del riuso in piazza: portate quello che non usate più!', 'autore': faccia('gino.p', 'Gino Palumbo', colori: ['#ef4b3f', '#e0663a']), 'da': 'Secondigliano', 'quando': '2 h', 'portato_da': 'gino.p'},
+    {
+      'post_id': 40,
+      'livello': 'quartiere',
+      'testo': 'Domenica mercatino del riuso in piazza: portate quello che non usate più!',
+      'autore': faccia('gino.p', 'Gino Palumbo', colori: ['#ef4b3f', '#e0663a']),
+      'da': 'Secondigliano',
+      'quando': '2 h',
+      'portato_da': 'gino.p',
+    },
   ],
   'nascosti': [
-    {'post_id': 41, 'testo': 'Vendo telefoni a metà prezzo, scrivetemi in privato', 'autore': faccia('spam.x', 'Offerte Top', colori: ['#c2410c', '#e0663a']), 'segnalazioni': 3, 'motivi': 'Spam o pubblicità', 'quando': '5 h'},
+    {
+      'post_id': 41,
+      'testo': 'Vendo telefoni a metà prezzo, scrivetemi in privato',
+      'autore': faccia('spam.x', 'Offerte Top', colori: ['#c2410c', '#e0663a']),
+      'segnalazioni': 3,
+      'motivi': 'Spam o pubblicità',
+      'quando': '5 h',
+    },
   ],
 };
 
-final tagFinto = {'ok': true, 'tag': 'festadelquartiere', 'post': [postTag], 'n_post': 1, 'seguaci': 4, 'seguo': false};
+final tagFinto = {
+  'ok': true,
+  'tag': 'festadelquartiere',
+  'post': [postTag],
+  'n_post': 1,
+  'seguaci': 4,
+  'seguo': false,
+};
 
 /// Forme vere della mappa (zone spente, regione, San Pietro a Patierno acceso) prese dal server il 09/11/2026.
 Map<String, dynamic> mappaVera() => jsonDecode(File('test/mappa_vera.json').readAsStringSync()) as Map<String, dynamic>;
@@ -560,50 +639,224 @@ final followFinti = {
   'altri': false,
   'conti': {'followers': 4, 'following': 2},
   'persone': [
-    {'faccia': faccia('marco.e', 'Marco Esposito', colori: ['#1aa39a', '#2b6cb0']), 'quartiere': 'Borgo Fiorito', 'seguo': true, 'io': false},
-    {'faccia': faccia('giulia.f', 'Giulia Ferraro', colori: ['#7b4bd6', '#e0663a']), 'quartiere': 'Borgo Fiorito', 'seguo': false, 'io': false},
+    {
+      'faccia': faccia('marco.e', 'Marco Esposito', colori: ['#1aa39a', '#2b6cb0']),
+      'quartiere': 'Borgo Fiorito',
+      'seguo': true,
+      'io': false,
+    },
+    {
+      'faccia': faccia('giulia.f', 'Giulia Ferraro', colori: ['#7b4bd6', '#e0663a']),
+      'quartiere': 'Borgo Fiorito',
+      'seguo': false,
+      'io': false,
+    },
     {'faccia': faccia('pietro.de.filippis', 'Pietro De Filippis'), 'quartiere': 'Borgo Fiorito', 'seguo': false, 'io': true},
-    {'faccia': faccia('luca.m', 'Luca Marino con un nome molto lungo da accorciare', colori: ['#ef4b3f', '#e0663a']), 'quartiere': 'Porto', 'seguo': false, 'io': false},
+    {
+      'faccia': faccia('luca.m', 'Luca Marino con un nome molto lungo da accorciare', colori: ['#ef4b3f', '#e0663a']),
+      'quartiere': 'Porto',
+      'seguo': false,
+      'io': false,
+    },
   ],
 };
 
 /// Fila «Da fare» come la manda /app/v1/da-fare (residente con cose da fare)
 final daFareResidente = <Map<String, dynamic>>[
-  {'chiave': 'profilo', 'icona': 'user', 'gruppo': 'profilo', 'numero': '60%', 'titolo': 'Completa il tuo profilo',
-   'testo': 'Manca: due righe su di te, copertina. I vicini si fidano di più di chi si presenta.', 'tasto': 'Completa',
-   'link': '/settings?campo=bio', 'app': {'tipo': 'modifica_profilo', 'campo': 'bio'}},
-  {'chiave': 'garantisci', 'icona': 'handshake', 'gruppo': 'quartiere', 'numero': 2, 'titolo': '2 vicini da garantire',
-   'testo': 'Se li conosci, garantisci per loro: così possono scrivere nel quartiere.', 'tasto': 'Garantisci',
-   'link': '/q/borgo-fiorito?t=residenti', 'app': {'tipo': 'quartiere', 'slug': 'borgo-fiorito', 'scheda': 'residenti'}},
-  {'chiave': 'vota', 'icona': 'vote', 'gruppo': 'quartiere', 'numero': 3, 'titolo': 'Vota i moderatori',
-   'testo': 'Ci sono 3 candidati a Borgo Fiorito: scegli chi modera il quartiere.', 'tasto': 'Vota',
-   'link': '/q/borgo-fiorito?t=moderatori', 'app': {'tipo': 'moderazione', 'slug': 'borgo-fiorito', 'scheda': 'moderatori'}},
-  {'chiave': 'nuovi', 'icona': 'sparkle', 'gruppo': 'quartiere', 'numero': 1, 'titolo': '1 nuovo vicino',
-   'testo': 'È arrivato a Borgo Fiorito questa settimana: dagli il benvenuto.', 'tasto': 'Saluta',
-   'link': '/q/borgo-fiorito?t=residenti#nuovi', 'app': {'tipo': 'nuovi_vicini'}},
-  {'chiave': 'segnalati', 'icona': 'flag', 'gruppo': 'moderazione', 'numero': 1, 'titolo': '1 post segnalato',
-   'testo': 'Guardalo e decidi se rimetterlo visibile o eliminarlo.', 'tasto': 'Rivedi',
-   'link': '/q/borgo-fiorito?t=segnalati', 'app': {'tipo': 'moderazione', 'slug': 'borgo-fiorito', 'scheda': 'nascosti'}},
+  {
+    'chiave': 'profilo',
+    'icona': 'user',
+    'gruppo': 'profilo',
+    'numero': '60%',
+    'titolo': 'Completa il tuo profilo',
+    'testo': 'Manca: due righe su di te, copertina. I vicini si fidano di più di chi si presenta.',
+    'tasto': 'Completa',
+    'link': '/settings?campo=bio',
+    'app': {'tipo': 'modifica_profilo', 'campo': 'bio'},
+  },
+  {
+    'chiave': 'garantisci',
+    'icona': 'handshake',
+    'gruppo': 'quartiere',
+    'numero': 2,
+    'titolo': '2 vicini da garantire',
+    'testo': 'Se li conosci, garantisci per loro: così possono scrivere nel quartiere.',
+    'tasto': 'Garantisci',
+    'link': '/q/borgo-fiorito?t=residenti',
+    'app': {'tipo': 'quartiere', 'slug': 'borgo-fiorito', 'scheda': 'residenti'},
+  },
+  {
+    'chiave': 'vota',
+    'icona': 'vote',
+    'gruppo': 'quartiere',
+    'numero': 3,
+    'titolo': 'Vota i moderatori',
+    'testo': 'Ci sono 3 candidati a Borgo Fiorito: scegli chi modera il quartiere.',
+    'tasto': 'Vota',
+    'link': '/q/borgo-fiorito?t=moderatori',
+    'app': {'tipo': 'moderazione', 'slug': 'borgo-fiorito', 'scheda': 'moderatori'},
+  },
+  {
+    'chiave': 'nuovi',
+    'icona': 'sparkle',
+    'gruppo': 'quartiere',
+    'numero': 1,
+    'titolo': '1 nuovo vicino',
+    'testo': 'È arrivato a Borgo Fiorito questa settimana: dagli il benvenuto.',
+    'tasto': 'Saluta',
+    'link': '/q/borgo-fiorito?t=residenti#nuovi',
+    'app': {'tipo': 'nuovi_vicini'},
+  },
+  {
+    'chiave': 'segnalati',
+    'icona': 'flag',
+    'gruppo': 'moderazione',
+    'numero': 1,
+    'titolo': '1 post segnalato',
+    'testo': 'Guardalo e decidi se rimetterlo visibile o eliminarlo.',
+    'tasto': 'Rivedi',
+    'link': '/q/borgo-fiorito?t=segnalati',
+    'app': {'tipo': 'moderazione', 'slug': 'borgo-fiorito', 'scheda': 'nascosti'},
+  },
 ];
 
 /// La stessa fila per chi si è appena iscritto e ha chiuso i Primi passi
 final daFareNuovo = <Map<String, dynamic>>[
-  {'chiave': 'profilo', 'icona': 'user', 'gruppo': 'profilo', 'numero': '0%', 'titolo': 'Completa il tuo profilo',
-   'testo': 'Manca: foto, quartiere, due righe su di te, professione, copertina.', 'tasto': 'Completa',
-   'link': '/settings?campo=avatar', 'app': {'tipo': 'modifica_profilo', 'campo': 'avatar'}},
-  {'chiave': 'guida-garanzie', 'icona': 'handshake', 'gruppo': 'guida', 'numero': '0/3', 'titolo': 'Fatti garantire',
-   'testo': 'Dopo aver scelto il quartiere, servono le garanzie di 3 vicini già confermati che ti conoscono.', 'tasto': 'Vai al quartiere',
-   'link': '/quartieri', 'app': {'tipo': 'mappa'}},
-  {'chiave': 'guida-partecipa', 'icona': 'heart', 'gruppo': 'guida', 'numero': null, 'titolo': 'Commenta un post',
-   'testo': 'Anche prima delle garanzie puoi leggere, reagire e commentare.', 'tasto': 'Leggi i post', 'link': '/?tab=citta', 'app': {'tipo': 'feed'}},
-  {'chiave': 'guida-invito', 'icona': 'share', 'gruppo': 'guida', 'numero': null, 'titolo': 'Invita un vicino',
-   'testo': 'Più vicini ci sono, prima il quartiere prende vita.', 'tasto': 'Invita', 'link': '#invita', 'app': {'tipo': 'invito'}},
+  {
+    'chiave': 'profilo',
+    'icona': 'user',
+    'gruppo': 'profilo',
+    'numero': '0%',
+    'titolo': 'Completa il tuo profilo',
+    'testo': 'Manca: foto, quartiere, due righe su di te, professione, copertina.',
+    'tasto': 'Completa',
+    'link': '/settings?campo=avatar',
+    'app': {'tipo': 'modifica_profilo', 'campo': 'avatar'},
+  },
+  {
+    'chiave': 'guida-garanzie',
+    'icona': 'handshake',
+    'gruppo': 'guida',
+    'numero': '0/3',
+    'titolo': 'Fatti garantire',
+    'testo': 'Dopo aver scelto il quartiere, servono le garanzie di 3 vicini già confermati che ti conoscono.',
+    'tasto': 'Vai al quartiere',
+    'link': '/quartieri',
+    'app': {'tipo': 'mappa'},
+  },
+  {
+    'chiave': 'guida-partecipa',
+    'icona': 'heart',
+    'gruppo': 'guida',
+    'numero': null,
+    'titolo': 'Commenta un post',
+    'testo': 'Anche prima delle garanzie puoi leggere, reagire e commentare.',
+    'tasto': 'Leggi i post',
+    'link': '/?tab=citta',
+    'app': {'tipo': 'feed'},
+  },
+  {
+    'chiave': 'guida-invito',
+    'icona': 'share',
+    'gruppo': 'guida',
+    'numero': null,
+    'titolo': 'Invita un vicino',
+    'testo': 'Più vicini ci sono, prima il quartiere prende vita.',
+    'tasto': 'Invita',
+    'link': '#invita',
+    'app': {'tipo': 'invito'},
+  },
 ];
 
 final nuoviViciniFinti = <Map<String, dynamic>>[
-  {'id': 41, 'faccia': faccia('sara.c', 'Sara Coppola', colori: ['#7b4bd6', '#e0663a']), 'quando': '2 giorni fa', 'salutato': false},
-  {'id': 42, 'faccia': faccia('ciro.v', 'Ciro Vitale', colori: ['#138a82', '#f0b34a']), 'quando': '5 giorni fa', 'salutato': true},
+  {
+    'id': 41,
+    'faccia': faccia('sara.c', 'Sara Coppola', colori: ['#7b4bd6', '#e0663a']),
+    'quando': '2 giorni fa',
+    'salutato': false,
+  },
+  {
+    'id': 42,
+    'faccia': faccia('ciro.v', 'Ciro Vitale', colori: ['#138a82', '#f0b34a']),
+    'quando': '5 giorni fa',
+    'salutato': true,
+  },
 ];
+
+// ── Messaggi privati ──
+final chatFinte = <Map<String, dynamic>>[
+  {
+    'id': 5,
+    'persona': faccia('sara.c', 'Sara Coppola', colori: ['#7b4bd6', '#e0663a']),
+    'anteprima': 'Perfetto, allora ci vediamo alle 10 davanti alla chiesa!',
+    'mio': false,
+    'quando': '3 min fa',
+    'non_letti': 2,
+    'stato': 'attiva',
+  },
+  {
+    'id': 7,
+    'persona': faccia('ciro.v', 'Ciro Vitale', colori: ['#138a82', '#f0b34a']),
+    'anteprima': 'Grazie per il passaggio di ieri 🙏',
+    'mio': true,
+    'quando': 'ieri',
+    'non_letti': 0,
+    'stato': 'attiva',
+  },
+  {
+    'id': 8,
+    'persona': faccia('gino.p', 'Gino Palumbo'),
+    'anteprima': 'Ciao, ho visto il tuo post sul mercatino',
+    'mio': true,
+    'quando': '2 giorni fa',
+    'non_letti': 0,
+    'stato': 'richiesta',
+  },
+];
+
+Map<String, dynamic> _m(int id, bool mio, String testo, String ora, {String giorno = 'Oggi'}) => {
+  'id': id,
+  'mio': mio,
+  'testo': testo,
+  'foto': null,
+  'eliminato': false,
+  'ora': ora,
+  'giorno': giorno,
+};
+
+final chatApertaFinta = <String, dynamic>{
+  'ok': true,
+  'conv_id': 5,
+  'persona': faccia('sara.c', 'Sara Coppola', colori: ['#7b4bd6', '#e0663a']),
+  'stato': 'attiva',
+  'richiesta_ricevuta': false,
+  'puo_scrivere': true,
+  'avviso': '',
+  'foto_permesse': true,
+  'altri_prima': false,
+  'letto_altro': 103,
+  'messaggi': [
+    _m(101, false, 'Ciao! Domani c\'è il mercatino in piazza, vieni?', '18:02', giorno: 'Ieri'),
+    _m(102, true, 'Sì! Porto anche i libri da scambiare 📚', '18:10', giorno: 'Ieri'),
+    _m(103, true, 'A che ora vi trovate?', '09:12'),
+    _m(104, false, 'Verso le 10', '09:20'),
+    _m(105, false, 'Perfetto, allora ci vediamo alle 10 davanti alla chiesa!', '09:21'),
+  ],
+};
+
+final chatRichiestaFinta = <String, dynamic>{
+  'ok': true,
+  'conv_id': 6,
+  'persona': faccia('gino.p', 'Gino Palumbo'),
+  'stato': 'richiesta',
+  'richiesta_ricevuta': true,
+  'puo_scrivere': true,
+  'avviso': '',
+  'foto_permesse': true,
+  'altri_prima': false,
+  'letto_altro': 0,
+  'messaggi': [_m(201, false, 'Ciao, ho visto il tuo post sul mercatino: hai ancora la bici da vendere?', '11:40')],
+};
 
 http.Client clientFinto() => MockClient((r) async {
   final p = r.url.path;
@@ -620,14 +873,58 @@ http.Client clientFinto() => MockClient((r) async {
   if (p.startsWith('/app/v1/tag/')) j = tagFinto;
   if (p == '/app/v1/da-fare') j = {'ok': true, 'voci': daFareResidente};
   if (p == '/app/v1/nuovi-vicini') j = {'ok': true, 'persone': nuoviViciniFinti};
+  if (p == '/api/messaggi') {
+    j = {
+      'ok': true,
+      'chat': r.url.queryParameters['tipo'] == 'richieste' ? <Object>[] : chatFinte,
+      'conta': {'chat': 1, 'richieste': 0},
+    };
+  }
+  if (p == '/api/messaggi/5') j = chatApertaFinta;
+  if (p == '/api/messaggi/6') j = chatRichiestaFinta;
   return http.Response.bytes(utf8.encode(jsonEncode(j)), 200, headers: {'content-type': 'application/json; charset=utf-8'});
 });
 
 /// Preferenze delle notifiche come le manda /app/v1/notifiche/preferenze
 final preferenzeFinte = <Map<String, dynamic>>[
-  {'chiave': 'commenti', 'titolo': 'Commenti e risposte', 'spiega': 'Quando qualcuno commenta un tuo post o risponde a un tuo commento.', 'sempre': false, 'campanella': true, 'telefono': true},
-  {'chiave': 'reazioni', 'titolo': 'Reazioni', 'spiega': 'Quando qualcuno reagisce a un tuo post o a un tuo commento.', 'sempre': false, 'campanella': true, 'telefono': false},
-  {'chiave': 'menzioni', 'titolo': 'Menzioni', 'spiega': 'Quando qualcuno ti cita con @ e il tuo nome.', 'sempre': false, 'campanella': true, 'telefono': true},
-  {'chiave': 'follower', 'titolo': 'Nuovi follower', 'spiega': 'Quando qualcuno comincia a seguirti.', 'sempre': false, 'campanella': false, 'telefono': false},
-  {'chiave': 'residenza', 'titolo': 'Garanzie e residenza', 'spiega': 'Quando un vicino garantisce per te e quando diventi residente confermato. Riguarda il tuo account o tutta la comunità: in campanella resta sempre.', 'sempre': true, 'campanella': true, 'telefono': true},
+  {
+    'chiave': 'commenti',
+    'titolo': 'Commenti e risposte',
+    'spiega': 'Quando qualcuno commenta un tuo post o risponde a un tuo commento.',
+    'sempre': false,
+    'campanella': true,
+    'telefono': true,
+  },
+  {
+    'chiave': 'reazioni',
+    'titolo': 'Reazioni',
+    'spiega': 'Quando qualcuno reagisce a un tuo post o a un tuo commento.',
+    'sempre': false,
+    'campanella': true,
+    'telefono': false,
+  },
+  {
+    'chiave': 'menzioni',
+    'titolo': 'Menzioni',
+    'spiega': 'Quando qualcuno ti cita con @ e il tuo nome.',
+    'sempre': false,
+    'campanella': true,
+    'telefono': true,
+  },
+  {
+    'chiave': 'follower',
+    'titolo': 'Nuovi follower',
+    'spiega': 'Quando qualcuno comincia a seguirti.',
+    'sempre': false,
+    'campanella': false,
+    'telefono': false,
+  },
+  {
+    'chiave': 'residenza',
+    'titolo': 'Garanzie e residenza',
+    'spiega': 'Quando un vicino garantisce per te e quando diventi residente confermato. Riguarda il tuo account o tutta la comunità: in campanella resta sempre.',
+    'sempre': true,
+    'campanella': true,
+    'telefono': true,
+  },
 ];

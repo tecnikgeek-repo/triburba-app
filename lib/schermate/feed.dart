@@ -74,6 +74,20 @@ class SchermataFeedState extends State<SchermataFeed> with TickerProviderStateMi
         titleSpacing: 16,
         title: Row(children: [emblema(30), const SizedBox(width: 8), const Marchio(misura: 25)]),
         actions: [
+          // messaggi privati, col numero delle chat da leggere
+          ListenableBuilder(
+            listenable: stato,
+            builder: (_, _) => IconButton(
+              tooltip: 'Messaggi',
+              icon: Badge(
+                isLabelVisible: stato.messaggi > 0,
+                label: Text(stato.messaggi > 99 ? '99+' : '${stato.messaggi}'),
+                backgroundColor: terracotta,
+                child: const Icon(Icons.chat_bubble_outline_rounded),
+              ),
+              onPressed: () => apriMessaggi(context),
+            ),
+          ),
           IconButton(
             tooltip: 'Cerca',
             icon: const Icon(Icons.search_rounded),

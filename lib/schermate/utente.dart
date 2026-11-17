@@ -277,15 +277,28 @@ class _SchermataUtenteState extends State<SchermataUtente> {
                         icon: const Icon(Icons.edit_outlined, size: 18),
                         label: const Text('Modifica'),
                       )
-                    : ConstrainedBox(
-                        constraints: const BoxConstraints(minWidth: 130),
-                        child: u['seguo'] == true
-                            ? OutlinedButton.icon(
-                                onPressed: _occupato ? null : _segui,
-                                icon: const Icon(Icons.check, size: 18),
-                                label: const Text('Segui già'),
-                              )
-                            : BottoneCaldo(testo: 'Segui', icona: Icons.person_add_alt_1, occupato: _occupato, onPressed: _segui),
+                    : Row(
+                        mainAxisSize: MainAxisSize.min,
+                        children: [
+                          if (u['bloccato'] != true && u['sistema'] != true) ...[
+                            IconButton.outlined(
+                              tooltip: 'Messaggio',
+                              icon: const Icon(Icons.chat_bubble_outline_rounded, size: 20),
+                              onPressed: () => apriChat(context, username: widget.username),
+                            ),
+                            const SizedBox(width: 8),
+                          ],
+                          ConstrainedBox(
+                            constraints: const BoxConstraints(minWidth: 130),
+                            child: u['seguo'] == true
+                                ? OutlinedButton.icon(
+                                    onPressed: _occupato ? null : _segui,
+                                    icon: const Icon(Icons.check, size: 18),
+                                    label: const Text('Segui già'),
+                                  )
+                                : BottoneCaldo(testo: 'Segui', icona: Icons.person_add_alt_1, occupato: _occupato, onPressed: _segui),
+                          ),
+                        ],
                       ),
               ),
             ],
