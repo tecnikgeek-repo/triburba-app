@@ -182,6 +182,9 @@ class Api {
   /// Guida: «benvenuto» visto, carta «nascondi», «invito» fatto.
   Future<Map<String, dynamic>> guida(String azione) => post('/app/v1/guida', {'azione': azione});
 
+  /// Biografia scritta nel benvenuto: ritorna il messaggio di ringraziamento
+  Future<String> salvaBio(String testo) async => '${(await post('/app/v1/guida', {'azione': 'bio', 'testo': testo}))['msg'] ?? ''}';
+
   Future<void> registraPush(String fcm) => post('/app/v1/push', {'fcm': fcm, 'versione': versione});
 
   /// Preferenze delle notifiche: categorie con campanella e telefono

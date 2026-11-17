@@ -469,11 +469,15 @@ class Guida {
     : benvenuto = j['benvenuto'] == true,
       nascosta = j['nascosta'] == true,
       completa = j['completa'] == true,
+      bio = j['bio'] == true,
       fatti = _i(j['fatti']),
       totale = _i(j['totale']),
       passi = (j['passi'] as List? ?? []).map((p) => PassoGuida((p as Map).cast<String, dynamic>())).toList();
 
   final bool benvenuto, nascosta, completa;
+
+  /// Ha già scritto due righe su di sé (se no, il benvenuto ha la pagina «Presentati ai vicini»)
+  final bool bio;
   final int fatti, totale;
   final List<PassoGuida> passi;
 }

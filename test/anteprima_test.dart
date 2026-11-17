@@ -221,6 +221,18 @@ void main() {
     // guida dei nuovi iscritti: benvenuto e carta «Primi passi»
     stato.entra(Io({...ioFinto, 'guida': guidaFinta()}));
     await _scatta(t, const SchermataPrimoAccesso(), '14-benvenuto');
+    // ultima pagina del benvenuto: «Presentati ai vicini» con la casella della biografia
+    await _scatta(
+      t,
+      const SchermataPrimoAccesso(),
+      '48-benvenuto-bio',
+      prima: () async {
+        for (var k = 0; k < 4; k++) {
+          await t.tap(find.text('Avanti'));
+          await t.pumpAndSettle();
+        }
+      },
+    );
     await _scatta(t, const SchermataFeed(), '15-primi-passi');
     stato.entra(Io({...ioFinto, 'guida': guidaFinta(completa: true)}));
     await _scatta(t, const SchermataFeed(), '16-primi-passi-fatti');

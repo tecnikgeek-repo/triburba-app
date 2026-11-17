@@ -55,12 +55,19 @@ class TestataHome extends StatelessWidget {
     return Container(
       margin: const EdgeInsets.fromLTRB(10, 12, 10, 0),
       padding: const EdgeInsets.fromLTRB(12, 12, 12, 8),
-      decoration: BoxDecoration(color: superficie, borderRadius: BorderRadius.circular(16), border: Border.all(color: linea)),
+      decoration: BoxDecoration(
+        color: superficie,
+        borderRadius: BorderRadius.circular(16),
+        border: Border.all(color: linea),
+      ),
       child: Column(
         children: [
           Row(
             children: [
-              GestureDetector(onTap: () => apriUtente(context, io.username), child: FotoProfilo(faccia: io.faccia, lato: 42)),
+              GestureDetector(
+                onTap: () => apriUtente(context, io.username),
+                child: FotoProfilo(faccia: io.faccia, lato: 42),
+              ),
               const SizedBox(width: 10),
               Expanded(
                 child: InkWell(
@@ -68,7 +75,11 @@ class TestataHome extends StatelessWidget {
                   onTap: () => _scrivi(context),
                   child: Container(
                     padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
-                    decoration: BoxDecoration(color: superficie2, borderRadius: BorderRadius.circular(99), border: Border.all(color: linea2)),
+                    decoration: BoxDecoration(
+                      color: superficie2,
+                      borderRadius: BorderRadius.circular(99),
+                      border: Border.all(color: linea2),
+                    ),
                     child: Text(
                       dove != null ? 'Cosa succede a $dove?' : 'Cosa succede nel quartiere?',
                       maxLines: 1,
@@ -107,7 +118,11 @@ class TestataHome extends StatelessWidget {
             Icon(i, size: 20, color: c),
             const SizedBox(width: 6),
             Flexible(
-              child: Text(t, overflow: TextOverflow.ellipsis, style: const TextStyle(color: testo2, fontWeight: FontWeight.w700, fontSize: 13.5)),
+              child: Text(
+                t,
+                overflow: TextOverflow.ellipsis,
+                style: const TextStyle(color: testo2, fontWeight: FontWeight.w700, fontSize: 13.5),
+              ),
             ),
           ],
         ),
@@ -169,7 +184,10 @@ class FilaDaFareState extends State<FilaDaFare> {
                 const SizedBox(width: 6),
                 Text('Da fare', style: titolo(16)),
                 const Spacer(),
-                Text(voci.length == 1 ? '1 cosa per te' : '${voci.length} cose per te', style: const TextStyle(color: muto, fontSize: 12.5)),
+                Text(
+                  voci.length == 1 ? '1 cosa per te' : '${voci.length} cose per te',
+                  style: const TextStyle(color: muto, fontSize: 12.5),
+                ),
               ],
             ),
           ),
@@ -189,7 +207,33 @@ class FilaDaFareState extends State<FilaDaFare> {
     );
   }
 
+  /// Scheda con la ✕ (per ora «Presentati ai vicini»): si chiude e torna più avanti, mai una notifica
   Widget _carta(Map<String, dynamic> v) {
+    final chiudi = v['chiudi'];
+    if (chiudi == null) return _cartaBase(v);
+    return Stack(
+      children: [
+        _cartaBase(v),
+        Positioned(
+          top: 4,
+          right: 4,
+          child: IconButton(
+            tooltip: 'Non ora',
+            visualDensity: VisualDensity.compact,
+            iconSize: 16,
+            style: IconButton.styleFrom(backgroundColor: superficie2, foregroundColor: muto),
+            icon: const Icon(Icons.close_rounded),
+            onPressed: () {
+              setState(() => _voci = [...?_voci]..remove(v));
+              stato.api.guida('$chiudi').catchError((_) => <String, dynamic>{});
+            },
+          ),
+        ),
+      ],
+    );
+  }
+
+  Widget _cartaBase(Map<String, dynamic> v) {
     final gruppo = '${v['gruppo']}';
     final tinta = switch (gruppo) {
       'moderazione' => oro,
@@ -234,24 +278,42 @@ class FilaDaFareState extends State<FilaDaFare> {
                       right: -14,
                       child: Container(
                         padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
-                        decoration: BoxDecoration(color: vernice, borderRadius: BorderRadius.circular(99), border: Border.all(color: linea2)),
-                        child: Text('$numero', style: const TextStyle(color: testo, fontSize: 11, fontWeight: FontWeight.w800)),
+                        decoration: BoxDecoration(
+                          color: vernice,
+                          borderRadius: BorderRadius.circular(99),
+                          border: Border.all(color: linea2),
+                        ),
+                        child: Text(
+                          '$numero',
+                          style: const TextStyle(color: testo, fontSize: 11, fontWeight: FontWeight.w800),
+                        ),
                       ),
                     ),
                 ],
               ),
               const SizedBox(height: 10),
-              Text('${v['titolo']}', maxLines: 2, overflow: TextOverflow.ellipsis,
-                  style: const TextStyle(fontWeight: FontWeight.w800, fontSize: 14.5, height: 1.2)),
+              Text(
+                '${v['titolo']}',
+                maxLines: 2,
+                overflow: TextOverflow.ellipsis,
+                style: const TextStyle(fontWeight: FontWeight.w800, fontSize: 14.5, height: 1.2),
+              ),
               const SizedBox(height: 4),
-              Text('${v['testo']}', maxLines: 3, overflow: TextOverflow.ellipsis,
-                  style: const TextStyle(color: testo2, fontSize: 12.5, height: 1.3)),
+              Text(
+                '${v['testo']}',
+                maxLines: 3,
+                overflow: TextOverflow.ellipsis,
+                style: const TextStyle(color: testo2, fontSize: 12.5, height: 1.3),
+              ),
               const Spacer(),
               Row(
                 children: [
                   Flexible(
-                    child: Text('${v['tasto']}', overflow: TextOverflow.ellipsis,
-                        style: const TextStyle(color: terracotta, fontWeight: FontWeight.w800, fontSize: 13)),
+                    child: Text(
+                      '${v['tasto']}',
+                      overflow: TextOverflow.ellipsis,
+                      style: const TextStyle(color: terracotta, fontWeight: FontWeight.w800, fontSize: 13),
+                    ),
                   ),
                   const SizedBox(width: 3),
                   const Icon(Icons.arrow_forward, size: 14, color: terracotta),
@@ -319,7 +381,9 @@ class _SchermataNuoviViciniState extends State<SchermataNuoviVicini> {
     return Scaffold(
       appBar: AppBar(title: const Text('Nuovi vicini')),
       body: p == null
-          ? Center(child: _errore != null ? Text(_errore!, style: const TextStyle(color: muto)) : const CircularProgressIndicator())
+          ? Center(
+              child: _errore != null ? Text(_errore!, style: const TextStyle(color: muto)) : const CircularProgressIndicator(),
+            )
           : RefreshIndicator(
               onRefresh: _carica,
               child: ListView(
@@ -337,7 +401,11 @@ class _SchermataNuoviViciniState extends State<SchermataNuoviVicini> {
                     Container(
                       margin: const EdgeInsets.only(bottom: 8),
                       padding: const EdgeInsets.all(12),
-                      decoration: BoxDecoration(color: superficie, borderRadius: BorderRadius.circular(14), border: Border.all(color: linea)),
+                      decoration: BoxDecoration(
+                        color: superficie,
+                        borderRadius: BorderRadius.circular(14),
+                        border: Border.all(color: linea),
+                      ),
                       child: Row(
                         children: [
                           GestureDetector(
@@ -349,8 +417,12 @@ class _SchermataNuoviViciniState extends State<SchermataNuoviVicini> {
                             child: Column(
                               crossAxisAlignment: CrossAxisAlignment.start,
                               children: [
-                                Text('${(x['faccia'] as Map)['nome']}', maxLines: 1, overflow: TextOverflow.ellipsis,
-                                    style: const TextStyle(fontWeight: FontWeight.w700)),
+                                Text(
+                                  '${(x['faccia'] as Map)['nome']}',
+                                  maxLines: 1,
+                                  overflow: TextOverflow.ellipsis,
+                                  style: const TextStyle(fontWeight: FontWeight.w700),
+                                ),
                                 Text('arrivato ${x['quando']}', style: const TextStyle(color: muto, fontSize: 12.5)),
                               ],
                             ),

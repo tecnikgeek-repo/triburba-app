@@ -36,11 +36,17 @@ class SchermataPrimoAccesso extends StatefulWidget {
 
 class _SchermataPrimoAccessoState extends State<SchermataPrimoAccesso> {
   final _pagine = PageController();
+  final _bio = TextEditingController();
   int _i = 0;
+
+  /// Pagina «Presentati ai vicini» solo per chi non ha ancora la biografia
+  bool get _conBio => stato.io?.guida?.bio != true;
+  int get _ultima => _conBio ? 4 : 3;
 
   @override
   void dispose() {
     _pagine.dispose();
+    _bio.dispose();
     super.dispose();
   }
 
@@ -51,11 +57,25 @@ class _SchermataPrimoAccessoState extends State<SchermataPrimoAccesso> {
       await p.setBool(_chiave(io.id), true);
     }
     stato.api.guida('benvenuto').catchError((_) => <String, dynamic>{});
+    // biografia scritta nell'ultima pagina (vuota = la si ricorda più avanti, con calma)
+    final bio = _bio.text.trim();
+    if (bio.isNotEmpty) {
+      final ctx = context;
+      stato.api
+          .salvaBio(bio)
+          .then((msg) {
+            if (ctx.mounted) messaggio(ctx, msg);
+            stato.ricarica();
+          })
+          .catchError((Object e) {
+            if (ctx.mounted) messaggio(ctx, 'Biografia non salvata: puoi scriverla dal tuo profilo.');
+          });
+    }
     if (mounted) Navigator.of(context).pop();
   }
 
   void _avanti() {
-    if (_i == 3) {
+    if (_i == _ultima) {
       _chiudi();
     } else {
       _pagine.nextPage(duration: const Duration(milliseconds: 350), curve: Curves.easeOutCubic);
@@ -94,6 +114,13 @@ class _SchermataPrimoAccessoState extends State<SchermataPrimoAccesso> {
             'Il tuo non c\'è ancora? Chiedilo dalla mappa e passa parola: si accende da solo.',
         true,
       ),
+      if (_conBio)
+        (
+          const Icon(Icons.person_outline, size: 46, color: bianco),
+          'Presentati ai vicini',
+          'Due righe su di te, che i vicini leggono sul tuo profilo. Se preferisci, puoi scriverle anche dopo.',
+          true,
+        ),
     ];
     return PopScope(
       canPop: false,
@@ -132,7 +159,7 @@ class _SchermataPrimoAccessoState extends State<SchermataPrimoAccesso> {
                     ),
                   ),
                   SizedBox(
-                    height: 330,
+                    height: _conBio && _i == 4 ? 400 : 330,
                     child: PageView(
                       controller: _pagine,
                       onPageChanged: (i) => setState(() => _i = i),
@@ -164,6 +191,20 @@ class _SchermataPrimoAccessoState extends State<SchermataPrimoAccesso> {
                                   textAlign: TextAlign.center,
                                   style: const TextStyle(color: testo2, fontSize: 15, height: 1.5),
                                 ),
+                                if (p.$2 == 'Presentati ai vicini') ...[
+                                  const SizedBox(height: 14),
+                                  TextField(
+                                    controller: _bio,
+                                    minLines: 2,
+                                    maxLines: 3,
+                                    maxLength: 240,
+                                    textCapitalization: TextCapitalization.sentences,
+                                    decoration: const InputDecoration(
+                                      hintText: 'Es. Abito qui da dieci anni, faccio l\'infermiera e la domenica corro sul lungomare.',
+                                      counterText: '',
+                                    ),
+                                  ),
+                                ],
                               ],
                             ),
                           ),
@@ -174,7 +215,7 @@ class _SchermataPrimoAccessoState extends State<SchermataPrimoAccesso> {
                     padding: const EdgeInsets.fromLTRB(22, 8, 22, 20),
                     child: Row(
                       children: [
-                        for (var k = 0; k < 4; k++)
+                        for (var k = 0; k <= _ultima; k++)
                           AnimatedContainer(
                             duration: const Duration(milliseconds: 250),
                             margin: const EdgeInsets.only(right: 7),
@@ -189,8 +230,8 @@ class _SchermataPrimoAccessoState extends State<SchermataPrimoAccesso> {
                         const SizedBox(width: 12),
                         Expanded(
                           child: BottoneCaldo(
-                            testo: _i == 3 ? 'Inizia' : 'Avanti',
-                            icona: _i == 3 ? Icons.check_rounded : Icons.arrow_forward_rounded,
+                            testo: _i == _ultima ? 'Inizia' : 'Avanti',
+                            icona: _i == _ultima ? Icons.check_rounded : Icons.arrow_forward_rounded,
                             onPressed: _avanti,
                           ),
                         ),
