@@ -3,6 +3,7 @@ import 'dart:convert';
 import 'dart:io';
 
 import 'package:http/http.dart' as http;
+import 'package:path_provider/path_provider.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 import 'modelli.dart';
@@ -417,14 +418,27 @@ class Api {
   }
 
   /// Manda un messaggio: ritorna (id della chat, messaggio, stato della chat)
-  Future<(int, Messaggio, String)> mandaMessaggio({int? convId, String? username, String testo = '', File? foto}) async {
+  Future<(int, Messaggio, String)> mandaMessaggio({int? convId, String? username, String testo = '', File? foto, File? vocale}) async {
     final j = await invia(
       '/api/messaggi/invia',
       {'testo': testo, if (convId != null) 'conv_id': '$convId' else 'username': username ?? ''},
-      campoFile: foto == null ? null : 'foto',
-      file: foto,
+      campoFile: vocale != null ? 'audio' : (foto == null ? null : 'foto'),
+      file: vocale ?? foto,
     );
     return ((j['conv_id'] as num).toInt(), Messaggio((j['messaggio'] as Map).cast<String, dynamic>()), '${j['stato'] ?? 'attiva'}');
+  }
+
+  /// Scarica un vocale (privato: serve il token) nella cartella temporanea, una volta sola
+  Future<File> scaricaVocale(String url) async {
+    final dir = await getTemporaryDirectory();
+    final f = File('${dir.path}/vocale-${url.hashCode.abs()}.m4a');
+    if (await f.exists() && await f.length() > 0) return f;
+    return _rete(() async {
+      final r = await _http.get(Uri.parse(assoluto(url)!), headers: _testate);
+      if (r.statusCode != 200) throw ErroreApi('Il vocale non si riesce ad ascoltare: riprova tra poco.');
+      await f.writeAsBytes(r.bodyBytes, flush: true);
+      return f;
+    });
   }
 
   Future<String> rispondiRichiesta(int convId, bool accetta) async =>

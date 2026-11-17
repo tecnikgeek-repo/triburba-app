@@ -7,6 +7,9 @@ import 'dart:io';
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
 import 'package:image_picker/image_picker.dart';
+import 'package:just_audio/just_audio.dart';
+import 'package:path_provider/path_provider.dart';
+import 'package:record/record.dart';
 
 import '../dati/api.dart';
 import '../dati/modelli.dart';
@@ -224,6 +227,12 @@ class _SchermataChatState extends State<SchermataChat> with WidgetsBindingObserv
   final _campo = TextEditingController();
   final _scorri = ScrollController();
 
+  // vocale in registrazione
+  AudioRecorder? _rec;
+  DateTime? _inizioReg;
+  Timer? _orologioReg;
+  int _secondiReg = 0;
+
   int get _ultimo => _msg.isEmpty ? 0 : _msg.last.id;
 
   @override
@@ -236,12 +245,19 @@ class _SchermataChatState extends State<SchermataChat> with WidgetsBindingObserv
     _scorri.addListener(() {
       if (_altriPrima && !_caricaPrima && _scorri.hasClients && _scorri.position.pixels >= _scorri.position.maxScrollExtent - 200) _prima();
     });
+    _campo.addListener(() {
+      if (mounted) setState(() {}); // casella vuota: microfono al posto di «Invia»
+    });
     _apri();
   }
 
   @override
   void dispose() {
     _giro?.cancel();
+    _orologioReg?.cancel();
+    _rec?.cancel().catchError((_) {});
+    _rec?.dispose();
+    LettoreVocale.fermaTutto();
     if (stato.chatAperta == _conv) stato.chatAperta = null;
     stato.arrivoMessaggi.removeListener(_aggiorna);
     WidgetsBinding.instance.removeObserver(this);
@@ -376,6 +392,86 @@ class _SchermataChatState extends State<SchermataChat> with WidgetsBindingObserv
     } on ErroreApi catch (e) {
       if (mounted) messaggio(context, e.messaggio);
     } finally {
+      if (mounted) setState(() => _invio = false);
+    }
+  }
+
+  bool get _registra => _inizioReg != null;
+
+  Future<void> _iniziaVocale() async {
+    final r = _rec ??= AudioRecorder();
+    try {
+      if (!await r.hasPermission()) {
+        if (mounted) messaggio(context, 'Per mandare un vocale consenti a triburba di usare il microfono dalle impostazioni del telefono.');
+        return;
+      }
+      LettoreVocale.fermaTutto();
+      final dir = await getTemporaryDirectory();
+      final percorso = '${dir.path}/registrazione-${DateTime.now().millisecondsSinceEpoch}.m4a';
+      await r.start(const RecordConfig(encoder: AudioEncoder.aacLc, bitRate: 64000, sampleRate: 44100, numChannels: 1), path: percorso);
+      if (!mounted) return;
+      setState(() {
+        _inizioReg = DateTime.now();
+        _secondiReg = 0;
+      });
+      _orologioReg = Timer.periodic(const Duration(milliseconds: 250), (_) {
+        final s = DateTime.now().difference(_inizioReg!).inSeconds;
+        if (s != _secondiReg && mounted) setState(() => _secondiReg = s);
+        if (s >= 180) _fermaVocale(manda: true); // al massimo 3 minuti
+      });
+    } catch (_) {
+      if (mounted) messaggio(context, 'Il microfono non risponde: riprova tra poco.');
+    }
+  }
+
+  Future<void> _fermaVocale({required bool manda}) async {
+    final r = _rec, inizio = _inizioReg;
+    if (r == null || inizio == null) return;
+    _orologioReg?.cancel();
+    final durata = DateTime.now().difference(inizio);
+    setState(() => _inizioReg = null);
+    try {
+      if (!manda) {
+        await r.cancel();
+        return;
+      }
+      final percorso = await r.stop();
+      if (percorso == null) return;
+      if (durata.inMilliseconds < 800) {
+        if (mounted) messaggio(context, 'Il vocale è troppo corto: tocca il microfono e parla.');
+        return;
+      }
+      await _mandaVocale(File(percorso));
+    } catch (_) {
+      if (mounted) messaggio(context, 'Il vocale non si è registrato bene: riprova.');
+    }
+  }
+
+  Future<void> _mandaVocale(File f) async {
+    setState(() => _invio = true);
+    try {
+      final (conv, m, statoChat) = await stato.api.mandaMessaggio(
+        convId: _conv,
+        username: _conv == null ? widget.username : null,
+        vocale: f,
+      );
+      if (!mounted) return;
+      final nuova = _conv == null;
+      setState(() {
+        _conv = conv;
+        if (!_msg.any((x) => x.id == m.id)) _msg.add(m);
+      });
+      stato.chatAperta = conv;
+      if (nuova || statoChat != 'attiva') {
+        _apri();
+      } else if (_giro == null) {
+        _avviaGiro();
+      }
+      if (_scorri.hasClients) _scorri.animateTo(0, duration: const Duration(milliseconds: 250), curve: Curves.easeOut);
+    } on ErroreApi catch (e) {
+      if (mounted) messaggio(context, e.messaggio);
+    } finally {
+      f.delete().catchError((_) => f);
       if (mounted) setState(() => _invio = false);
     }
   }
@@ -681,6 +777,7 @@ class _SchermataChatState extends State<SchermataChat> with WidgetsBindingObserv
                     ),
                   ),
                 ),
+              if (m.audio != null) LettoreVocale(url: m.audio!, durata: m.durata, mio: m.mio),
               if (m.testo.isNotEmpty)
                 Padding(
                   padding: EdgeInsets.fromLTRB(foto != null ? 8 : 0, foto != null ? 6 : 0, foto != null ? 8 : 0, 0),
@@ -755,6 +852,9 @@ class _SchermataChatState extends State<SchermataChat> with WidgetsBindingObserv
     child: Text(t, style: const TextStyle(color: testo2, fontSize: 13, height: 1.4)),
   );
 
+  /// Casella vuota e niente foto: al posto di «Invia» c'è il microfono (vocali solo nelle chat accettate)
+  bool _microfono(ChatAperta c) => c.fotoPermesse && _foto == null && _campo.text.trim().isEmpty;
+
   Widget _casella(ChatAperta c) => SafeArea(
     top: false,
     child: Column(
@@ -784,24 +884,52 @@ class _SchermataChatState extends State<SchermataChat> with WidgetsBindingObserv
           child: Row(
             crossAxisAlignment: CrossAxisAlignment.end,
             children: [
-              if (c.fotoPermesse)
+              if (c.fotoPermesse && !_registra)
                 IconButton(tooltip: 'Manda una foto', icon: const Icon(Icons.image_outlined), onPressed: _invio ? null : _scegliFoto),
-              Expanded(
-                child: TextField(
-                  controller: _campo,
-                  minLines: 1,
-                  maxLines: 5,
-                  maxLength: 2000,
-                  textCapitalization: TextCapitalization.sentences,
-                  decoration: InputDecoration(
-                    hintText: 'Scrivi un messaggio…',
-                    counterText: '',
-                    isDense: true,
-                    contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
-                    border: OutlineInputBorder(borderRadius: BorderRadius.circular(24)),
+              if (_registra)
+                Expanded(
+                  child: Container(
+                    height: 46,
+                    padding: const EdgeInsets.only(left: 16, right: 4),
+                    decoration: BoxDecoration(
+                      color: superficie2,
+                      borderRadius: BorderRadius.circular(24),
+                      border: Border.all(color: linea2),
+                    ),
+                    child: Row(
+                      children: [
+                        const Icon(Icons.fiber_manual_record, color: pompeiano, size: 14),
+                        const SizedBox(width: 8),
+                        Text(
+                          _mmss(_secondiReg),
+                          style: const TextStyle(fontWeight: FontWeight.w700, fontFeatures: [FontFeature.tabularFigures()]),
+                        ),
+                        const SizedBox(width: 10),
+                        const Expanded(
+                          child: Text('Sto registrando…', style: TextStyle(color: testo2)),
+                        ),
+                        TextButton(onPressed: () => _fermaVocale(manda: false), child: const Text('Annulla')),
+                      ],
+                    ),
+                  ),
+                )
+              else
+                Expanded(
+                  child: TextField(
+                    controller: _campo,
+                    minLines: 1,
+                    maxLines: 5,
+                    maxLength: 2000,
+                    textCapitalization: TextCapitalization.sentences,
+                    decoration: InputDecoration(
+                      hintText: 'Scrivi un messaggio…',
+                      counterText: '',
+                      isDense: true,
+                      contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+                      border: OutlineInputBorder(borderRadius: BorderRadius.circular(24)),
+                    ),
                   ),
                 ),
-              ),
               const SizedBox(width: 6),
               Material(
                 shape: const CircleBorder(),
@@ -809,7 +937,11 @@ class _SchermataChatState extends State<SchermataChat> with WidgetsBindingObserv
                 child: Ink(
                   decoration: const BoxDecoration(gradient: gradienteBottone),
                   child: InkWell(
-                    onTap: _invio ? null : _manda,
+                    onTap: _invio
+                        ? null
+                        : _registra
+                        ? () => _fermaVocale(manda: true)
+                        : (_microfono(c) ? _iniziaVocale : _manda),
                     child: SizedBox(
                       width: 46,
                       height: 46,
@@ -818,7 +950,12 @@ class _SchermataChatState extends State<SchermataChat> with WidgetsBindingObserv
                               padding: EdgeInsets.all(13),
                               child: CircularProgressIndicator(strokeWidth: 2, color: bianco),
                             )
-                          : const Icon(Icons.send_rounded, color: bianco, size: 22),
+                          : Icon(
+                              _microfono(c) && !_registra ? Icons.mic_none_rounded : Icons.send_rounded,
+                              color: bianco,
+                              size: 22,
+                              semanticLabel: _microfono(c) && !_registra ? 'Registra un vocale' : 'Invia',
+                            ),
                     ),
                   ),
                 ),
@@ -829,4 +966,136 @@ class _SchermataChatState extends State<SchermataChat> with WidgetsBindingObserv
       ],
     ),
   );
+}
+
+String _mmss(int s) => '${s ~/ 60}:${(s % 60).toString().padLeft(2, '0')}';
+
+/// Lettore di un messaggio vocale: tocco per ascoltare/fermare, barra e tempo. Uno solo suona alla volta.
+class LettoreVocale extends StatefulWidget {
+  const LettoreVocale({super.key, required this.url, required this.durata, required this.mio});
+
+  final String url;
+  final int durata;
+  final bool mio;
+
+  static _LettoreVocaleState? _attivo;
+  static void fermaTutto() => _attivo?._ferma();
+
+  @override
+  State<LettoreVocale> createState() => _LettoreVocaleState();
+}
+
+class _LettoreVocaleState extends State<LettoreVocale> {
+  AudioPlayer? _p;
+  bool _suona = false, _carica = false;
+  Duration _pos = Duration.zero;
+  StreamSubscription<Duration>? _subPos;
+  StreamSubscription<PlayerState>? _subStato;
+
+  @override
+  void dispose() {
+    if (LettoreVocale._attivo == this) LettoreVocale._attivo = null;
+    _subPos?.cancel();
+    _subStato?.cancel();
+    _p?.dispose();
+    super.dispose();
+  }
+
+  void _ferma() {
+    _p?.pause();
+    if (mounted) setState(() => _suona = false);
+  }
+
+  Future<void> _tocca() async {
+    if (_carica) return;
+    if (_suona) {
+      _ferma();
+      return;
+    }
+    if (LettoreVocale._attivo != this) LettoreVocale._attivo?._ferma();
+    LettoreVocale._attivo = this;
+    try {
+      if (_p == null) {
+        setState(() => _carica = true);
+        final f = await stato.api.scaricaVocale(widget.url);
+        final p = AudioPlayer();
+        await p.setFilePath(f.path);
+        _p = p;
+        _subPos = p.positionStream.listen((d) {
+          if (mounted) setState(() => _pos = d);
+        });
+        _subStato = p.playerStateStream.listen((s) {
+          if (s.processingState == ProcessingState.completed) {
+            p.pause();
+            p.seek(Duration.zero);
+            if (mounted) setState(() => _suona = false);
+          }
+        });
+      }
+      if (!mounted) return;
+      setState(() {
+        _carica = false;
+        _suona = true;
+      });
+      await _p!.play();
+    } on ErroreApi catch (e) {
+      if (mounted) {
+        setState(() => _carica = false);
+        messaggio(context, e.messaggio);
+      }
+    } catch (_) {
+      if (mounted) {
+        setState(() => _carica = false);
+        messaggio(context, 'Il vocale non si riesce ad ascoltare: riprova tra poco.');
+      }
+    }
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    final tot = (_p?.duration ?? Duration(seconds: widget.durata)).inMilliseconds;
+    final quota = tot > 0 ? (_pos.inMilliseconds / tot).clamp(0.0, 1.0) : 0.0;
+    final colore = widget.mio ? bianco : testo;
+    return SizedBox(
+      width: 220,
+      child: Row(
+        children: [
+          Material(
+            color: widget.mio ? bianco : terracotta,
+            shape: const CircleBorder(),
+            child: InkWell(
+              customBorder: const CircleBorder(),
+              onTap: _tocca,
+              child: SizedBox(
+                width: 38,
+                height: 38,
+                child: _carica
+                    ? Padding(
+                        padding: const EdgeInsets.all(10),
+                        child: CircularProgressIndicator(strokeWidth: 2, color: widget.mio ? terracottaScura : bianco),
+                      )
+                    : Icon(
+                        _suona ? Icons.pause_rounded : Icons.play_arrow_rounded,
+                        color: widget.mio ? terracottaScura : bianco,
+                        semanticLabel: _suona ? 'Ferma il vocale' : 'Ascolta il vocale',
+                      ),
+              ),
+            ),
+          ),
+          const SizedBox(width: 10),
+          Expanded(
+            child: ClipRRect(
+              borderRadius: BorderRadius.circular(99),
+              child: LinearProgressIndicator(value: quota, minHeight: 4, color: colore, backgroundColor: colore.withValues(alpha: .25)),
+            ),
+          ),
+          const SizedBox(width: 10),
+          Text(
+            _mmss(_suona || _pos > Duration.zero ? _pos.inSeconds : widget.durata),
+            style: TextStyle(color: colore.withValues(alpha: .85), fontSize: 12, fontFeatures: const [FontFeature.tabularFigures()]),
+          ),
+        ],
+      ),
+    );
+  }
 }

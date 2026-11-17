@@ -503,6 +503,8 @@ class Messaggio {
       mio = j['mio'] == true,
       testo = _s(j['testo']) ?? '',
       foto = _s(j['foto']),
+      audio = _s(j['audio']),
+      durata = _i(j['durata']),
       eliminato = j['eliminato'] == true,
       ora = _s(j['ora']) ?? '',
       giorno = _s(j['giorno']) ?? '';
@@ -511,6 +513,10 @@ class Messaggio {
   final bool mio;
   String testo;
   String? foto;
+
+  /// Messaggio vocale (indirizzo privato) e durata in secondi
+  String? audio;
+  int durata;
   bool eliminato;
   final String ora, giorno;
 }
