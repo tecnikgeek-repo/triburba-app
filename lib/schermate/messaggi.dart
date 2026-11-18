@@ -425,7 +425,19 @@ class _SchermataChatState extends State<SchermataChat> with WidgetsBindingObserv
       LettoreVocale.fermaTutto();
       final dir = await getTemporaryDirectory();
       final percorso = '${dir.path}/registrazione-${DateTime.now().millisecondsSinceEpoch}.m4a';
-      await r.start(const RecordConfig(encoder: AudioEncoder.aacLc, bitRate: 64000, sampleRate: 44100, numChannels: 1), path: percorso);
+      // Microfono del telefono, mai quello Bluetooth «da telefonata» (cuffie, auto, orologio): registra a 8-16 kHz e la voce
+      // esce robotica. Qualità piena (48 kHz, 128 kbit/s): il server la tiene così com'è, senza ricomprimerla.
+      await r.start(
+        const RecordConfig(
+          encoder: AudioEncoder.aacLc,
+          bitRate: 128000,
+          sampleRate: 48000,
+          numChannels: 1,
+          androidConfig: AndroidRecordConfig(manageBluetooth: false, audioSource: AndroidAudioSource.mic),
+          iosConfig: IosRecordConfig(categoryOptions: [IosAudioCategoryOption.defaultToSpeaker, IosAudioCategoryOption.allowBluetoothA2DP]),
+        ),
+        path: percorso,
+      );
       if (!mounted) return;
       setState(() {
         _inizioReg = DateTime.now();
