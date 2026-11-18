@@ -222,6 +222,11 @@ class _SchermataChatState extends State<SchermataChat> with WidgetsBindingObserv
   bool _altriPrima = false, _caricaPrima = false, _invio = false;
   int _lettoAltro = 0;
   String? _errore;
+
+  // «sta scrivendo…» / «sta registrando…»: quello dell'altro e l'ultimo che ho mandato io (al massimo ogni 3 secondi)
+  String? _attivitaAltro;
+  String _fa = '';
+  DateTime _faQuando = DateTime(2000);
   File? _foto;
   Timer? _giro;
   final _campo = TextEditingController();
@@ -247,12 +252,18 @@ class _SchermataChatState extends State<SchermataChat> with WidgetsBindingObserv
     });
     _campo.addListener(() {
       if (mounted) setState(() {}); // casella vuota: microfono al posto di «Invia»
+      if (_campo.text.trim().isNotEmpty) {
+        _segnala('scrive');
+      } else if (_fa == 'scrive') {
+        _smetti();
+      }
     });
     _apri();
   }
 
   @override
   void dispose() {
+    _smetti();
     _giro?.cancel();
     _orologioReg?.cancel();
     _rec?.cancel().catchError((_) {});
@@ -269,6 +280,31 @@ class _SchermataChatState extends State<SchermataChat> with WidgetsBindingObserv
   @override
   void didChangeAppLifecycleState(AppLifecycleState s) {
     if (s == AppLifecycleState.resumed) _aggiorna();
+    if (s == AppLifecycleState.paused || s == AppLifecycleState.hidden) _smetti();
+  }
+
+  /// Dico all'altro che sto scrivendo o registrando (solo nelle chat attive, non più di una volta ogni 3 secondi)
+  void _segnala(String cosa) {
+    final conv = _conv;
+    if (conv == null || _chat?.stato != 'attiva') return;
+    final ora = DateTime.now();
+    if (cosa == _fa && ora.difference(_faQuando).inMilliseconds < 3000) return;
+    _fa = cosa;
+    _faQuando = ora;
+    stato.api
+        .attivitaChat(conv, cosa)
+        .then((a) {
+          if (mounted && a != _attivitaAltro) setState(() => _attivitaAltro = a);
+        })
+        .catchError((_) {});
+  }
+
+  /// Ho smesso (casella svuotata, vocale annullato, uscito dalla chat)
+  void _smetti() {
+    final conv = _conv;
+    if (_fa.isEmpty || conv == null) return;
+    _fa = '';
+    stato.api.attivitaChat(conv, '').catchError((_) => null);
   }
 
   void _avviaGiro() {
@@ -288,6 +324,7 @@ class _SchermataChatState extends State<SchermataChat> with WidgetsBindingObserv
           ..addAll(c.messaggi);
         _altriPrima = c.altriPrima;
         _lettoAltro = c.lettoAltro;
+        _attivitaAltro = c.attivitaAltro;
         _errore = null;
       });
       stato.chatAperta = _conv;
@@ -327,10 +364,11 @@ class _SchermataChatState extends State<SchermataChat> with WidgetsBindingObserv
           cambiato = true;
         }
       }
-      if (nuovi.isEmpty && n.lettoAltro == _lettoAltro && !cambiato) return;
+      if (nuovi.isEmpty && n.lettoAltro == _lettoAltro && n.attivitaAltro == _attivitaAltro && !cambiato) return;
       setState(() {
         _msg.addAll(nuovi);
         _lettoAltro = n.lettoAltro;
+        _attivitaAltro = n.attivitaAltro;
       });
       if (nuovi.isNotEmpty) stato.ricarica();
     } catch (_) {}
@@ -391,6 +429,7 @@ class _SchermataChatState extends State<SchermataChat> with WidgetsBindingObserv
         testo: t,
         foto: _foto,
       );
+      _fa = ''; // l'invio azzera «sta scrivendo» anche sul server
       if (!mounted) return;
       final nuova = _conv == null;
       setState(() {
@@ -443,7 +482,10 @@ class _SchermataChatState extends State<SchermataChat> with WidgetsBindingObserv
         _inizioReg = DateTime.now();
         _secondiReg = 0;
       });
+      _segnala('registra');
       _orologioReg = Timer.periodic(const Duration(milliseconds: 250), (_) {
+        if (_inizioReg == null) return;
+        _segnala('registra');
         final s = DateTime.now().difference(_inizioReg!).inSeconds;
         if (s != _secondiReg && mounted) setState(() => _secondiReg = s);
         if (s >= 180) _fermaVocale(manda: true); // al massimo 3 minuti
@@ -461,9 +503,11 @@ class _SchermataChatState extends State<SchermataChat> with WidgetsBindingObserv
     setState(() => _inizioReg = null);
     try {
       if (!manda) {
+        _smetti();
         await r.cancel();
         return;
       }
+      _fa = ''; // se parte, l'invio lo azzera sul server; se no si spegne da solo in pochi secondi
       final percorso = await r.stop();
       if (percorso == null) return;
       if (durata.inMilliseconds < 800) {
@@ -674,7 +718,18 @@ class _SchermataChatState extends State<SchermataChat> with WidgetsBindingObserv
                             overflow: TextOverflow.ellipsis,
                             style: const TextStyle(fontSize: 16, fontWeight: FontWeight.w700),
                           ),
-                          Text('@${c.persona.username}', style: const TextStyle(color: muto, fontSize: 12.5)),
+                          Text(
+                            _attivitaAltro == 'registra'
+                                ? 'sta registrando un vocale…'
+                                : _attivitaAltro == 'scrive'
+                                ? 'sta scrivendo…'
+                                : '@${c.persona.username}',
+                            maxLines: 1,
+                            overflow: TextOverflow.ellipsis,
+                            style: _attivitaAltro != null
+                                ? const TextStyle(color: golfo, fontSize: 12.5, fontStyle: FontStyle.italic, fontWeight: FontWeight.w600)
+                                : const TextStyle(color: muto, fontSize: 12.5),
+                          ),
                         ],
                       ),
                     ),

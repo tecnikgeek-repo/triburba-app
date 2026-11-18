@@ -444,6 +444,12 @@ class Api {
     });
   }
 
+  /// «sta scrivendo/registrando»: cosa = 'scrive' | 'registra' | '' (ho smesso). Ritorna cosa sta facendo l'altro.
+  Future<String?> attivitaChat(int convId, String cosa) async {
+    final v = (await post('/api/messaggi/attivita', {'conv_id': convId, 'cosa': cosa}))['attivita_altro'];
+    return v == null ? null : '$v';
+  }
+
   Future<String> rispondiRichiesta(int convId, bool accetta) async =>
       '${(await post('/api/messaggi/richiesta', {'conv_id': convId, 'azione': accetta ? 'accetta' : 'rifiuta'}))['msg'] ?? ''}';
 
