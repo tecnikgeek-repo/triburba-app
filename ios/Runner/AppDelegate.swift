@@ -8,6 +8,10 @@ import UserNotifications
     _ application: UIApplication,
     didFinishLaunchingWithOptions launchOptions: [UIApplication.LaunchOptionsKey: Any]?
   ) -> Bool {
+    // Il tocco sulle notifiche lo riceve l'app e lo gira a TUTTI i plugin (Firebase e notifiche locali):
+    // senza questa riga il delegato lo prende l'ultimo plugin che si registra e il tocco su una push
+    // di Firebase si perde (la chat non si apre).
+    UNUserNotificationCenter.current().delegate = self as UNUserNotificationCenterDelegate
     return super.application(application, didFinishLaunchingWithOptions: launchOptions)
   }
 

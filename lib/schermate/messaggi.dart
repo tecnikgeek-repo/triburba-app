@@ -220,7 +220,7 @@ class _SchermataChatState extends State<SchermataChat> with WidgetsBindingObserv
   int? _conv;
   final List<Messaggio> _msg = [];
   bool _altriPrima = false, _caricaPrima = false, _invio = false;
-  int _lettoAltro = 0;
+  int _lettoAltro = 0, _arrivatoAltro = 0;
   String? _errore;
 
   // «sta scrivendo…» / «sta registrando…»: quello dell'altro e l'ultimo che ho mandato io (al massimo ogni 3 secondi)
@@ -324,6 +324,7 @@ class _SchermataChatState extends State<SchermataChat> with WidgetsBindingObserv
           ..addAll(c.messaggi);
         _altriPrima = c.altriPrima;
         _lettoAltro = c.lettoAltro;
+        _arrivatoAltro = c.arrivatoAltro;
         _attivitaAltro = c.attivitaAltro;
         _errore = null;
       });
@@ -364,10 +365,17 @@ class _SchermataChatState extends State<SchermataChat> with WidgetsBindingObserv
           cambiato = true;
         }
       }
-      if (nuovi.isEmpty && n.lettoAltro == _lettoAltro && n.attivitaAltro == _attivitaAltro && !cambiato) return;
+      if (nuovi.isEmpty &&
+          n.lettoAltro == _lettoAltro &&
+          n.arrivatoAltro == _arrivatoAltro &&
+          n.attivitaAltro == _attivitaAltro &&
+          !cambiato) {
+        return;
+      }
       setState(() {
         _msg.addAll(nuovi);
         _lettoAltro = n.lettoAltro;
+        _arrivatoAltro = n.arrivatoAltro;
         _attivitaAltro = n.attivitaAltro;
       });
       if (nuovi.isNotEmpty) stato.ricarica();
@@ -793,17 +801,34 @@ class _SchermataChatState extends State<SchermataChat> with WidgetsBindingObserv
         final giornoNuovo = idx == 0 || _msg[idx - 1].giorno != m.giorno;
         return Column(
           crossAxisAlignment: m.mio ? CrossAxisAlignment.end : CrossAxisAlignment.start,
-          children: [
-            if (giornoNuovo) _giorno(m.giorno),
-            _bolla(m),
-            if (m.id == ultimoMio)
-              Padding(
-                padding: const EdgeInsets.only(right: 4, bottom: 4),
-                child: Text(_lettoAltro >= m.id ? 'Visto' : 'Inviato', style: const TextStyle(color: muto, fontSize: 11.5)),
-              ),
-          ],
+          children: [if (giornoNuovo) _giorno(m.giorno), _bolla(m), if (m.id == ultimoMio) _spunte(m.id)],
         );
       },
+    );
+  }
+
+  /// Sotto il mio ultimo messaggio: una spunta = inviato, due = arrivato, due arancio = letto (vale anche per i precedenti)
+  Widget _spunte(int id) {
+    final letto = _lettoAltro >= id, arrivato = letto || _arrivatoAltro >= id;
+    final colore = letto ? terracotta : muto;
+    final nome = letto ? 'Letto' : (arrivato ? 'Arrivato' : 'Inviato');
+    return Padding(
+      padding: const EdgeInsets.only(right: 4, bottom: 4),
+      child: Semantics(
+        label: nome,
+        excludeSemantics: true,
+        child: Row(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            Icon(arrivato ? Icons.done_all_rounded : Icons.done_rounded, size: 16, color: colore),
+            const SizedBox(width: 3),
+            Text(
+              nome,
+              style: TextStyle(color: colore, fontSize: 11.5, fontWeight: letto ? FontWeight.w600 : FontWeight.w400),
+            ),
+          ],
+        ),
+      ),
     );
   }
 

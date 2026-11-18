@@ -538,6 +538,7 @@ class ChatAperta {
       messaggi = (j['messaggi'] as List? ?? []).map((m) => Messaggio((m as Map).cast<String, dynamic>())).toList(),
       altriPrima = j['altri_prima'] == true,
       lettoAltro = _i(j['letto_altro']),
+      arrivatoAltro = _i(j['arrivato_altro']),
       attivitaAltro = _s(j['attivita_altro']),
       cambiati = (j['cambiati'] as List? ?? []).map((e) => (id: _i((e as Map)['id']), sparito: e['sparito'] == true)).toList();
 
@@ -547,6 +548,9 @@ class ChatAperta {
   final bool richiestaRicevuta, puoScrivere, fotoPermesse, altriPrima;
   final List<Messaggio> messaggi;
   final int lettoAltro;
+
+  /// Ultimo mio messaggio arrivato all'altro (seconda spunta); letto = spunte arancio
+  final int arrivatoAltro;
 
   /// Cosa sta facendo l'altro adesso: 'scrive', 'registra' o null
   final String? attivitaAltro;

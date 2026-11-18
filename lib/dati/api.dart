@@ -450,6 +450,9 @@ class Api {
     return v == null ? null : '$v';
   }
 
+  /// Il telefono ha ricevuto una notifica di messaggio: il sito segna «arrivato» (seconda spunta a chi l'ha mandato)
+  Future<void> messaggiArrivati() => get('/api/messaggi/conta');
+
   Future<String> rispondiRichiesta(int convId, bool accetta) async =>
       '${(await post('/api/messaggi/richiesta', {'conv_id': convId, 'azione': accetta ? 'accetta' : 'rifiuta'}))['msg'] ?? ''}';
 

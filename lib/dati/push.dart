@@ -10,6 +10,7 @@ import 'package:flutter/foundation.dart';
 import 'package:flutter/widgets.dart' show AppLifecycleListener;
 import 'package:flutter_local_notifications/flutter_local_notifications.dart';
 
+import 'api.dart';
 import 'stato.dart';
 
 final _locali = FlutterLocalNotificationsPlugin();
@@ -25,9 +26,17 @@ const _canale = AndroidNotificationChannel(
   importance: Importance.high,
 );
 
-/// In sottofondo il sistema mostra già la notifica: qui non serve fare nulla.
+/// In sottofondo il sistema mostra già la notifica; per i messaggi dico al sito che sono arrivati sul telefono
+/// (seconda spunta a chi li ha mandati). Gira in un isolate a parte: Api nuova col token salvato.
 @pragma('vm:entry-point')
-Future<void> _inSottofondo(RemoteMessage m) async {}
+Future<void> _inSottofondo(RemoteMessage m) async {
+  if (m.data['tipo'] != 'messaggio') return;
+  try {
+    final api = Api(versione: '');
+    await api.caricaToken();
+    if (api.token != null) await api.messaggiArrivati();
+  } catch (_) {}
+}
 
 /// iPhone: la configurazione arriva da --dart-define nella compilazione (segreti del repo), non da un file.
 const _iosApiKey = String.fromEnvironment('FB_IOS_API_KEY');
@@ -104,7 +113,16 @@ Future<void> preparaPush() async {
   // tocco su una notifica arrivata con l'app in sottofondo o chiusa
   FirebaseMessaging.onMessageOpenedApp.listen((m) => _apriLink(m.data['link'] ?? ''));
   final iniziale = await FirebaseMessaging.instance.getInitialMessage();
-  if (iniziale != null) _apriLink(iniziale.data['link'] ?? '');
+  if (iniziale != null) {
+    _apriLink(iniziale.data['link'] ?? '');
+  } else {
+    // notifica mostrata da noi ad app aperta e toccata dopo che l'app è stata chiusa: qui non passa da onDidReceive…
+    try {
+      final avvio = await _locali.getNotificationAppLaunchDetails();
+      final link = avvio?.notificationResponse?.payload;
+      if (avvio?.didNotificationLaunchApp == true && link != null && link.isNotEmpty) _apriLink(link);
+    } catch (_) {}
+  }
 }
 
 void _apriLink(String link) {
