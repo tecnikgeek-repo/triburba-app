@@ -242,6 +242,10 @@ class _SchermataChatState extends State<SchermataChat> with WidgetsBindingObserv
   File? _foto;
   Timer? _giro;
   final _campo = TextEditingController();
+  final _fuoco = FocusNode();
+
+  /// Pannello delle emoji aperto sotto la casella (al posto della tastiera)
+  bool _pannelloEmoji = false;
   final _scorri = ScrollController();
 
   // vocale in registrazione
@@ -270,7 +274,33 @@ class _SchermataChatState extends State<SchermataChat> with WidgetsBindingObserv
         _smetti();
       }
     });
+    _fuoco.addListener(() {
+      // tocco la casella: torna la tastiera e il pannello delle emoji si chiude
+      if (_fuoco.hasFocus && _pannelloEmoji && mounted) setState(() => _pannelloEmoji = false);
+    });
     _apri();
+  }
+
+  void _apriChiudiEmoji() {
+    if (_pannelloEmoji) {
+      setState(() => _pannelloEmoji = false);
+      _fuoco.requestFocus();
+    } else {
+      _fuoco.unfocus();
+      setState(() => _pannelloEmoji = true);
+    }
+  }
+
+  /// Metto l'emoji dove c'è il cursore (o in fondo)
+  void _mettiEmoji(String e) {
+    final v = _campo.value;
+    if (v.text.length + e.length > 2000) return;
+    final a = v.selection.isValid ? v.selection.start : v.text.length;
+    final z = v.selection.isValid ? v.selection.end : v.text.length;
+    _campo.value = TextEditingValue(
+      text: v.text.replaceRange(a, z, e),
+      selection: TextSelection.collapsed(offset: a + e.length),
+    );
   }
 
   @override
@@ -285,6 +315,7 @@ class _SchermataChatState extends State<SchermataChat> with WidgetsBindingObserv
     stato.arrivoMessaggi.removeListener(_aggiorna);
     WidgetsBinding.instance.removeObserver(this);
     _campo.dispose();
+    _fuoco.dispose();
     _scorri.dispose();
     super.dispose();
   }
@@ -1027,6 +1058,22 @@ class _SchermataChatState extends State<SchermataChat> with WidgetsBindingObserv
   Widget _bollaSola(Messaggio m) {
     final largo = MediaQuery.sizeOf(context).width * .78;
     final foto = assoluto(m.foto);
+    if (!m.eliminato && foto == null && m.audio == null && soloEmoji(m.testo)) {
+      return GestureDetector(
+        onLongPress: () => _azioniMessaggio(m),
+        child: Padding(
+          padding: const EdgeInsets.symmetric(vertical: 2, horizontal: 2),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.end,
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              Text(m.testo, style: const TextStyle(fontSize: 44, height: 1.15)),
+              Text(m.ora, style: const TextStyle(color: muto, fontSize: 10.5)),
+            ],
+          ),
+        ),
+      );
+    }
     return GestureDetector(
       onLongPress: () => _azioniMessaggio(m),
       child: Container(
@@ -1211,10 +1258,17 @@ class _SchermataChatState extends State<SchermataChat> with WidgetsBindingObserv
                     ),
                   ),
                 )
-              else
+              else ...[
+                IconButton(
+                  tooltip: _pannelloEmoji ? 'Tastiera' : 'Emoji',
+                  icon: Icon(_pannelloEmoji ? Icons.keyboard_alt_outlined : Icons.emoji_emotions_outlined),
+                  color: _pannelloEmoji ? terracotta : null,
+                  onPressed: _apriChiudiEmoji,
+                ),
                 Expanded(
                   child: TextField(
                     controller: _campo,
+                    focusNode: _fuoco,
                     minLines: 1,
                     maxLines: 5,
                     maxLength: 2000,
@@ -1228,6 +1282,7 @@ class _SchermataChatState extends State<SchermataChat> with WidgetsBindingObserv
                     ),
                   ),
                 ),
+              ],
               const SizedBox(width: 6),
               Material(
                 shape: const CircleBorder(),
@@ -1261,9 +1316,44 @@ class _SchermataChatState extends State<SchermataChat> with WidgetsBindingObserv
             ],
           ),
         ),
+        if (_pannelloEmoji && !_registra)
+          Container(
+            height: 240,
+            decoration: const BoxDecoration(
+              color: superficie2,
+              border: Border(top: BorderSide(color: linea)),
+            ),
+            child: GridView.count(
+              crossAxisCount: 8,
+              padding: const EdgeInsets.fromLTRB(8, 8, 8, 8),
+              children: [
+                for (final e in emojiTutte)
+                  Semantics(
+                    label: e,
+                    button: true,
+                    child: InkResponse(
+                      onTap: () => _mettiEmoji(e),
+                      child: Center(child: Text(e, style: const TextStyle(fontSize: 26, height: 1))),
+                    ),
+                  ),
+              ],
+            ),
+          ),
       ],
     ),
   );
+}
+
+/// Messaggio di sole emoji (da 1 a 3): si vede grande e senza fumetto, come su WhatsApp
+// (propriet\u00e0 Unicode che il controllo del codice non conosce ma Dart s\u00ec: passano da una variabile)
+final _pEmoji = r'^(?:\p{Extended_Pictographic}|\p{Emoji_Component}|\u200d|\ufe0f|\s)+$';
+final _pFigura = r'\p{Extended_Pictographic}|\p{Regional_Indicator}{2}';
+final _reEmoji = RegExp(_pEmoji, unicode: true);
+final _reFigura = RegExp(_pFigura, unicode: true);
+bool soloEmoji(String t) {
+  if (t.isEmpty || t.length > 40 || !_reEmoji.hasMatch(t)) return false;
+  final n = _reFigura.allMatches(t).length;
+  return n >= 1 && n <= 3;
 }
 
 String _mmss(int s) => '${s ~/ 60}:${(s % 60).toString().padLeft(2, '0')}';
