@@ -525,6 +525,26 @@ class Messaggio {
   final String ora, giorno;
 }
 
+/// Reazione con una emoji a un messaggio privato: quante persone (al massimo 2) e se c'è anche la mia
+class ReazioneChat {
+  ReazioneChat(Map<String, dynamic> j) : emoji = _s(j['emoji']) ?? '', n = _i(j['n']), mia = j['mia'] == true;
+  final String emoji;
+  final int n;
+  final bool mia;
+
+  static List<ReazioneChat> lista(dynamic v) =>
+      (v is List ? v : const []).map((e) => ReazioneChat((e as Map).cast<String, dynamic>())).toList();
+
+  /// { id messaggio: reazioni } (il sito manda [] quando non ce n'è nessuna)
+  static Map<int, List<ReazioneChat>> mappa(dynamic v) => v is Map
+      ? {for (final e in v.entries) _i(e.key): lista(e.value)}
+      : <int, List<ReazioneChat>>{};
+
+  /// Per capire al volo se qualcosa è cambiato
+  static String firma(Map<int, List<ReazioneChat>> m) =>
+      (m.keys.toList()..sort()).map((k) => '$k:${m[k]!.map((r) => '${r.emoji}${r.n}${r.mia ? '*' : ''}').join(',')}').join(';');
+}
+
 /// Una chat aperta: persona, messaggi e cosa si può fare
 class ChatAperta {
   ChatAperta(Map<String, dynamic> j)
@@ -540,6 +560,7 @@ class ChatAperta {
       lettoAltro = _i(j['letto_altro']),
       arrivatoAltro = _i(j['arrivato_altro']),
       attivitaAltro = _s(j['attivita_altro']),
+      reazioni = ReazioneChat.mappa(j['reazioni']),
       cambiati = (j['cambiati'] as List? ?? []).map((e) => (id: _i((e as Map)['id']), sparito: e['sparito'] == true)).toList();
 
   final int? convId;
@@ -554,6 +575,9 @@ class ChatAperta {
 
   /// Cosa sta facendo l'altro adesso: 'scrive', 'registra' o null
   final String? attivitaAltro;
+
+  /// Reazioni con le emoji di tutta la chat
+  final Map<int, List<ReazioneChat>> reazioni;
 
   /// Messaggi già a schermo eliminati da poco: sparito = ritirato (da togliere), altrimenti «Messaggio eliminato»
   final List<({int id, bool sparito})> cambiati;

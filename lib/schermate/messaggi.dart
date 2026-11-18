@@ -205,6 +205,15 @@ class _Etichetta extends StatelessWidget {
 
 // ── Chat ──
 
+/// Emoji per le reazioni: le prime sei nella barra veloce, tutte dal tasto «+» (le stesse del sito)
+const emojiVeloci = ['👍', '❤️', '😂', '😮', '😢', '🙏'];
+const emojiTutte = [
+  '👍', '❤️', '😂', '😮', '😢', '🙏', '😍', '🥰', '😘', '😊', '😁', '🤣', '😅', '😉', '😎', '🤩', '🥳', '😇', '🤔', '🙄', '😏', //
+  '😴', '😬', '🤗', '😡', '😭', '😱', '🤯', '🥺', '😤', '🤭', '🫶', '👏', '🙌', '💪', '👌', '✌️', '🤝', '👋', '🤞', '🔥', //
+  '✨', '🎉', '💯', '⭐', '💙', '💚', '💛', '🧡', '💜', '🖤', '💔', '😋', '🍕', '☕', '🍀', '🌞', '🌧️', '⚽', '🎂', '✅', //
+  '❌', '👀', '🙈',
+];
+
 class SchermataChat extends StatefulWidget {
   const SchermataChat({super.key, this.convId, this.username});
 
@@ -225,6 +234,9 @@ class _SchermataChatState extends State<SchermataChat> with WidgetsBindingObserv
 
   // «sta scrivendo…» / «sta registrando…»: quello dell'altro e l'ultimo che ho mandato io (al massimo ogni 3 secondi)
   String? _attivitaAltro;
+
+  /// Reazioni con le emoji: { id messaggio: reazioni }
+  Map<int, List<ReazioneChat>> _reaz = {};
   String _fa = '';
   DateTime _faQuando = DateTime(2000);
   File? _foto;
@@ -326,6 +338,7 @@ class _SchermataChatState extends State<SchermataChat> with WidgetsBindingObserv
         _lettoAltro = c.lettoAltro;
         _arrivatoAltro = c.arrivatoAltro;
         _attivitaAltro = c.attivitaAltro;
+        _reaz = c.reazioni;
         _errore = null;
       });
       stato.chatAperta = _conv;
@@ -369,6 +382,7 @@ class _SchermataChatState extends State<SchermataChat> with WidgetsBindingObserv
           n.lettoAltro == _lettoAltro &&
           n.arrivatoAltro == _arrivatoAltro &&
           n.attivitaAltro == _attivitaAltro &&
+          ReazioneChat.firma(n.reazioni) == ReazioneChat.firma(_reaz) &&
           !cambiato) {
         return;
       }
@@ -377,6 +391,7 @@ class _SchermataChatState extends State<SchermataChat> with WidgetsBindingObserv
         _lettoAltro = n.lettoAltro;
         _arrivatoAltro = n.arrivatoAltro;
         _attivitaAltro = n.attivitaAltro;
+        _reaz = n.reazioni;
       });
       if (nuovi.isNotEmpty) stato.ricarica();
     } catch (_) {}
@@ -392,6 +407,7 @@ class _SchermataChatState extends State<SchermataChat> with WidgetsBindingObserv
       setState(() {
         _msg.insertAll(0, n.messaggi.where((m) => !_msg.any((x) => x.id == m.id)));
         _altriPrima = n.altriPrima;
+        _reaz = {..._reaz, ...n.reazioni};
       });
     } catch (_) {
     } finally {
@@ -584,12 +600,45 @@ class _SchermataChatState extends State<SchermataChat> with WidgetsBindingObserv
       subtitle: Text(sotto, style: const TextStyle(color: muto, fontSize: 12.5)),
       onTap: () => Navigator.pop(context, chiave),
     );
+    final c = _chat;
+    final puoReagire = !m.eliminato && c != null && c.stato == 'attiva' && c.puoScrivere;
+    final mie = (_reaz[m.id] ?? const <ReazioneChat>[]).where((r) => r.mia).map((r) => r.emoji).toSet();
     final scelta = await showModalBottomSheet<String>(
       context: context,
       builder: (s) => SafeArea(
         child: Column(
           mainAxisSize: MainAxisSize.min,
           children: [
+            if (puoReagire)
+              Padding(
+                padding: const EdgeInsets.fromLTRB(12, 14, 12, 6),
+                child: Container(
+                  padding: const EdgeInsets.all(5),
+                  decoration: BoxDecoration(color: superficie2, borderRadius: BorderRadius.circular(99)),
+                  child: Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                    children: [
+                      for (final e in emojiVeloci)
+                        _tastoEmoji(e, mia: mie.contains(e), onTap: () => Navigator.pop(s, 'emoji:$e')),
+                      Semantics(
+                        label: 'Altre emoji',
+                        button: true,
+                        child: InkResponse(
+                          onTap: () => Navigator.pop(s, 'altre'),
+                          radius: 24,
+                          child: Container(
+                            width: 42,
+                            height: 42,
+                            alignment: Alignment.center,
+                            decoration: const BoxDecoration(color: superficie, shape: BoxShape.circle),
+                            child: const Icon(Icons.add_rounded, color: muto),
+                          ),
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+              ),
             if (m.mio && !m.eliminato)
               voce(
                 'tutti',
@@ -607,6 +656,12 @@ class _SchermataChatState extends State<SchermataChat> with WidgetsBindingObserv
       ),
     );
     if (scelta == null || !mounted) return;
+    if (scelta.startsWith('emoji:')) return _reagisci(m, scelta.substring(6));
+    if (scelta == 'altre') {
+      final e = await _scegliEmoji();
+      if (e != null && mounted) _reagisci(m, e);
+      return;
+    }
     try {
       switch (scelta) {
         case 'tutti':
@@ -643,6 +698,115 @@ class _SchermataChatState extends State<SchermataChat> with WidgetsBindingObserv
     } on ErroreApi catch (e) {
       if (mounted) messaggio(context, e.messaggio);
     }
+  }
+
+  Widget _tastoEmoji(String e, {bool mia = false, required VoidCallback onTap}) => Semantics(
+    label: 'Reagisci con $e',
+    button: true,
+    child: InkResponse(
+      onTap: onTap,
+      radius: 24,
+      child: Container(
+        width: 42,
+        height: 42,
+        alignment: Alignment.center,
+        decoration: BoxDecoration(color: mia ? terracotta.withValues(alpha: .28) : null, shape: BoxShape.circle),
+        child: Text(e, style: const TextStyle(fontSize: 24, height: 1)),
+      ),
+    ),
+  );
+
+  /// Tutte le emoji (dal tasto «+»)
+  Future<String?> _scegliEmoji() => showModalBottomSheet<String>(
+    context: context,
+    isScrollControlled: true,
+    builder: (s) => SafeArea(
+      child: ConstrainedBox(
+        constraints: BoxConstraints(maxHeight: MediaQuery.sizeOf(s).height * .6),
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            const Padding(
+              padding: EdgeInsets.fromLTRB(18, 16, 18, 6),
+              child: Text(
+                'Reagisci con una emoji',
+                style: TextStyle(color: testo, fontSize: 17, fontWeight: FontWeight.w700),
+              ),
+            ),
+            Flexible(
+              child: GridView.count(
+                shrinkWrap: true,
+                crossAxisCount: 7,
+                padding: const EdgeInsets.fromLTRB(10, 4, 10, 12),
+                children: [
+                  for (final e in emojiTutte)
+                    InkResponse(
+                      onTap: () => Navigator.pop(s, e),
+                      child: Center(child: Text(e, style: const TextStyle(fontSize: 26, height: 1))),
+                    ),
+                ],
+              ),
+            ),
+          ],
+        ),
+      ),
+    ),
+  );
+
+  /// Metto, cambio o tolgo la mia reazione (la stessa di prima la toglie)
+  Future<void> _reagisci(Messaggio m, String emoji) async {
+    try {
+      final r = await stato.api.reagisciMessaggio(m.id, emoji);
+      if (mounted) setState(() => _reaz = {..._reaz, m.id: r});
+    } on ErroreApi catch (e) {
+      if (mounted) messaggio(context, e.messaggio);
+    } catch (_) {
+      if (mounted) messaggio(context, 'Connessione assente: riprova.');
+    }
+  }
+
+  /// Le pastiglie delle reazioni sotto la bolla: toccarne una aggiunge la stessa emoji, o toglie la mia
+  Widget _reazioni(Messaggio m, List<ReazioneChat> lista) {
+    final c = _chat;
+    final puo = c != null && c.stato == 'attiva' && c.puoScrivere;
+    return Wrap(
+      spacing: 4,
+      children: [
+        for (final r in lista)
+          GestureDetector(
+            onTap: puo ? () => _reagisci(m, r.mia ? '' : r.emoji) : null,
+            child: Semantics(
+              label: '${r.emoji} ${r.n}${r.mia ? ', anche la tua: tocca per toglierla' : ''}',
+              button: puo,
+              excludeSemantics: true,
+              child: Container(
+                height: 26,
+                padding: const EdgeInsets.symmetric(horizontal: 7),
+                decoration: BoxDecoration(
+                  color: r.mia ? Color.alphaBlend(terracotta.withValues(alpha: .22), superficie) : superficie,
+                  borderRadius: BorderRadius.circular(99),
+                  border: Border.all(color: vernice, width: 2),
+                  boxShadow: const [BoxShadow(color: Color(0x40000000), blurRadius: 8, offset: Offset(0, 2))],
+                ),
+                child: Row(
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    Text(r.emoji, style: const TextStyle(fontSize: 14, height: 1)),
+                    if (r.n > 1) ...[
+                      const SizedBox(width: 3),
+                      Text(
+                        '${r.n}',
+                        style: const TextStyle(color: muto, fontSize: 11.5, fontWeight: FontWeight.w700),
+                      ),
+                    ],
+                  ],
+                ),
+              ),
+            ),
+          ),
+      ],
+    );
   }
 
   Future<void> _menu() async {
@@ -845,6 +1009,22 @@ class _SchermataChatState extends State<SchermataChat> with WidgetsBindingObserv
   );
 
   Widget _bolla(Messaggio m) {
+    final reaz = m.eliminato ? const <ReazioneChat>[] : (_reaz[m.id] ?? const <ReazioneChat>[]);
+    final b = _bollaSola(m);
+    if (reaz.isEmpty) return b;
+    return Padding(
+      padding: const EdgeInsets.only(bottom: 16),
+      child: Stack(
+        clipBehavior: Clip.none,
+        children: [
+          b,
+          Positioned(left: m.mio ? null : 10, right: m.mio ? 10 : null, bottom: -15, child: _reazioni(m, reaz)),
+        ],
+      ),
+    );
+  }
+
+  Widget _bollaSola(Messaggio m) {
     final largo = MediaQuery.sizeOf(context).width * .78;
     final foto = assoluto(m.foto);
     return GestureDetector(

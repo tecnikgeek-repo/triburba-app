@@ -458,6 +458,9 @@ class Api {
 
   /// Elimina per tutti: ritorna true se è sparito senza traccia (entro un minuto dall'invio)
   Future<bool> eliminaMessaggio(int id) async => (await post('/api/messaggi/elimina', {'id': id}))['sparito'] == true;
+  /// Reazione con una emoji ('' o la stessa di prima la toglie): ritorna le reazioni aggiornate del messaggio
+  Future<List<ReazioneChat>> reagisciMessaggio(int id, String emoji) async =>
+      ReazioneChat.lista((await post('/api/messaggi/reazione', {'id': id, 'emoji': emoji}))['reazioni']);
   Future<void> nascondiMessaggio(int id) => post('/api/messaggi/nascondi', {'id': id});
   Future<void> cancellaChat(int convId) => post('/api/messaggi/cancella', {'conv_id': convId});
   Future<String> segnalaMessaggio(int id, String motivo) async =>
