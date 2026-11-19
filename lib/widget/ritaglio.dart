@@ -64,6 +64,28 @@ Future<File?> scegliCopertina(BuildContext context, {String? attuale}) async {
   return Navigator.push<File>(context, MaterialPageRoute(builder: (_) => SchermataRitaglio(file: File(x.path))));
 }
 
+/// Velo sopra la copertina mentre si carica (rotellina + «Carico la copertina…»), come sul sito.
+class VeloCaricamento extends StatelessWidget {
+  const VeloCaricamento({super.key, this.testo = 'Carico la copertina…'});
+
+  final String testo;
+
+  @override
+  Widget build(BuildContext context) => ColoredBox(
+    color: const Color(0x80120D0B),
+    child: Center(
+      child: Column(
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          const SizedBox(width: 30, height: 30, child: CircularProgressIndicator(strokeWidth: 3, color: oro)),
+          const SizedBox(height: 10),
+          Text(testo, style: const TextStyle(color: bianco, fontWeight: FontWeight.w700, fontSize: 13.5)),
+        ],
+      ),
+    ),
+  );
+}
+
 /// La copertina di adesso in un file temporaneo (per risistemarla)
 Future<File?> _scarica(String url) async {
   final client = HttpClient();

@@ -40,6 +40,9 @@ class _SchermataModificaProfiloState extends State<SchermataModificaProfilo> {
   late bool _pubblico = stato.io?.compleannoPubblico ?? false;
   bool _salvo = false;
   bool _foto = false;
+
+  /// Copertina appena ritagliata: si vede subito, col velo di caricamento, finché il server non risponde
+  File? _copertinaNuova;
   final _fuocoBio = FocusNode();
   final _fuocoLavoro = FocusNode();
 
@@ -67,14 +70,18 @@ class _SchermataModificaProfiloState extends State<SchermataModificaProfilo> {
           child: Stack(
             fit: StackFit.expand,
             children: [
-              if (url != null)
+              if (_copertinaNuova != null)
+                Image.file(_copertinaNuova!, fit: BoxFit.cover)
+              else if (url != null)
                 CachedNetworkImage(imageUrl: url, fit: BoxFit.cover)
               else
                 const DecoratedBox(decoration: BoxDecoration(gradient: gradiente)),
-              if (url == null)
+              if (_copertinaNuova != null && _foto) const VeloCaricamento(),
+              if (url == null && _copertinaNuova == null)
                 const Center(
                   child: Text('Nessuna copertina', style: TextStyle(color: bianco, fontWeight: FontWeight.w700)),
                 ),
+              if (!(_foto && _copertinaNuova != null))
               Positioned(
                 right: 8,
                 bottom: 8,
@@ -147,12 +154,19 @@ class _SchermataModificaProfiloState extends State<SchermataModificaProfilo> {
   Future<void> _cambiaCopertina() async {
     final f = await scegliCopertina(context, attuale: assoluto(stato.io?.copertina));
     if (f == null || !mounted) return;
-    setState(() => _foto = true);
+    // la nuova si vede subito col velo; dopo il salvataggio resta quella locale (uguale), così niente lampo vuoto
+    setState(() {
+      _foto = true;
+      _copertinaNuova = f;
+    });
     try {
       stato.entra(await stato.api.cambiaFoto(f, copertina: true));
       if (mounted) messaggio(context, 'Copertina aggiornata.');
     } on ErroreApi catch (e) {
-      if (mounted) messaggio(context, e.messaggio);
+      if (mounted) {
+        setState(() => _copertinaNuova = null);
+        messaggio(context, e.messaggio);
+      }
     } finally {
       if (mounted) setState(() => _foto = false);
     }

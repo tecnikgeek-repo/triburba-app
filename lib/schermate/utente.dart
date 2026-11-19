@@ -1,4 +1,5 @@
 // Il profilo di una persona: copertina, foto, tribù, numeri, segui, e i suoi post.
+import 'dart:io';
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
 import 'package:url_launcher/url_launcher.dart';
@@ -34,6 +35,10 @@ class _SchermataUtenteState extends State<SchermataUtente> {
   final _chiaveTesta = GlobalKey();
   bool _occupato = false;
 
+  /// Copertina appena ritagliata: si vede subito col velo di caricamento, poi resta (è uguale a quella salvata)
+  File? _copertinaNuova;
+  bool _caricoCopertina = false;
+
   @override
   void dispose() {
     _scorri.dispose();
@@ -61,7 +66,10 @@ class _SchermataUtenteState extends State<SchermataUtente> {
   Future<void> _cambiaCopertina() async {
     final f = await scegliCopertina(context, attuale: img(_u?['copertina'] as String?));
     if (f == null || !mounted) return;
-    setState(() => _occupato = true);
+    setState(() {
+      _caricoCopertina = true;
+      _copertinaNuova = f;
+    });
     try {
       final io = await stato.api.cambiaFoto(f, copertina: true);
       stato.entra(io);
@@ -69,9 +77,12 @@ class _SchermataUtenteState extends State<SchermataUtente> {
       setState(() => _u!['copertina'] = io.copertina);
       messaggio(context, 'Copertina aggiornata.');
     } on ErroreApi catch (e) {
-      if (mounted) messaggio(context, e.messaggio);
+      if (mounted) {
+        setState(() => _copertinaNuova = null);
+        messaggio(context, e.messaggio);
+      }
     } finally {
-      if (mounted) setState(() => _occupato = false);
+      if (mounted) setState(() => _caricoCopertina = false);
     }
   }
 
@@ -255,7 +266,15 @@ class _SchermataUtenteState extends State<SchermataUtente> {
             children: [
               Positioned.fill(
                 bottom: 40,
-                child: copertina != null
+                child: _copertinaNuova != null
+                    ? Stack(
+                        fit: StackFit.expand,
+                        children: [
+                          Image.file(_copertinaNuova!, fit: BoxFit.cover),
+                          if (_caricoCopertina) const VeloCaricamento(),
+                        ],
+                      )
+                    : copertina != null
                     ? GestureDetector(
                         onTap: () => apriFoto(context, copertina, titolo: f.nome, sottotitolo: 'Copertina'),
                         child: Hero(
@@ -265,7 +284,7 @@ class _SchermataUtenteState extends State<SchermataUtente> {
                       )
                     : const DecoratedBox(decoration: BoxDecoration(gradient: gradiente)),
               ),
-              if (io)
+              if (io && !_caricoCopertina)
                 Positioned(
                   right: 10,
                   top: 10,
@@ -274,7 +293,7 @@ class _SchermataUtenteState extends State<SchermataUtente> {
                     borderRadius: BorderRadius.circular(10),
                     child: InkWell(
                       borderRadius: BorderRadius.circular(10),
-                      onTap: _occupato ? null : _cambiaCopertina,
+                      onTap: _cambiaCopertina,
                       child: Padding(
                         padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
                         child: Row(
