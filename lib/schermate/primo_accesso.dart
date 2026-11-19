@@ -96,7 +96,7 @@ class _SchermataPrimoAccessoState extends State<SchermataPrimoAccesso> {
       (
         const Icon(Icons.handshake_outlined, size: 46, color: bianco),
         'La tua tribù',
-        'Scegli il quartiere dove abiti. Per scrivere servono le garanzie di $vicini già confermati che ti conoscono: '
+        'Il quartiere o comune che hai scelto all\'iscrizione è la tua tribù. Per scrivere servono le garanzie di $vicini già confermati che ti conoscono: '
             'così qui ci sono persone vere. Intanto puoi leggere, reagire e commentare.',
         true,
       ),
@@ -111,7 +111,7 @@ class _SchermataPrimoAccessoState extends State<SchermataPrimoAccesso> {
         const Icon(Icons.map_outlined, size: 46, color: bianco),
         'La mappa che si accende',
         'Quartieri e comuni restano nella nebbia finché non li chiede abbastanza gente. '
-            'Il tuo non c\'è ancora? Chiedilo dalla mappa e passa parola: si accende da solo.',
+            'Il tuo non è ancora acceso? La tua iscrizione conta già come richiesta: passa parola e, quando si accende, ci entri da solo.',
         true,
       ),
       if (_conBio)

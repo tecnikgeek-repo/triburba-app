@@ -302,6 +302,9 @@ class Io {
   String get ruolo => _s(_u['ruolo']) ?? 'user';
 
   Map<String, dynamic>? get casa => j['casa'] as Map<String, dynamic>?;
+
+  /// Zona scelta all'iscrizione e non ancora accesa (titolo, testo, nome, fuori): il quartiere non si chiede più.
+  Map<String, dynamic>? get zonaAttesa => j['zona_attesa'] as Map<String, dynamic>?;
   String? get residenza => _s(j['residenza']);
   int get giorniCambio => _i(j['giorni_cambio']);
   int get garanzieMin => j['garanzie_min'] == null ? 2 : _i(j['garanzie_min']);

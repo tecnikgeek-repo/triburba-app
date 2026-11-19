@@ -383,12 +383,20 @@ class _SchermataIscrizioneState extends State<SchermataIscrizione> {
               decoration: const InputDecoration(labelText: 'La tua città'),
             ),
           ],
-          if (_scelta != null && _scelta!.startsWith('c'))
+          if (_scelta != null && _scelta != 'altro' && int.tryParse(_scelta!) == null)
             Padding(
               padding: const EdgeInsets.only(top: 6),
               child: Text(
-                'Il comune non è ancora aperto: la tua iscrizione vale come richiesta. A ${_dati?.soglia ?? 20} richieste si accende.',
+                'Non è ancora aperto: la tua iscrizione conta come richiesta. Quando si accende entri da solo nella sua tribù.',
                 style: const TextStyle(color: oro, fontSize: 12.5),
+              ),
+            )
+          else if (_scelta == null)
+            const Padding(
+              padding: EdgeInsets.only(top: 6),
+              child: Text(
+                'Lo scegli solo adesso: ci sono tutti i quartieri e i comuni, anche quelli non ancora aperti.',
+                style: TextStyle(color: muto, fontSize: 12.5),
               ),
             ),
           const SizedBox(height: 12),
@@ -514,6 +522,10 @@ class _SceltaZonaState extends State<_SceltaZona> {
                     ListTile(
                       leading: CircleAvatar(radius: 8, backgroundColor: colore(q.$3)),
                       title: Text(q.$2, style: const TextStyle(fontWeight: FontWeight.w700)),
+                      // zona spenta («q34»/«c12»): si sceglie lo stesso, quando si accende si entra da soli
+                      subtitle: int.tryParse(q.$1) == null
+                          ? const Text('Non ancora aperto', style: TextStyle(color: muto, fontSize: 12))
+                          : null,
                       onTap: () => Navigator.pop(context, (q.$1, q.$2)),
                     ),
                 ],

@@ -106,7 +106,7 @@ class SchermataFeedState extends State<SchermataFeed> with TickerProviderStateMi
       body: Column(
         children: [
           if (io != null && !guidaVisibile && io.casa != null && io.residenza == 'in_attesa') _attesa(io.casa!),
-          if (io != null && !guidaVisibile && io.casa == null) _senzaCasa(),
+          if (io != null && !guidaVisibile && io.casa == null) io.zonaAttesa != null ? _zonaAttesa(io.zonaAttesa!) : _senzaCasa(),
           Expanded(
             child: _schede == null
                 ? const SizedBox.shrink()
@@ -181,6 +181,35 @@ class SchermataFeedState extends State<SchermataFeed> with TickerProviderStateMi
                       style: const TextStyle(fontWeight: FontWeight.w700),
                     ),
                     TextSpan(text: 'Servono ${stato.io!.viciniGaranti} già confermati che garantiscano per te: poi potrai pubblicare.'),
+                  ],
+                ),
+                style: const TextStyle(fontSize: 13, color: testo2, height: 1.35),
+              ),
+            ),
+            const Icon(Icons.chevron_right, color: muto),
+          ],
+        ),
+      ),
+    ),
+  );
+
+  /// Dove abita l'ha già detto all'iscrizione, ma la zona è ancora spenta: niente «scegli il quartiere».
+  Widget _zonaAttesa(Map<String, dynamic> z) => Material(
+    color: oro.withValues(alpha: .10),
+    child: InkWell(
+      onTap: () => stato.apri({'tipo': 'mappa'}),
+      child: Padding(
+        padding: const EdgeInsets.fromLTRB(14, 10, 10, 10),
+        child: Row(
+          children: [
+            const Icon(Icons.place_outlined, color: oro, size: 22),
+            const SizedBox(width: 10),
+            Expanded(
+              child: Text.rich(
+                TextSpan(
+                  children: [
+                    TextSpan(text: '${z['titolo'] ?? ''}\n', style: const TextStyle(fontWeight: FontWeight.w800, color: bianco)),
+                    TextSpan(text: '${z['testo'] ?? ''}'),
                   ],
                 ),
                 style: const TextStyle(fontSize: 13, color: testo2, height: 1.35),

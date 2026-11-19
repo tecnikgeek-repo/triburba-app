@@ -207,14 +207,18 @@ class _SchermataScriviState extends State<SchermataScrivi> {
                   const Icon(Icons.how_to_reg_outlined, size: 54, color: oro),
                   const SizedBox(height: 14),
                   Text(
-                    casa == null ? 'Prima scegli il tuo quartiere' : 'La tua residenza è in attesa',
+                    casa == null
+                        ? (io.zonaAttesa != null ? '${io.zonaAttesa!['titolo']}' : 'Prima scegli il tuo quartiere')
+                        : 'La tua residenza è in attesa',
                     style: titolo(22),
                     textAlign: TextAlign.center,
                   ),
                   const SizedBox(height: 8),
                   Text(
                     casa == null
-                        ? 'Su triburba si scrive nella propria tribù: scegli il quartiere dove abiti dalla mappa.'
+                        ? (io.zonaAttesa != null
+                              ? '${io.zonaAttesa!['testo']}'
+                              : 'Su triburba si scrive nella propria tribù: scegli il quartiere dove abiti dalla mappa.')
                         : 'Per pubblicare a ${casa['nome']} servono le garanzie di ${io.viciniGaranti} già confermati. Intanto puoi leggere, reagire e commentare.',
                     textAlign: TextAlign.center,
                     style: const TextStyle(color: testo2, height: 1.45),
