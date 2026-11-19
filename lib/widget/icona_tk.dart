@@ -6,6 +6,10 @@ import 'package:flutter_svg/flutter_svg.dart';
 const _tratti = <String, String>{
   'heart': '<path d="M12 20.5s-7.5-4.6-9.3-9.2C1.5 8.1 3.6 4.5 7.2 4.5c2 0 3.6 1.1 4.8 2.8 1.2-1.7 2.8-2.8 4.8-2.8 3.6 0 5.7 3.6 4.5 6.8-1.8 4.6-9.3 9.2-9.3 9.2z"/>',
   'comment': '<path d="M21 12a8.5 8.5 0 0 1-12.4 7.6L3 21l1.4-5.1A8.5 8.5 0 1 1 21 12z"/>',
+  // messaggi privati: due fumetti che si parlano (uguale a icon('messaggi') del sito)
+  'messaggi': '<path d="M9 9.5V6a3 3 0 0 1 3-3h6a3 3 0 0 1 3 3v3a3 3 0 0 1-2.2 2.9l.7 3.1L17 12h-2"/>'
+      '<path d="M7.5 18H12a3 3 0 0 0 3-3v-2.5a3 3 0 0 0-3-3H6a3 3 0 0 0-3 3V15a3 3 0 0 0 2.2 2.9L4.5 21z"/>'
+      '<path d="M6.5 13.75h.01M9 13.75h.01M11.5 13.75h.01"/>',
   'share': '<path d="M4 12v7a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2v-7"/><path d="m16 6-4-4-4 4"/><path d="M12 2v13"/>',
   'tamtam': '<ellipse cx="12" cy="9" rx="6" ry="2.3"/><path d="M6 9l1.3 8.6c.3 1.4 2.2 2.4 4.7 2.4s4.4-1 4.7-2.4L18 9"/>'
       '<path d="M8.6 11.4 12 19.6M15.4 11.4 12 19.6"/><path d="M4 5.5a4 4 0 0 0 0 6M20 5.5a4 4 0 0 1 0 6M2 3.5a7 7 0 0 0 0 10M22 3.5a7 7 0 0 1 0 10"/>',

@@ -327,7 +327,17 @@ class _PostCardState extends State<PostCard> {
 
   Widget _dove() {
     final chips = <Widget>[];
-    if (p.quartiere != null) {
+    if (p.tipo == 'bacheca') {
+      // scritto sulla bacheca personale: porta al profilo di chi l'ha scritto
+      chips.add(
+        Chip2(
+          testo: p.quartiere?.nome ?? 'Bacheca di ${p.autore.nome}',
+          icona: Icons.person_outline,
+          colore: golfo,
+          onTap: () => apriUtente(context, p.autore.username),
+        ),
+      );
+    } else if (p.quartiere != null) {
       chips.add(
         Chip2(
           testo: p.quartiere!.nome,
@@ -691,6 +701,8 @@ class _PostCardState extends State<PostCard> {
             testo: p.commenti == 0 ? 'Commenta' : (p.commenti == 1 ? 'Commento' : 'Commenti'),
             onTap: _apriCommenti,
           ),
+          // niente tam-tam per i post della bacheca personale e per i cambi di foto: restano sul profilo
+          if (!const ['bacheca', 'foto_profilo', 'copertina'].contains(p.tipo))
           _azione(
             icona: IconaTk('tamtam', lato: 24, colore: p.mioRilancio ? oro : testo2),
             testo: 'Tam-tam',

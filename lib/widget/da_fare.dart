@@ -50,8 +50,10 @@ class TestataHome extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final io = stato.io;
-    if (io == null || !io.puoPubblicare) return const SizedBox.shrink();
+    if (io == null || (!io.puoPubblicare && !io.puoBacheca)) return const SizedBox.shrink();
     final dove = io.casa?['nome'];
+    // chi non è ancora residente scrive solo sulla propria bacheca: niente attività né sondaggi
+    final soloBacheca = !io.puoPubblicare;
     return Container(
       margin: const EdgeInsets.fromLTRB(10, 12, 10, 0),
       padding: const EdgeInsets.fromLTRB(12, 12, 12, 8),
@@ -81,7 +83,7 @@ class TestataHome extends StatelessWidget {
                       border: Border.all(color: linea2),
                     ),
                     child: Text(
-                      dove != null ? 'Cosa succede a $dove?' : 'Cosa succede nel quartiere?',
+                      soloBacheca ? 'Scrivi sulla tua bacheca…' : (dove != null ? 'Cosa succede a $dove?' : 'Cosa succede nel quartiere?'),
                       maxLines: 1,
                       overflow: TextOverflow.ellipsis,
                       style: const TextStyle(color: muto, fontSize: 15),
@@ -97,8 +99,10 @@ class TestataHome extends StatelessWidget {
             mainAxisAlignment: MainAxisAlignment.spaceEvenly,
             children: [
               _scorciatoia(context, Icons.image_outlined, 'Foto', golfo, () => _scrivi(context, foto: true)),
-              _scorciatoia(context, Icons.handshake_outlined, 'Attività', terracotta, () => _scrivi(context, tipo: 'attivita')),
-              _scorciatoia(context, Icons.how_to_vote_outlined, 'Sondaggio', oro, () => _scrivi(context, tipo: 'sondaggio')),
+              if (!soloBacheca) ...[
+                _scorciatoia(context, Icons.handshake_outlined, 'Attività', terracotta, () => _scrivi(context, tipo: 'attivita')),
+                _scorciatoia(context, Icons.how_to_vote_outlined, 'Sondaggio', oro, () => _scrivi(context, tipo: 'sondaggio')),
+              ],
             ],
           ),
         ],

@@ -15,6 +15,7 @@ import '../dati/api.dart';
 import '../dati/modelli.dart';
 import '../dati/stato.dart';
 import '../tema.dart';
+import '../widget/icona_tk.dart';
 import '../widget/faccia.dart';
 import '../widget/segnala.dart';
 import 'bloccati.dart';
@@ -128,7 +129,7 @@ class _SchermataMessaggiState extends State<SchermataMessaggi> with SingleTicker
             padding: const EdgeInsets.all(32),
             children: [
               const SizedBox(height: 40),
-              const Icon(Icons.chat_bubble_outline_rounded, size: 48, color: terracotta),
+              const IconaTk('messaggi', lato: 52, colore: terracotta),
               const SizedBox(height: 14),
               Text(vuotoTitolo, textAlign: TextAlign.center, style: titolo(18)),
               const SizedBox(height: 8),

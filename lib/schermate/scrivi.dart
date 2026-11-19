@@ -15,15 +15,18 @@ import '../widget/testo_ricco.dart';
 import '../widget/menzioni.dart';
 
 /// Ritorna il post pubblicato (o null se annullato).
-Future<Post?> apriScrivi(BuildContext context, {String tipo = 'post', bool foto = false}) =>
-    Navigator.of(context).push<Post>(MaterialPageRoute(fullscreenDialog: true, builder: (_) => SchermataScrivi(tipo: tipo, foto: foto)));
+Future<Post?> apriScrivi(BuildContext context, {String tipo = 'post', bool foto = false, bool bacheca = false}) => Navigator.of(context)
+    .push<Post>(MaterialPageRoute(fullscreenDialog: true, builder: (_) => SchermataScrivi(tipo: tipo, foto: foto, bacheca: bacheca)));
 
 class SchermataScrivi extends StatefulWidget {
-  const SchermataScrivi({super.key, this.tipo = 'post', this.foto = false});
+  const SchermataScrivi({super.key, this.tipo = 'post', this.foto = false, this.bacheca = false});
 
   /// Dalle scorciatoie della Home: si apre già su Attività o Sondaggio, oppure con la scelta della foto.
   final String tipo;
   final bool foto;
+
+  /// Dal proprio profilo: si scrive sulla propria bacheca.
+  final bool bacheca;
 
   @override
   State<SchermataScrivi> createState() => _SchermataScriviState();
@@ -32,7 +35,8 @@ class SchermataScrivi extends StatefulWidget {
 class _SchermataScriviState extends State<SchermataScrivi> {
   final _campo = TextEditingController();
   File? _foto;
-  String _portata = 'quartiere';
+  // chi non è ancora residente scrive solo sulla propria bacheca
+  late String _portata = (widget.bacheca || !(stato.io?.puoPubblicare ?? false)) ? 'bacheca' : 'quartiere';
   bool _invio = false;
   bool _anteprima = false;
 
@@ -198,7 +202,7 @@ class _SchermataScriviState extends State<SchermataScrivi> {
           ),
         ],
       ),
-      body: !io.puoPubblicare
+      body: !io.puoPubblicare && !io.puoBacheca
           ? Padding(
               padding: const EdgeInsets.all(28),
               child: Column(
@@ -238,13 +242,18 @@ class _SchermataScriviState extends State<SchermataScrivi> {
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
                           Text(io.nome, style: const TextStyle(fontWeight: FontWeight.w700)),
-                          if (casa != null) Text('Nella tribù di ${casa['nome']}', style: const TextStyle(color: muto, fontSize: 12.5)),
+                          if (_portata == 'bacheca')
+                            const Text('Sulla tua bacheca', style: TextStyle(color: muto, fontSize: 12.5))
+                          else if (casa != null)
+                            Text('Nella tribù di ${casa['nome']}', style: const TextStyle(color: muto, fontSize: 12.5)),
                         ],
                       ),
                     ),
                   ],
                 ),
                 const SizedBox(height: 12),
+                // attività e sondaggi si propongono nel quartiere, non sulla bacheca personale
+                if (_portata != 'bacheca')
                 SegmentedButton<String>(
                   segments: const [
                     ButtonSegment(
@@ -292,7 +301,7 @@ class _SchermataScriviState extends State<SchermataScrivi> {
                       hintText: switch (_tipo) {
                         'attivita' => 'Cosa proponi di fare insieme? Es. pulire il parco, una raccolta…',
                         'sondaggio' => 'Fai una domanda ai tuoi vicini…',
-                        _ => 'Cosa succede nel quartiere?',
+                        _ => _portata == 'bacheca' ? 'Scrivi sulla tua bacheca…' : 'Cosa succede nel quartiere?',
                       },
                     ),
                   ),
@@ -390,7 +399,23 @@ class _SchermataScriviState extends State<SchermataScrivi> {
                   style: TextStyle(color: muto, fontSize: 12, fontWeight: FontWeight.w800, letterSpacing: .6),
                 ),
                 const SizedBox(height: 8),
-                _scelta('quartiere', Icons.place_outlined, 'Solo il mio quartiere', 'Lo vedono la tua tribù e chi la segue.'),
+                _scelta(
+                  'bacheca',
+                  Icons.person_outline,
+                  'Solo sulla tua bacheca',
+                  'Resta sul tuo profilo, arriva a chi ti segue e può uscire nella bacheca principale.',
+                ),
+                if (!io.puoPubblicare)
+                  Padding(
+                    padding: const EdgeInsets.only(bottom: 8),
+                    child: Text(
+                      'Per scrivere nel quartiere servono le garanzie di ${io.viciniGaranti} già confermati.',
+                      style: const TextStyle(color: muto, fontSize: 12.5, height: 1.4),
+                    ),
+                  ),
+                if (io.puoPubblicare) ...[
+                // stesse parole del sito: «A San Pietro a Patierno», «Ad Arzano»
+                _scelta('quartiere', Icons.place_outlined, _aCasa('${casa?['nome'] ?? 'il quartiere'}'), 'Lo vedono la tua tribù e chi la segue.'),
                 _scelta(
                   'municipalita',
                   Icons.layers_outlined,
@@ -400,11 +425,12 @@ class _SchermataScriviState extends State<SchermataScrivi> {
                 _scelta(
                   'citta',
                   Icons.location_city,
-                  io.tamtam['grande'] ?? 'Verso tutta Napoli',
+                  io.tamtam['grande'] ?? 'Tutta Napoli',
                   io.tamtam['nota'] ?? 'Arriva quando lo rilanciano residenti di altri quartieri.',
                 ),
                 if (io.superadmin)
                   _scelta('ovunque', Icons.public, 'Ovunque', 'Solo tu: lo vede tutta triburba, in ogni quartiere.'),
+                ],
                 const SizedBox(height: 10),
                 const Text(
                   'Le foto passano un controllo automatico. Ricorda il regolamento: rispetto per tutti, niente dati personali di altri.',
@@ -583,6 +609,8 @@ class _SchermataScriviState extends State<SchermataScrivi> {
     ),
   );
 
+  String _aCasa(String nome) => (RegExp('^[aeiouàèéìòù]', caseSensitive: false).hasMatch(nome) ? 'Ad ' : 'A ') + nome;
+
   Widget _scelta(String id, IconData ico, String t, String s) {
     final on = _portata == id;
     return Padding(
@@ -592,7 +620,10 @@ class _SchermataScriviState extends State<SchermataScrivi> {
         borderRadius: BorderRadius.circular(12),
         child: InkWell(
           borderRadius: BorderRadius.circular(12),
-          onTap: () => setState(() => _portata = id),
+          onTap: () => setState(() {
+            _portata = id;
+            if (id == 'bacheca') _tipo = 'post';
+          }),
           child: Container(
             padding: const EdgeInsets.all(12),
             decoration: BoxDecoration(

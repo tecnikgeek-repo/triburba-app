@@ -46,7 +46,7 @@ Future<bool> apriTamtam(BuildContext context, Post p) async {
               _Opzione(
                 icona: Icons.location_city,
                 colore: oro,
-                titolo: p.citta ? 'È già arrivato a tutta Napoli' : (t['grande'] ?? 'A tutta Napoli'),
+                titolo: p.citta ? 'È già arrivato a tutta Napoli' : (t['grande'] ?? 'Tutta Napoli'),
                 testo: p.mioRilancio ? 'Hai già rilanciato: tocca per ritirare il tuo voto.' : (t['nota'] ?? ''),
                 attivo: !p.citta || p.mioRilancio,
                 evidenza: p.mioRilancio,

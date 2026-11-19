@@ -323,6 +323,9 @@ class Io {
 
   bool _puo(String k) => (j['puo'] as Map?)?[k] == true;
   bool get puoPubblicare => _puo('pubblicare');
+
+  /// Scrivere sulla propria bacheca: chiunque abbia confermato l'email, anche chi non è ancora residente.
+  bool get puoBacheca => _puo('bacheca');
   bool get puoCommentare => _puo('commentare');
   bool get residente => _puo('residente');
   bool get admin => _puo('admin');

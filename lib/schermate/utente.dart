@@ -8,9 +8,11 @@ import '../dati/api.dart';
 import '../dati/modelli.dart';
 import '../dati/stato.dart';
 import '../tema.dart';
+import '../widget/icona_tk.dart';
 import '../widget/faccia.dart';
 import '../widget/lista_post.dart';
 import '../widget/ritaglio.dart';
+import 'scrivi.dart';
 import '../widget/segnala.dart';
 import 'bloccati.dart';
 import 'naviga.dart';
@@ -348,7 +350,7 @@ class _SchermataUtenteState extends State<SchermataUtente> {
                           if (u['bloccato'] != true && u['sistema'] != true) ...[
                             IconButton.outlined(
                               tooltip: 'Messaggio',
-                              icon: const Icon(Icons.chat_bubble_outline_rounded, size: 20),
+                              icon: const IconaTk('messaggi', lato: 21, colore: testo),
                               onPressed: () => apriChat(context, username: widget.username),
                             ),
                             const SizedBox(width: 8),
@@ -425,6 +427,34 @@ class _SchermataUtenteState extends State<SchermataUtente> {
                 ],
               ),
               const SizedBox(height: 10),
+              // dal proprio profilo si scrive sulla propria bacheca (come sul sito)
+              if (io && (stato.io?.puoBacheca ?? false))
+                Padding(
+                  padding: const EdgeInsets.only(bottom: 10),
+                  child: InkWell(
+                    borderRadius: BorderRadius.circular(99),
+                    onTap: () async {
+                      final p = await apriScrivi(context, bacheca: true);
+                      if (p != null) _lista.currentState?.aggiorna();
+                    },
+                    child: Container(
+                      padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+                      decoration: BoxDecoration(
+                        color: superficie2,
+                        borderRadius: BorderRadius.circular(99),
+                        border: Border.all(color: linea2),
+                      ),
+                      child: const Row(
+                        children: [
+                          Icon(Icons.edit_outlined, color: muto, size: 20),
+                          SizedBox(width: 10),
+                          Expanded(child: Text('Scrivi sulla tua bacheca…', style: TextStyle(color: muto, fontSize: 15))),
+                          Icon(Icons.image_outlined, color: golfo, size: 20),
+                        ],
+                      ),
+                    ),
+                  ),
+                ),
               const Divider(),
             ],
           ),

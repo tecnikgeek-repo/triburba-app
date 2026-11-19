@@ -1,9 +1,10 @@
-// Home: schede del feed come sul sito (Per te, Quartiere, Municipalità, Napoli, Area metro, Persone),
+// Home: schede del feed come sul sito (Bacheca, Per te, Quartiere, Municipalità, Napoli, Area metro, Persone),
 // avviso della residenza in attesa e ricerca.
 import 'package:flutter/material.dart';
 
 import '../dati/stato.dart';
 import '../tema.dart';
+import '../widget/icona_tk.dart';
 import '../widget/compleanni.dart';
 import '../widget/da_fare.dart';
 import '../widget/fascia_email.dart';
@@ -83,7 +84,7 @@ class SchermataFeedState extends State<SchermataFeed> with TickerProviderStateMi
                 isLabelVisible: stato.messaggi > 0,
                 label: Text(stato.messaggi > 99 ? '99+' : '${stato.messaggi}'),
                 backgroundColor: terracotta,
-                child: const Icon(Icons.chat_bubble_outline_rounded),
+                child: const IconaTk('messaggi', lato: 25, colore: testo),
               ),
               onPressed: () => apriMessaggi(context),
             ),
@@ -116,8 +117,8 @@ class SchermataFeedState extends State<SchermataFeed> with TickerProviderStateMi
                       for (final s in _elenco)
                         ListaPost(
                           key: _liste.putIfAbsent(s.$1, () => GlobalKey<ListaPostState>()),
-                          // in cima a «Per te», come un social vero: «Cosa succede a …?», la fila «Da fare» e i Primi passi
-                          testa: s.$1 == 'perte'
+                          // in cima alla prima scheda (la Bacheca), come un social vero: «Cosa succede a …?», la fila «Da fare» e i Primi passi
+                          testa: s.$1 == _elenco.first.$1
                               ? Column(
                                   crossAxisAlignment: CrossAxisAlignment.stretch,
                                   children: [
@@ -147,6 +148,7 @@ class SchermataFeedState extends State<SchermataFeed> with TickerProviderStateMi
                           vuoto: Vuoto(
                             icona: Icons.forum_outlined,
                             testo: switch (s.$1) {
+                              'bacheca' => 'Qui si mescolano i post delle bacheche personali e dei quartieri e comuni. Scrivi tu il primo.',
                               'seguiti' => 'Qui trovi i post delle persone che segui. Cerca i tuoi vicini e seguili.',
                               'citta' => 'Qui arrivano i post che le tribù rilanciano a tutta Napoli col tam-tam.',
                               'area' => "Qui arrivano i post rilanciati a tutta l'area metropolitana.",
