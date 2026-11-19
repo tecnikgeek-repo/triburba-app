@@ -234,7 +234,6 @@ class _CartaFestaState extends State<_CartaFesta> with TickerProviderStateMixin 
   late final _coriandoli = AnimationController(vsync: this, duration: const Duration(milliseconds: 4200));
   late final _torta = AnimationController(vsync: this, duration: const Duration(milliseconds: 2400))..repeat();
   var _seme = 1;
-  bool _invio = false;
 
   @override
   void initState() {
@@ -255,21 +254,6 @@ class _CartaFestaState extends State<_CartaFesta> with TickerProviderStateMixin 
     _seme++;
     _coriandoli.forward(from: 0);
   });
-
-  Future<void> _faiSapere() async {
-    setState(() => _invio = true);
-    try {
-      final msg = await stato.api.compleannoPubblico(true);
-      if (!mounted) return;
-      messaggio(context, msg);
-      _ancora();
-      await widget.onPubblico();
-    } on ErroreApi catch (e) {
-      if (mounted) messaggio(context, e.messaggio);
-    } finally {
-      if (mounted) setState(() => _invio = false);
-    }
-  }
 
   @override
   Widget build(BuildContext context) {
@@ -378,21 +362,7 @@ class _CartaFestaState extends State<_CartaFesta> with TickerProviderStateMixin 
                 const SizedBox(height: 10),
                 const Text('I tuoi vicini lo sanno: gli auguri arrivano qui.', style: TextStyle(color: oro, fontWeight: FontWeight.w600, fontSize: 13.5)),
               ],
-              if (!pubblico) ...[
-                const SizedBox(height: 14),
-                Container(
-                  padding: const EdgeInsets.all(12),
-                  decoration: BoxDecoration(color: const Color(0x33000000), borderRadius: BorderRadius.circular(12), border: Border.all(color: linea2)),
-                  child: Column(
-                    children: [
-                      const Text('Il tuo compleanno è privato. Vuoi che i vicini ti facciano gli auguri?',
-                          textAlign: TextAlign.center, style: TextStyle(color: testo2, fontSize: 13.5)),
-                      const SizedBox(height: 10),
-                      BottoneCaldo(testo: 'Fallo sapere', icona: Icons.cake_outlined, occupato: _invio, onPressed: _faiSapere),
-                    ],
-                  ),
-                ),
-              ],
+              // la scelta «fai sapere il compleanno» l'ha già fatta all'iscrizione (o nel profilo): non si richiede qui
               TextButton.icon(
                 onPressed: _ancora,
                 style: TextButton.styleFrom(foregroundColor: muto),
