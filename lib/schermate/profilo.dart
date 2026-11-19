@@ -3,6 +3,7 @@ import 'dart:convert';
 import 'dart:io';
 import 'dart:typed_data';
 
+import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:share_plus/share_plus.dart';
@@ -14,6 +15,7 @@ import '../dati/stato.dart';
 import '../tema.dart';
 import '../widget/faccia.dart';
 import '../widget/nascita.dart';
+import '../widget/ritaglio.dart';
 import 'admin.dart';
 import 'legale.dart';
 import 'preferenze_notifiche.dart';
@@ -52,6 +54,53 @@ class _SchermataModificaProfiloState extends State<SchermataModificaProfilo> {
   }
 
   /// Il pezzo che manca si accende con un bordo caldo.
+  Widget _copertina(String? percorso) {
+    final url = assoluto(percorso);
+    return Material(
+      color: Colors.transparent,
+      borderRadius: BorderRadius.circular(12),
+      clipBehavior: Clip.antiAlias,
+      child: InkWell(
+        onTap: _foto ? null : _cambiaCopertina,
+        child: AspectRatio(
+          aspectRatio: proporzioneCopertina,
+          child: Stack(
+            fit: StackFit.expand,
+            children: [
+              if (url != null)
+                CachedNetworkImage(imageUrl: url, fit: BoxFit.cover)
+              else
+                const DecoratedBox(decoration: BoxDecoration(gradient: gradiente)),
+              if (url == null)
+                const Center(
+                  child: Text('Nessuna copertina', style: TextStyle(color: bianco, fontWeight: FontWeight.w700)),
+                ),
+              Positioned(
+                right: 8,
+                bottom: 8,
+                child: Container(
+                  padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
+                  decoration: BoxDecoration(color: const Color(0xCC120D0B), borderRadius: BorderRadius.circular(10)),
+                  child: Row(
+                    mainAxisSize: MainAxisSize.min,
+                    children: [
+                      _foto
+                          ? const SizedBox(width: 16, height: 16, child: CircularProgressIndicator(strokeWidth: 2, color: bianco))
+                          : const Icon(Icons.photo_camera_outlined, color: bianco, size: 18),
+                      const SizedBox(width: 8),
+                      Text(url == null ? 'Aggiungi copertina' : 'Cambia copertina',
+                          style: const TextStyle(color: bianco, fontWeight: FontWeight.w700, fontSize: 13)),
+                    ],
+                  ),
+                ),
+              ),
+            ],
+          ),
+        ),
+      ),
+    );
+  }
+
   Widget _evidenzia(String campo, Widget figlio) => widget.campo != campo
       ? figlio
       : Container(
@@ -94,7 +143,23 @@ class _SchermataModificaProfiloState extends State<SchermataModificaProfilo> {
     }
   }
 
+  /// Copertina: galleria o fotocamera, poi ritaglio 3:1 (quello che si vede è quello che esce sul profilo)
+  Future<void> _cambiaCopertina() async {
+    final f = await scegliCopertina(context, attuale: assoluto(stato.io?.copertina));
+    if (f == null || !mounted) return;
+    setState(() => _foto = true);
+    try {
+      stato.entra(await stato.api.cambiaFoto(f, copertina: true));
+      if (mounted) messaggio(context, 'Copertina aggiornata.');
+    } on ErroreApi catch (e) {
+      if (mounted) messaggio(context, e.messaggio);
+    } finally {
+      if (mounted) setState(() => _foto = false);
+    }
+  }
+
   Future<void> _cambiaFoto({bool copertina = false}) async {
+    if (copertina) return _cambiaCopertina();
     final x = await ImagePicker().pickImage(
       source: ImageSource.gallery,
       maxWidth: copertina ? 2000 : 900,
@@ -151,14 +216,9 @@ class _SchermataModificaProfiloState extends State<SchermataModificaProfilo> {
               ],
             )),
           ),
-          const SizedBox(height: 8),
-          Center(
-            child: _evidenzia('cover', TextButton.icon(
-              onPressed: _foto ? null : () => _cambiaFoto(copertina: true),
-              icon: const Icon(Icons.wallpaper_outlined),
-              label: const Text('Cambia copertina'),
-            )),
-          ),
+          const SizedBox(height: 16),
+          // la copertina com'è sul profilo (3:1), tutta toccabile, con il tasto ben visibile
+          _evidenzia('cover', _copertina(io.copertina)),
           const SizedBox(height: 12),
           TextField(
             controller: _nome,

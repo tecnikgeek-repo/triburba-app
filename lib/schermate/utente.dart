@@ -9,6 +9,7 @@ import '../dati/stato.dart';
 import '../tema.dart';
 import '../widget/faccia.dart';
 import '../widget/lista_post.dart';
+import '../widget/ritaglio.dart';
 import '../widget/segnala.dart';
 import 'bloccati.dart';
 import 'naviga.dart';
@@ -54,6 +55,24 @@ class _SchermataUtenteState extends State<SchermataUtente> {
     final j = await stato.api.utente(widget.username, prima: prima);
     if (prima == 0 && mounted) setState(() => _u = j['utente'] as Map<String, dynamic>);
     return ((j['post'] as List).map((p) => Post(p as Map<String, dynamic>)).toList(), j['altri'] == true);
+  }
+
+  /// Il proprio profilo: cambio copertina direttamente dalla testata (galleria/fotocamera → ritaglio 3:1 → caricata)
+  Future<void> _cambiaCopertina() async {
+    final f = await scegliCopertina(context, attuale: img(_u?['copertina'] as String?));
+    if (f == null || !mounted) return;
+    setState(() => _occupato = true);
+    try {
+      final io = await stato.api.cambiaFoto(f, copertina: true);
+      stato.entra(io);
+      if (!mounted) return;
+      setState(() => _u!['copertina'] = io.copertina);
+      messaggio(context, 'Copertina aggiornata.');
+    } on ErroreApi catch (e) {
+      if (mounted) messaggio(context, e.messaggio);
+    } finally {
+      if (mounted) setState(() => _occupato = false);
+    }
   }
 
   Future<void> _segui() async {
@@ -227,8 +246,10 @@ class _SchermataUtenteState extends State<SchermataUtente> {
       crossAxisAlignment: CrossAxisAlignment.stretch,
       children: [
         if (io) _completa(u),
-        SizedBox(
-          height: 190,
+        LayoutBuilder(
+          // copertina sempre 3:1 (anche su tablet), come nel ritaglio e sul sito: quello che si sceglie è quello che si vede
+          builder: (c, box) => SizedBox(
+          height: box.maxWidth / proporzioneCopertina + 40,
           child: Stack(
             clipBehavior: Clip.none,
             children: [
@@ -244,6 +265,31 @@ class _SchermataUtenteState extends State<SchermataUtente> {
                       )
                     : const DecoratedBox(decoration: BoxDecoration(gradient: gradiente)),
               ),
+              if (io)
+                Positioned(
+                  right: 10,
+                  top: 10,
+                  child: Material(
+                    color: const Color(0xCC120D0B),
+                    borderRadius: BorderRadius.circular(10),
+                    child: InkWell(
+                      borderRadius: BorderRadius.circular(10),
+                      onTap: _occupato ? null : _cambiaCopertina,
+                      child: Padding(
+                        padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
+                        child: Row(
+                          mainAxisSize: MainAxisSize.min,
+                          children: [
+                            const Icon(Icons.photo_camera_outlined, color: bianco, size: 18),
+                            const SizedBox(width: 8),
+                            Text(copertina == null ? 'Aggiungi copertina' : 'Cambia copertina',
+                                style: const TextStyle(color: bianco, fontWeight: FontWeight.w700, fontSize: 13)),
+                          ],
+                        ),
+                      ),
+                    ),
+                  ),
+                ),
               Positioned(
                 left: 16,
                 bottom: 0,
@@ -302,6 +348,7 @@ class _SchermataUtenteState extends State<SchermataUtente> {
                       ),
               ),
             ],
+          ),
           ),
         ),
         Padding(
