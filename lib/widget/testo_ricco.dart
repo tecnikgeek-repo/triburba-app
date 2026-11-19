@@ -3,6 +3,7 @@ import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
 import 'package:url_launcher/url_launcher.dart';
 
+import '../dati/modelli.dart';
 import '../dati/stato.dart';
 import '../tema.dart';
 
@@ -122,7 +123,8 @@ class _TestoRiccoState extends State<TestoRicco> {
         } else {
           out.add(
             TextSpan(
-              text: pezzo,
+              // nome completo di chi è taggato, se il server ce l'ha dato; altrimenti @username
+              text: nomiMenzioni[u.toLowerCase()] ?? pezzo,
               style: s.copyWith(color: golfo, fontWeight: FontWeight.w700),
               recognizer: _tocco(() => stato.apri({'tipo': 'utente', 'username': u})),
             ),

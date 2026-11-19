@@ -4,6 +4,15 @@ int _i(dynamic v) => v is num ? v.toInt() : int.tryParse('$v') ?? 0;
 String? _s(dynamic v) => v == null ? null : '$v';
 List<String> _l(dynamic v) => v is List ? v.map((e) => '$e').toList() : const [];
 
+/// Nomi completi delle persone taggate ({username minuscolo: nome}), raccolti dai post e dai commenti che manda il server:
+/// il testo mostra «Angelo Visone» al posto di @angelovisone (come sul sito).
+final nomiMenzioni = <String, String>{};
+
+String _conMenzioni(dynamic menzioni, String testo) {
+  if (menzioni is Map) menzioni.forEach((k, v) => nomiMenzioni['$k'.toLowerCase()] = '$v');
+  return testo;
+}
+
 /// Una persona come compare accanto a post e commenti.
 class Faccia {
   Faccia(Map<String, dynamic> j)
@@ -104,7 +113,7 @@ class Post {
   Post(Map<String, dynamic> j)
     : id = _i(j['id']),
       tipo = _s(j['tipo']) ?? 'post',
-      testo = _s(j['testo']) ?? '',
+      testo = _conMenzioni(j['menzioni'], _s(j['testo']) ?? ''),
       quando = _s(j['quando']) ?? '',
       autore = Faccia(j['autore'] as Map<String, dynamic>),
       quartiere = j['quartiere'] is Map ? QuartiereBreve(j['quartiere'] as Map<String, dynamic>) : null,
@@ -233,7 +242,7 @@ class Commento {
   Commento(Map<String, dynamic> j)
     : id = _i(j['id']),
       padre = j['parent_id'] == null ? null : _i(j['parent_id']),
-      testo = _s(j['content']) ?? '',
+      testo = _conMenzioni(j['menzioni'], _s(j['content']) ?? ''),
       creato = DateTime.tryParse(_s(j['created_at']) ?? ''),
       username = _s(j['username']) ?? '',
       nome = _s(j['nome']) ?? '',
