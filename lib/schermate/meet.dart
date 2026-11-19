@@ -1,4 +1,4 @@
-// Meet: la stanza vocale del quartiere, come sul sito (19/11/2026).
+// Falò (prima «Meet»): la stanza vocale del quartiere, come sul sito (19/11/2026).
 // La voce passa direttamente tra chi è dentro (WebRTC, fino a 8 persone); il sito fa da centralino:
 // /api/meet/battito ogni 1,5 s dice chi c'è e consegna i messaggi per collegarsi. Chi entra dopo chiama chi c'era già.
 import 'dart:async';
@@ -22,7 +22,7 @@ class SchermataMeet extends StatefulWidget {
 }
 
 class _SchermataMeetState extends State<SchermataMeet> {
-  String _nome = 'Meet';
+  String _nome = 'Falò';
   int _max = 8;
   String? _blocco;
   List<Map<String, dynamic>> _presenti = [];
@@ -62,7 +62,7 @@ class _SchermataMeetState extends State<SchermataMeet> {
       final j = await stato.api.get('/api/meet/stato', {'q': '${widget.quartiereId}'});
       if (!mounted || _mioPeer != null) return;
       setState(() {
-        _nome = '${j['nome'] ?? 'Meet'}';
+        _nome = '${j['nome'] ?? 'Falò'}';
         _max = (j['max'] as num?)?.toInt() ?? 8;
         _blocco = j['blocco'] as String?;
         _presenti = (j['presenti'] as List? ?? []).cast<Map<String, dynamic>>();
@@ -412,7 +412,7 @@ class _SchermataMeetState extends State<SchermataMeet> {
   }
 }
 
-/// Carta che porta al Meet (pagina del quartiere)
+/// Carta che porta al Falò (pagina del quartiere)
 class CartaMeet extends StatelessWidget {
   const CartaMeet({super.key, required this.quartiereId, required this.nomeQuartiere, this.colore});
 
@@ -434,7 +434,7 @@ class CartaMeet extends StatelessWidget {
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                Text('${stato.io?.meetNome ?? 'Meet'} di $nomeQuartiere', style: TextStyle(color: testo, fontWeight: FontWeight.w800, fontSize: 15)),
+                Text('${stato.io?.meetNome ?? 'Falò'} di $nomeQuartiere', style: TextStyle(color: testo, fontWeight: FontWeight.w800, fontSize: 15)),
                 Text('La stanza vocale del quartiere: entra e parla con i vicini', style: TextStyle(color: muto, fontSize: 12.5)),
               ],
             ),

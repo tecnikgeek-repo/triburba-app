@@ -340,8 +340,8 @@ class Io {
   bool get admin => _puo('admin');
   bool get superadmin => _puo('superadmin');
 
-  /// Nome della stanza vocale del quartiere (deciso dal server, oggi «Meet»).
-  String get meetNome => _s(j['meet_nome']) ?? 'Meet';
+  /// Nome della stanza vocale del quartiere (deciso dal server, oggi «Falò»).
+  String get meetNome => _s(j['meet_nome']) ?? 'Falò';
 
   /// Tema scelto (salvato sull'account, uguale sul sito); null = mai scelto.
   String? get tema => _s(j['tema']);
