@@ -498,6 +498,9 @@ class Api {
               '')
           .toString();
 
+  /// Tema scelto: si salva sull'account, così è uguale sul sito e su ogni telefono.
+  Future<void> salvaTema(String id) async => invia('/app/v1/tema', {'tema': id});
+
   Future<Io> cambiaFoto(File foto, {bool copertina = false}) async =>
       Io((await invia('/app/v1/profilo/foto', {'tipo': copertina ? 'copertina' : 'avatar'}, campoFile: 'foto', file: foto))['io']);
 

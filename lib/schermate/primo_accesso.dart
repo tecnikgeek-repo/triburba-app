@@ -134,7 +134,7 @@ class _SchermataPrimoAccessoState extends State<SchermataPrimoAccesso> {
           child: Container(
             width: double.infinity,
             constraints: const BoxConstraints(maxWidth: 520),
-            decoration: const BoxDecoration(
+            decoration: BoxDecoration(
               color: superficie,
               borderRadius: BorderRadius.vertical(top: Radius.circular(24)),
               border: Border(top: BorderSide(color: linea2)),
@@ -189,7 +189,7 @@ class _SchermataPrimoAccessoState extends State<SchermataPrimoAccesso> {
                                 Text(
                                   p.$3,
                                   textAlign: TextAlign.center,
-                                  style: const TextStyle(color: testo2, fontSize: 15, height: 1.5),
+                                  style: TextStyle(color: testo2, fontSize: 15, height: 1.5),
                                 ),
                                 if (p.$2 == 'Presentati ai vicini') ...[
                                   const SizedBox(height: 14),

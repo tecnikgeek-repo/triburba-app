@@ -69,7 +69,7 @@ class _VisoreFotoState extends State<VisoreFoto> with SingleTickerProviderStateM
       imageUrl: widget.url,
       httpHeaders: widget.testate,
       fit: BoxFit.contain,
-      placeholder: (_, _) => const Center(child: CircularProgressIndicator(color: terracotta)),
+      placeholder: (_, _) => Center(child: CircularProgressIndicator(color: terracotta)),
       errorWidget: (_, _, _) => const Center(
         child: Text(
           'Foto non disponibile',

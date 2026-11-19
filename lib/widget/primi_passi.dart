@@ -126,7 +126,7 @@ class _PrimiPassiState extends State<PrimiPassi> {
           ],
         ),
         const SizedBox(height: 10),
-        const Text(
+        Text(
           'Hai fatto tutti i primi passi. Adesso triburba è casa tua: scrivi, proponi attività e fai girare le notizie che contano.',
           style: TextStyle(color: testo2, height: 1.4),
         ),
@@ -152,21 +152,21 @@ class _PrimiPassiState extends State<PrimiPassi> {
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  const Text(
+                  Text(
                     'PRIMI PASSI',
                     style: TextStyle(color: terracotta, fontSize: 12, fontWeight: FontWeight.w700, letterSpacing: 1),
                   ),
                   const SizedBox(height: 2),
                   Text('Benvenuto su triburba', style: titolo(20)),
                   const SizedBox(height: 3),
-                  const Text('Sette passi per entrare nella tua tribù. Si spuntano da soli.', style: TextStyle(color: muto, fontSize: 13)),
+                  Text('Sette passi per entrare nella tua tribù. Si spuntano da soli.', style: TextStyle(color: muto, fontSize: 13)),
                 ],
               ),
             ),
             IconButton(
               tooltip: 'Nascondi i primi passi',
               onPressed: _nascondi,
-              icon: const Icon(Icons.close_rounded, color: muto),
+              icon: Icon(Icons.close_rounded, color: muto),
             ),
           ],
         ),
@@ -192,12 +192,12 @@ class _PrimiPassiState extends State<PrimiPassi> {
                   children: [
                     TextSpan(
                       text: '${g.fatti}',
-                      style: const TextStyle(fontWeight: FontWeight.w800, color: testo, fontSize: 15),
+                      style: TextStyle(fontWeight: FontWeight.w800, color: testo, fontSize: 15),
                     ),
                     TextSpan(text: ' su ${g.totale}'),
                   ],
                 ),
-                style: const TextStyle(color: muto, fontSize: 13),
+                style: TextStyle(color: muto, fontSize: 13),
               ),
             ],
           ),
@@ -230,9 +230,9 @@ class _PrimiPassiState extends State<PrimiPassi> {
         tasto = Row(
           mainAxisSize: MainAxisSize.min,
           children: [
-            const Icon(Icons.lock_outline_rounded, size: 14, color: muto),
+            Icon(Icons.lock_outline_rounded, size: 14, color: muto),
             const SizedBox(width: 4),
-            Text(p.tasto, style: const TextStyle(color: muto, fontSize: 12.5)),
+            Text(p.tasto, style: TextStyle(color: muto, fontSize: 12.5)),
           ],
         );
       } else if (prossimo) {
@@ -278,7 +278,7 @@ class _PrimiPassiState extends State<PrimiPassi> {
                       if (conta.isNotEmpty)
                         TextSpan(
                           text: conta,
-                          style: const TextStyle(color: oro, fontWeight: FontWeight.w800),
+                          style: TextStyle(color: oro, fontWeight: FontWeight.w800),
                         ),
                     ],
                   ),
@@ -292,7 +292,7 @@ class _PrimiPassiState extends State<PrimiPassi> {
                 ),
                 if (prossimo) ...[
                   const SizedBox(height: 3),
-                  Text(p.testo, style: const TextStyle(color: testo2, fontSize: 13, height: 1.35)),
+                  Text(p.testo, style: TextStyle(color: testo2, fontSize: 13, height: 1.35)),
                   const SizedBox(height: 8),
                   ?tasto,
                 ],

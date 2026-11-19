@@ -8,13 +8,15 @@ import '../tema.dart';
 String numeroBreve(int n) => n < 1000 ? '$n' : (n < 1000000 ? '${n ~/ 1000}k' : '${n ~/ 1000000}M');
 
 class IconaConBollino extends StatefulWidget {
-  const IconaConBollino({super.key, required this.icona, required this.n, this.bordo = superficie});
+  // ignore: prefer_initializing_formals
+  const IconaConBollino({super.key, required this.icona, required this.n, Color? bordo}) : _bordo = bordo;
 
   final Widget icona;
   final int n;
 
   /// Colore dell'anello intorno al bollino: quello del fondo della card.
-  final Color bordo;
+  final Color? _bordo;
+  Color get bordo => _bordo ?? superficie;
 
   @override
   State<IconaConBollino> createState() => _IconaConBollinoState();
@@ -60,7 +62,7 @@ class _IconaConBollinoState extends State<IconaConBollino> with SingleTickerProv
                 alignment: Alignment.center,
                 decoration: BoxDecoration(
                   shape: BoxShape.circle,
-                  gradient: const LinearGradient(
+                  gradient: LinearGradient(
                     begin: Alignment.topLeft,
                     end: Alignment.bottomRight,
                     colors: [terracottaScura, terracotta, oro],

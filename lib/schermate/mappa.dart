@@ -65,7 +65,7 @@ class _SchermataMappaState extends State<SchermataMappa> {
                   : Column(
                       mainAxisSize: MainAxisSize.min,
                       children: [
-                        Text(_errore!, style: const TextStyle(color: testo2)),
+                        Text(_errore!, style: TextStyle(color: testo2)),
                         const SizedBox(height: 10),
                         OutlinedButton(onPressed: _carica, child: const Text('Riprova')),
                       ],
@@ -77,7 +77,7 @@ class _SchermataMappaState extends State<SchermataMappa> {
                 padding: const EdgeInsets.fromLTRB(12, 4, 12, 90),
                 children: [
                   MappaDisegno(mappa: m, onApri: (q) => apriQuartiere(context, q.slug)),
-                  const Padding(
+                  Padding(
                     padding: EdgeInsets.only(top: 8, bottom: 14),
                     child: Text.rich(
                       TextSpan(
@@ -98,7 +98,7 @@ class _SchermataMappaState extends State<SchermataMappa> {
                       padding: const EdgeInsets.only(bottom: 12),
                       child: Text(
                         'Potrai cambiare quartiere di casa tra ${m.giorniCambio} giorni.',
-                        style: const TextStyle(color: muto, fontSize: 12.5),
+                        style: TextStyle(color: muto, fontSize: 12.5),
                       ),
                     ),
                   for (final g in m.gruppi) ...[
@@ -106,7 +106,7 @@ class _SchermataMappaState extends State<SchermataMappa> {
                       padding: const EdgeInsets.fromLTRB(4, 10, 4, 6),
                       child: Text(
                         g.$1.toUpperCase(),
-                        style: const TextStyle(color: muto, fontSize: 12, fontWeight: FontWeight.w800, letterSpacing: .6),
+                        style: TextStyle(color: muto, fontSize: 12, fontWeight: FontWeight.w800, letterSpacing: .6),
                       ),
                     ),
                     for (final q in g.$2) _rigaQuartiere(q, m),
@@ -145,15 +145,15 @@ class _SchermataMappaState extends State<SchermataMappa> {
                       Text(q.nome, style: const TextStyle(fontWeight: FontWeight.w800, fontSize: 15.5)),
                       Text(
                         '${q.residenti} residenti · ${q.post} post${q.citta != 'Napoli' ? ' · ${q.citta}' : ''}',
-                        style: const TextStyle(color: muto, fontSize: 12.5),
+                        style: TextStyle(color: muto, fontSize: 12.5),
                       ),
                     ],
                   ),
                 ),
-                if (casa) const Chip2(testo: 'Casa', icona: Icons.home_rounded, colore: terracotta),
-                if (!casa && segui) const Chip2(testo: 'Segui', icona: Icons.check, colore: golfo),
+                if (casa) Chip2(testo: 'Casa', icona: Icons.home_rounded, colore: terracotta),
+                if (!casa && segui) Chip2(testo: 'Segui', icona: Icons.check, colore: golfo),
                 const SizedBox(width: 4),
-                const Icon(Icons.chevron_right, color: muto),
+                Icon(Icons.chevron_right, color: muto),
               ],
             ),
           ),
@@ -171,7 +171,7 @@ class _SchermataMappaState extends State<SchermataMappa> {
         children: [
           Row(
             children: [
-              const Icon(Icons.wb_twilight_rounded, color: oro),
+              Icon(Icons.wb_twilight_rounded, color: oro),
               const SizedBox(width: 8),
               Expanded(child: Text('Accendi la tua zona', style: titolo(19))),
             ],
@@ -180,7 +180,7 @@ class _SchermataMappaState extends State<SchermataMappa> {
           Text(
             'I quartieri di Napoli e i comuni dell\'area metropolitana restano nella nebbia finché non li chiede '
             'abbastanza gente: a ${m.sogliaApertura} richieste si accendono da soli sulla mappa.',
-            style: const TextStyle(color: testo2, fontSize: 13, height: 1.4),
+            style: TextStyle(color: testo2, fontSize: 13, height: 1.4),
           ),
           const SizedBox(height: 10),
           TextField(

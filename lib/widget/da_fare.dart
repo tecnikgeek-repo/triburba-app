@@ -86,7 +86,7 @@ class TestataHome extends StatelessWidget {
                       soloBacheca ? 'Scrivi sulla tua bacheca…' : (dove != null ? 'Cosa succede a $dove?' : 'Cosa succede nel quartiere?'),
                       maxLines: 1,
                       overflow: TextOverflow.ellipsis,
-                      style: const TextStyle(color: muto, fontSize: 15),
+                      style: TextStyle(color: muto, fontSize: 15),
                     ),
                   ),
                 ),
@@ -125,7 +125,7 @@ class TestataHome extends StatelessWidget {
               child: Text(
                 t,
                 overflow: TextOverflow.ellipsis,
-                style: const TextStyle(color: testo2, fontWeight: FontWeight.w700, fontSize: 13.5),
+                style: TextStyle(color: testo2, fontWeight: FontWeight.w700, fontSize: 13.5),
               ),
             ),
           ],
@@ -184,13 +184,13 @@ class FilaDaFareState extends State<FilaDaFare> {
             padding: const EdgeInsets.symmetric(horizontal: 16),
             child: Row(
               children: [
-                const Icon(Icons.auto_awesome, size: 18, color: terracotta),
+                Icon(Icons.auto_awesome, size: 18, color: terracotta),
                 const SizedBox(width: 6),
                 Text('Da fare', style: titolo(16)),
                 const Spacer(),
                 Text(
                   voci.length == 1 ? '1 cosa per te' : '${voci.length} cose per te',
-                  style: const TextStyle(color: muto, fontSize: 12.5),
+                  style: TextStyle(color: muto, fontSize: 12.5),
                 ),
               ],
             ),
@@ -289,7 +289,7 @@ class FilaDaFareState extends State<FilaDaFare> {
                         ),
                         child: Text(
                           '$numero',
-                          style: const TextStyle(color: testo, fontSize: 11, fontWeight: FontWeight.w800),
+                          style: TextStyle(color: testo, fontSize: 11, fontWeight: FontWeight.w800),
                         ),
                       ),
                     ),
@@ -307,7 +307,7 @@ class FilaDaFareState extends State<FilaDaFare> {
                 '${v['testo']}',
                 maxLines: 3,
                 overflow: TextOverflow.ellipsis,
-                style: const TextStyle(color: testo2, fontSize: 12.5, height: 1.3),
+                style: TextStyle(color: testo2, fontSize: 12.5, height: 1.3),
               ),
               const Spacer(),
               Row(
@@ -316,11 +316,11 @@ class FilaDaFareState extends State<FilaDaFare> {
                     child: Text(
                       '${v['tasto']}',
                       overflow: TextOverflow.ellipsis,
-                      style: const TextStyle(color: terracotta, fontWeight: FontWeight.w800, fontSize: 13),
+                      style: TextStyle(color: terracotta, fontWeight: FontWeight.w800, fontSize: 13),
                     ),
                   ),
                   const SizedBox(width: 3),
-                  const Icon(Icons.arrow_forward, size: 14, color: terracotta),
+                  Icon(Icons.arrow_forward, size: 14, color: terracotta),
                 ],
               ),
             ],
@@ -386,7 +386,7 @@ class _SchermataNuoviViciniState extends State<SchermataNuoviVicini> {
       appBar: AppBar(title: const Text('Nuovi vicini')),
       body: p == null
           ? Center(
-              child: _errore != null ? Text(_errore!, style: const TextStyle(color: muto)) : const CircularProgressIndicator(),
+              child: _errore != null ? Text(_errore!, style: TextStyle(color: muto)) : const CircularProgressIndicator(),
             )
           : RefreshIndicator(
               onRefresh: _carica,
@@ -397,7 +397,7 @@ class _SchermataNuoviViciniState extends State<SchermataNuoviVicini> {
                     dove != null
                         ? 'Sono appena arrivati a $dove: un saluto fa sentire a casa.'
                         : 'Sono appena arrivati nel tuo quartiere: un saluto fa sentire a casa.',
-                    style: const TextStyle(color: muto, height: 1.4),
+                    style: TextStyle(color: muto, height: 1.4),
                   ),
                   const SizedBox(height: 12),
                   if (p.isEmpty) const Vuoto(icona: Icons.waving_hand_outlined, testo: 'Questa settimana non è arrivato nessuno di nuovo.'),
@@ -427,12 +427,12 @@ class _SchermataNuoviViciniState extends State<SchermataNuoviVicini> {
                                   overflow: TextOverflow.ellipsis,
                                   style: const TextStyle(fontWeight: FontWeight.w700),
                                 ),
-                                Text('arrivato ${x['quando']}', style: const TextStyle(color: muto, fontSize: 12.5)),
+                                Text('arrivato ${x['quando']}', style: TextStyle(color: muto, fontSize: 12.5)),
                               ],
                             ),
                           ),
                           if (x['salutato'] == true)
-                            const Chip2(testo: 'Salutato', icona: Icons.check, colore: golfo, tenue: true)
+                            Chip2(testo: 'Salutato', icona: Icons.check, colore: golfo, tenue: true)
                           else
                             SizedBox(
                               width: 130,

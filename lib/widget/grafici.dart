@@ -37,7 +37,7 @@ class Legenda extends StatelessWidget {
           children: [
             Container(width: 10, height: 10, decoration: BoxDecoration(color: c, borderRadius: BorderRadius.circular(3))),
             const SizedBox(width: 6),
-            Text(t, style: const TextStyle(color: testo2, fontSize: 12.5)),
+            Text(t, style: TextStyle(color: testo2, fontSize: 12.5)),
           ],
         ),
     ],
@@ -199,7 +199,7 @@ class Classifica extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    if (righe.isEmpty) return Text(vuoto, style: const TextStyle(color: muto));
+    if (righe.isEmpty) return Text(vuoto, style: TextStyle(color: muto));
     double n(dynamic r) => double.tryParse('${(r as Map)['n']}') ?? 0;
     final massimo = math.max(1.0, righe.map(n).fold<double>(0, math.max));
     return Column(

@@ -145,7 +145,7 @@ class _Sezione extends StatelessWidget {
             ?coda,
           ],
         ),
-        if (spiega != null) ...[const SizedBox(height: 6), Text(spiega!, style: const TextStyle(color: muto, fontSize: 13, height: 1.35))],
+        if (spiega != null) ...[const SizedBox(height: 6), Text(spiega!, style: TextStyle(color: muto, fontSize: 13, height: 1.35))],
         const SizedBox(height: 10),
         ...figli,
       ],
@@ -210,7 +210,7 @@ class _Carica extends StatelessWidget {
                 child: Column(
                   mainAxisSize: MainAxisSize.min,
                   children: [
-                    Text(errore!, textAlign: TextAlign.center, style: const TextStyle(color: muto)),
+                    Text(errore!, textAlign: TextAlign.center, style: TextStyle(color: muto)),
                     const SizedBox(height: 12),
                     OutlinedButton(onPressed: ricarica, child: const Text('Riprova')),
                   ],
@@ -427,7 +427,7 @@ class _GestioneState extends State<_Gestione> with AutomaticKeepAliveClientMixin
       intestazione: 'Immagini da rivedere',
       spiega: 'Foto sfocate dal controllo automatico o segnalate come contenuto sessuale o violento. Le vedi solo tu, in chiaro.',
       figli: [
-        if (l.isEmpty) const Text('Nessuna immagine in attesa.', style: TextStyle(color: muto)),
+        if (l.isEmpty) Text('Nessuna immagine in attesa.', style: TextStyle(color: muto)),
         for (final im in l) _immagine(im as Map),
       ],
     );
@@ -447,8 +447,8 @@ class _GestioneState extends State<_Gestione> with AutomaticKeepAliveClientMixin
               child: CachedNetworkImage(imageUrl: url, height: 180, width: double.infinity, fit: BoxFit.cover),
             ),
           const SizedBox(height: 6),
-          Text('@${im['username']} · ${_s(im['q_nome'])} · ${quandoAdmin(im['created_at'])}', style: const TextStyle(color: muto, fontSize: 12.5)),
-          if (_s(im['img_motivo']).isNotEmpty) Text(_s(im['img_motivo']), style: const TextStyle(color: oro, fontSize: 12.5)),
+          Text('@${im['username']} · ${_s(im['q_nome'])} · ${quandoAdmin(im['created_at'])}', style: TextStyle(color: muto, fontSize: 12.5)),
+          if (_s(im['img_motivo']).isNotEmpty) Text(_s(im['img_motivo']), style: TextStyle(color: oro, fontSize: 12.5)),
           const SizedBox(height: 6),
           Wrap(
             spacing: 8,
@@ -479,13 +479,13 @@ class _GestioneState extends State<_Gestione> with AutomaticKeepAliveClientMixin
       intestazione: 'Residenti in attesa',
       spiega: 'I primi residenti di ogni quartiere non hanno vicini confermati che possano garantire: confermali tu, se sai che abitano lì.',
       figli: [
-        if (l.isEmpty) const Text('Nessuno in attesa.', style: TextStyle(color: muto)),
+        if (l.isEmpty) Text('Nessuno in attesa.', style: TextStyle(color: muto)),
         for (final u in l)
           ListTile(
             contentPadding: EdgeInsets.zero,
             leading: FotoProfilo.da(nome: _s(u['display_name']).isEmpty ? _s(u['username']) : _s(u['display_name']), avatar: u['avatar_path'] as String?, lato: 38),
             title: Text(_s(u['display_name']).isEmpty ? '@${u['username']}' : _s(u['display_name']), style: const TextStyle(fontWeight: FontWeight.w700)),
-            subtitle: Text('${u['quartiere_nome']} · ${_i(u['garanzie'])} garanzie', style: const TextStyle(color: muto)),
+            subtitle: Text('${u['quartiere_nome']} · ${_i(u['garanzie'])} garanzie', style: TextStyle(color: muto)),
             trailing: OutlinedButton(
               onPressed: () => _azione(context, () => stato.api.adminResidente(_i(u['id'])), _carica),
               child: const Text('Conferma'),
@@ -502,7 +502,7 @@ class _GestioneState extends State<_Gestione> with AutomaticKeepAliveClientMixin
       icona: Icons.visibility_off_outlined,
       intestazione: 'Post nascosti dalle segnalazioni',
       figli: [
-        if (l.isEmpty) const Text('Nessun post nascosto.', style: TextStyle(color: muto)),
+        if (l.isEmpty) Text('Nessun post nascosto.', style: TextStyle(color: muto)),
         for (final n in l)
           Padding(
             padding: const EdgeInsets.only(bottom: 10),
@@ -513,14 +513,14 @@ class _GestioneState extends State<_Gestione> with AutomaticKeepAliveClientMixin
                 children: [
                   Text(
                     '@${n['username']} · ${_s(n['q_nome'])} · ${_i(n['segnalazioni'])} segnalazioni${_s(n['motivi']).isEmpty ? '' : ': ${n['motivi']}'} · ${_i(n['ovunque']) == 0 ? 'nascosto ovunque' : 'nascosto in un quartiere'}',
-                    style: const TextStyle(color: oro, fontSize: 12.5),
+                    style: TextStyle(color: oro, fontSize: 12.5),
                   ),
                   Text(_accorcia(_s(n['content']), 140)),
                 ],
               ),
             ),
           ),
-        if (l.isNotEmpty) const Text('Per rimetterli visibili o eliminarli apri la Moderazione del quartiere d\'origine.', style: TextStyle(color: muto, fontSize: 12.5)),
+        if (l.isNotEmpty) Text('Per rimetterli visibili o eliminarli apri la Moderazione del quartiere d\'origine.', style: TextStyle(color: muto, fontSize: 12.5)),
       ],
     );
   }
@@ -540,7 +540,7 @@ class _GestioneState extends State<_Gestione> with AutomaticKeepAliveClientMixin
         if (err.isNotEmpty) ...[
           const SizedBox(height: 8),
           const Text('Ultimi errori', style: TextStyle(fontWeight: FontWeight.w700)),
-          for (final e in err) Text(_s(e is Map ? (e['riga'] ?? e['testo'] ?? e) : e), style: const TextStyle(color: muto, fontSize: 12)),
+          for (final e in err) Text(_s(e is Map ? (e['riga'] ?? e['testo'] ?? e) : e), style: TextStyle(color: muto, fontSize: 12)),
         ],
       ],
     );
@@ -564,7 +564,7 @@ class _GestioneState extends State<_Gestione> with AutomaticKeepAliveClientMixin
         gruppo = _s(q['mun_nome']);
         righe.add(Padding(
           padding: const EdgeInsets.only(top: 10, bottom: 2),
-          child: Text(gruppo.toUpperCase(), style: const TextStyle(color: terracotta, fontSize: 11.5, fontWeight: FontWeight.w800, letterSpacing: .6)),
+          child: Text(gruppo.toUpperCase(), style: TextStyle(color: terracotta, fontSize: 11.5, fontWeight: FontWeight.w800, letterSpacing: .6)),
         ));
       }
       righe.add(_interruttore(q as Map, _i(q['attivo']) == 1, (v) => _zona('q', q, v)));
@@ -583,7 +583,7 @@ class _GestioneState extends State<_Gestione> with AutomaticKeepAliveClientMixin
     value: acceso,
     onChanged: cambia,
     title: Text(_s(z['nome']), style: const TextStyle(fontWeight: FontWeight.w600, fontSize: 14.5)),
-    subtitle: _i(z['iscritti']) > 0 ? Text('${_i(z['iscritti'])} iscritti', style: const TextStyle(color: muto, fontSize: 12)) : null,
+    subtitle: _i(z['iscritti']) > 0 ? Text('${_i(z['iscritti'])} iscritti', style: TextStyle(color: muto, fontSize: 12)) : null,
   );
 
   Widget _comuni(Map<String, dynamic> d) {
@@ -602,7 +602,7 @@ class _GestioneState extends State<_Gestione> with AutomaticKeepAliveClientMixin
           decoration: const InputDecoration(hintText: 'Cerca un comune…', prefixIcon: Icon(Icons.search_rounded)),
         ),
         const SizedBox(height: 4),
-        if (vis.isEmpty) Padding(padding: const EdgeInsets.only(top: 8), child: Text(f.isEmpty ? 'Nessun comune acceso.' : 'Nessun comune con questo nome.', style: const TextStyle(color: muto))),
+        if (vis.isEmpty) Padding(padding: const EdgeInsets.only(top: 8), child: Text(f.isEmpty ? 'Nessun comune acceso.' : 'Nessun comune con questo nome.', style: TextStyle(color: muto))),
         for (final c in vis.take(40)) _interruttore(c, _i(c['attiva']) == 1, (v) => _zona('c', c, v)),
       ],
     );
@@ -614,7 +614,7 @@ class _GestioneState extends State<_Gestione> with AutomaticKeepAliveClientMixin
     figli: [
       for (final p in d['pubblicazione'] as List) ...[
         Text(_s(p['titolo']), style: const TextStyle(fontWeight: FontWeight.w700)),
-        Text(_s(p['spiega']), style: const TextStyle(color: muto, fontSize: 12.5)),
+        Text(_s(p['spiega']), style: TextStyle(color: muto, fontSize: 12.5)),
         const SizedBox(height: 6),
         if (p['scelte'] != null)
           DropdownButtonFormField<String>(
@@ -654,7 +654,7 @@ class _GestioneState extends State<_Gestione> with AutomaticKeepAliveClientMixin
             child: Row(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                const Icon(Icons.rocket_launch_outlined, color: oro, size: 20),
+                Icon(Icons.rocket_launch_outlined, color: oro, size: 20),
                 const SizedBox(width: 10),
                 Expanded(
                   child: Text(
@@ -667,7 +667,7 @@ class _GestioneState extends State<_Gestione> with AutomaticKeepAliveClientMixin
           ),
         for (final s in d['soglie'] as List) ...[
           Text(_s(s['titolo']), style: const TextStyle(fontWeight: FontWeight.w700)),
-          Text(_s(s['spiega']), style: const TextStyle(color: muto, fontSize: 12.5)),
+          Text(_s(s['spiega']), style: TextStyle(color: muto, fontSize: 12.5)),
           const SizedBox(height: 6),
           TextField(controller: _soglie[_s(s['chiave'])], keyboardType: TextInputType.number),
           const SizedBox(height: 12),
@@ -694,7 +694,7 @@ class _GestioneState extends State<_Gestione> with AutomaticKeepAliveClientMixin
     return _Sezione(
       icona: Icons.manage_accounts_outlined,
       intestazione: 'Utenti',
-      coda: Text('${_i(d['tot_utenti'])}', style: const TextStyle(color: muto, fontWeight: FontWeight.w700)),
+      coda: Text('${_i(d['tot_utenti'])}', style: TextStyle(color: muto, fontWeight: FontWeight.w700)),
       figli: [
         for (final u in _utenti)
           Padding(
@@ -719,7 +719,7 @@ class _GestioneState extends State<_Gestione> with AutomaticKeepAliveClientMixin
                     ],
                   ),
                   const SizedBox(height: 4),
-                  Text('${_s(u['email'])}\n${_s(u['q_nome']).isEmpty ? 'Senza quartiere' : _s(u['q_nome'])} · iscritto il ${quandoAdmin(u['created_at']).split(' ').first}', style: const TextStyle(color: muto, fontSize: 12.5, height: 1.35)),
+                  Text('${_s(u['email'])}\n${_s(u['q_nome']).isEmpty ? 'Senza quartiere' : _s(u['q_nome'])} · iscritto il ${quandoAdmin(u['created_at']).split(' ').first}', style: TextStyle(color: muto, fontSize: 12.5, height: 1.35)),
                   if (_i(u['id']) != mio) ...[
                     const SizedBox(height: 6),
                     Wrap(
@@ -761,7 +761,7 @@ class _GestioneState extends State<_Gestione> with AutomaticKeepAliveClientMixin
     key: _kPost,
     icona: Icons.article_outlined,
     intestazione: _post7 ? 'Post degli ultimi 7 giorni' : 'Ultimi post',
-    coda: Text('${_i(d['tot_post'])}', style: const TextStyle(color: muto, fontWeight: FontWeight.w700)),
+    coda: Text('${_i(d['tot_post'])}', style: TextStyle(color: muto, fontWeight: FontWeight.w700)),
     figli: [
       _Periodi(
         scelto: _post7 ? 7 : 0,
@@ -772,13 +772,13 @@ class _GestioneState extends State<_Gestione> with AutomaticKeepAliveClientMixin
         },
       ),
       const SizedBox(height: 8),
-      if (_post.isEmpty) const Text('Nessun post.', style: TextStyle(color: muto)),
+      if (_post.isEmpty) Text('Nessun post.', style: TextStyle(color: muto)),
       for (final p in _post)
         ListTile(
           contentPadding: EdgeInsets.zero,
           onTap: () => apriPost(context, _i(p['id'])),
           title: Text(_accorcia(_s(p['content']), 120)),
-          subtitle: Text('@${p['username']} · ${_s(p['q_nome'])} · ${quandoAdmin(p['created_at'])}', style: const TextStyle(color: muto, fontSize: 12.5)),
+          subtitle: Text('@${p['username']} · ${_s(p['q_nome'])} · ${quandoAdmin(p['created_at'])}', style: TextStyle(color: muto, fontSize: 12.5)),
           trailing: IconButton(
             tooltip: 'Elimina',
             icon: const Icon(Icons.delete_outline_rounded, color: pompeiano),
@@ -872,7 +872,7 @@ class _StatisticheState extends State<_Statistiche> with AutomaticKeepAliveClien
           icona: Icons.local_fire_department_outlined,
           intestazione: 'Post con più reazioni',
           figli: [
-            if (((s['post_top'] as List?) ?? const []).isEmpty) const Text('Ancora nessuno.', style: TextStyle(color: muto)),
+            if (((s['post_top'] as List?) ?? const []).isEmpty) Text('Ancora nessuno.', style: TextStyle(color: muto)),
             for (final p in (s['post_top'] as List?) ?? const [])
               ListTile(
                 contentPadding: EdgeInsets.zero,
@@ -1015,7 +1015,7 @@ class _IscrittiState extends State<_Iscritti> with AutomaticKeepAliveClientMixin
           figli: [
             GraficoBarre(a: serieDa(r['nuovi_giorni']), b: serieDa(r['via_giorni'])),
             const SizedBox(height: 8),
-            const Legenda([('Iscrizioni', terracotta), ('Cancellazioni', oro)]),
+            Legenda([('Iscrizioni', terracotta), ('Cancellazioni', oro)]),
           ],
         ),
         _Sezione(
@@ -1028,9 +1028,9 @@ class _IscrittiState extends State<_Iscritti> with AutomaticKeepAliveClientMixin
         _Sezione(
           icona: Icons.person_add_alt_outlined,
           intestazione: 'Nuovi iscritti',
-          coda: Text('${_i(d['tot_nuovi'])}', style: const TextStyle(color: muto, fontWeight: FontWeight.w700)),
+          coda: Text('${_i(d['tot_nuovi'])}', style: TextStyle(color: muto, fontWeight: FontWeight.w700)),
           figli: [
-            if (_nuovi.isEmpty) const Text('Nessuno in questo periodo.', style: TextStyle(color: muto)),
+            if (_nuovi.isEmpty) Text('Nessuno in questo periodo.', style: TextStyle(color: muto)),
             for (final u in _nuovi)
               ListTile(
                 contentPadding: EdgeInsets.zero,
@@ -1041,7 +1041,7 @@ class _IscrittiState extends State<_Iscritti> with AutomaticKeepAliveClientMixin
                   '@${u['username']} · ${_s(u['q_nome']).isEmpty ? 'senza quartiere' : '${u['q_nome']} (${_s(u['residenza']) == 'confermata' ? 'residente' : 'in attesa'})'}\n'
                   '${quandoAdmin(u['created_at'])} · ${_s(u['iscritto_da']) == 'app' ? 'dall\'app' : (_s(u['iscritto_da']).isEmpty ? '' : 'dalla versione web')}'
                   '${_s(u['ultimo_accesso']).isEmpty ? '' : ' · ultimo accesso ${quandoAdmin(u['ultimo_accesso'])}'}',
-                  style: const TextStyle(color: muto, fontSize: 12.5, height: 1.35),
+                  style: TextStyle(color: muto, fontSize: 12.5, height: 1.35),
                 ),
               ),
             _mostraAltri(_nuovi.length, _i(d['tot_nuovi']), _altriN, () => _altri(false)),
@@ -1051,9 +1051,9 @@ class _IscrittiState extends State<_Iscritti> with AutomaticKeepAliveClientMixin
           icona: Icons.person_remove_outlined,
           intestazione: 'Chi si è cancellato',
           spiega: 'Di chi elimina l\'account resta solo questa riga, per 12 mesi.',
-          coda: Text('${_i(d['tot_cancellati'])}', style: const TextStyle(color: muto, fontWeight: FontWeight.w700)),
+          coda: Text('${_i(d['tot_cancellati'])}', style: TextStyle(color: muto, fontWeight: FontWeight.w700)),
           figli: [
-            if (_via.isEmpty) const Text('Nessuno in questo periodo.', style: TextStyle(color: muto)),
+            if (_via.isEmpty) Text('Nessuno in questo periodo.', style: TextStyle(color: muto)),
             for (final u in _via)
               ListTile(
                 contentPadding: EdgeInsets.zero,
@@ -1061,7 +1061,7 @@ class _IscrittiState extends State<_Iscritti> with AutomaticKeepAliveClientMixin
                 subtitle: Text(
                   '@${u['username']} · ${_s(u['quartiere']).isEmpty ? 'senza quartiere' : u['quartiere']}\n'
                   'Iscritto ${quandoAdmin(u['iscritto_il']).split(' ').first} · cancellato ${quandoAdmin(u['cancellato_il'])}${_s(u['da']).isEmpty ? '' : ' · ${u['da']}'}',
-                  style: const TextStyle(color: muto, fontSize: 12.5, height: 1.35),
+                  style: TextStyle(color: muto, fontSize: 12.5, height: 1.35),
                 ),
               ),
             _mostraAltri(_via.length, _i(d['tot_cancellati']), _altriV, () => _altri(true)),
@@ -1169,7 +1169,7 @@ class _VisiteState extends State<_Visite> with AutomaticKeepAliveClientMixin {
           },
         ),
         const SizedBox(height: 8),
-        const Row(
+        Row(
           children: [
             Icon(Icons.lock_outline_rounded, size: 15, color: muto),
             SizedBox(width: 6),
@@ -1199,7 +1199,7 @@ class _VisiteState extends State<_Visite> with AutomaticKeepAliveClientMixin {
           figli: [
             GraficoBarre(a: serieDa(r['unici_giorni']), b: serieDa(r['viste_giorni'])),
             const SizedBox(height: 8),
-            const Legenda([('Visitatori', terracotta), ('Pagine viste', oro)]),
+            Legenda([('Visitatori', terracotta), ('Pagine viste', oro)]),
           ],
         ),
         _Sezione(
@@ -1228,7 +1228,7 @@ class _VisiteState extends State<_Visite> with AutomaticKeepAliveClientMixin {
         _Sezione(
           icona: Icons.schedule_rounded,
           intestazione: 'Chi entra',
-          coda: Text('${_i(d['tot_accessi'])}', style: const TextStyle(color: muto, fontWeight: FontWeight.w700)),
+          coda: Text('${_i(d['tot_accessi'])}', style: TextStyle(color: muto, fontWeight: FontWeight.w700)),
           figli: [
             _Periodi(
               scelto: ['ultimo', 'nome', 'iscritto'].indexOf(_ordine),
@@ -1249,13 +1249,13 @@ class _VisiteState extends State<_Visite> with AutomaticKeepAliveClientMixin {
                     Flexible(
                       child: Text(_s(u['display_name']).isEmpty ? '@${u['username']}' : _s(u['display_name']), overflow: TextOverflow.ellipsis, style: const TextStyle(fontWeight: FontWeight.w700)),
                     ),
-                    if (_oggi(u['ultimo_accesso'])) ...[const SizedBox(width: 6), const Chip2(testo: 'oggi', colore: golfo, tenue: true)],
+                    if (_oggi(u['ultimo_accesso'])) ...[const SizedBox(width: 6), Chip2(testo: 'oggi', colore: golfo, tenue: true)],
                   ],
                 ),
                 subtitle: Text(
                   '${_s(u['q_nome']).isEmpty ? 'senza quartiere' : u['q_nome']} · '
                   '${_s(u['ultimo_accesso']).isEmpty ? 'mai entrato da oggi' : 'ultimo accesso ${quandoAdmin(u['ultimo_accesso'])}'} · ${_i(u['giorni_30'])} giorni attivi su 30',
-                  style: const TextStyle(color: muto, fontSize: 12.5, height: 1.35),
+                  style: TextStyle(color: muto, fontSize: 12.5, height: 1.35),
                 ),
               ),
             _mostraAltri(_accessi.length, _i(d['tot_accessi']), _altriA, _altri),
@@ -1362,9 +1362,9 @@ class _RegistroState extends State<_Registro> with AutomaticKeepAliveClientMixin
           },
         ),
         const SizedBox(height: 8),
-        const Text('Il registro non salva indirizzi IP né il testo dei post. Il voto per i moderatori resta segreto.', style: TextStyle(color: muto, fontSize: 12.5)),
+        Text('Il registro non salva indirizzi IP né il testo dei post. Il voto per i moderatori resta segreto.', style: TextStyle(color: muto, fontSize: 12.5)),
         const SizedBox(height: 10),
-        if (_righe.isEmpty) const Text('Nessuna riga.', style: TextStyle(color: muto)),
+        if (_righe.isEmpty) Text('Nessuna riga.', style: TextStyle(color: muto)),
         for (final r in _righe)
           Container(
             margin: const EdgeInsets.only(bottom: 8),
@@ -1376,12 +1376,12 @@ class _RegistroState extends State<_Registro> with AutomaticKeepAliveClientMixin
                 Row(
                   children: [
                     Expanded(child: Text(_s(r['username']).isEmpty ? 'triburba' : '@${r['username']}', style: const TextStyle(fontWeight: FontWeight.w700))),
-                    Text(quandoAdmin(r['created_at']), style: const TextStyle(color: muto, fontSize: 12)),
+                    Text(quandoAdmin(r['created_at']), style: TextStyle(color: muto, fontSize: 12)),
                   ],
                 ),
                 const SizedBox(height: 4),
                 Chip2(testo: _s(r['titolo']).toUpperCase(), colore: oro, tenue: true),
-                if (_s(r['dettaglio']).isNotEmpty) ...[const SizedBox(height: 4), Text(_s(r['dettaglio']), style: const TextStyle(color: testo2, fontSize: 13))],
+                if (_s(r['dettaglio']).isNotEmpty) ...[const SizedBox(height: 4), Text(_s(r['dettaglio']), style: TextStyle(color: testo2, fontSize: 13))],
               ],
             ),
           ),
@@ -1462,9 +1462,9 @@ class _SchermataAdminCommentiState extends State<SchermataAdminCommenti> {
         physics: const AlwaysScrollableScrollPhysics(),
         padding: const EdgeInsets.fromLTRB(14, 14, 14, 30),
         children: [
-          Text('${_i(_d!['tot'])} commenti', style: const TextStyle(color: muto, fontWeight: FontWeight.w700)),
+          Text('${_i(_d!['tot'])} commenti', style: TextStyle(color: muto, fontWeight: FontWeight.w700)),
           const SizedBox(height: 8),
-          if (_righe.isEmpty) const Text('Ancora nessun commento.', style: TextStyle(color: muto)),
+          if (_righe.isEmpty) Text('Ancora nessun commento.', style: TextStyle(color: muto)),
           for (final c in _righe)
             Container(
               margin: const EdgeInsets.only(bottom: 8),
@@ -1486,7 +1486,7 @@ class _SchermataAdminCommentiState extends State<SchermataAdminCommenti> {
                           const SizedBox(height: 3),
                           Text(_accorcia(_s(c['content']), 200)),
                           const SizedBox(height: 4),
-                          Text('Sul post di @${c['post_autore']}: «${_accorcia(_s(c['post_testo']), 60)}»', style: const TextStyle(color: muto, fontSize: 12)),
+                          Text('Sul post di @${c['post_autore']}: «${_accorcia(_s(c['post_testo']), 60)}»', style: TextStyle(color: muto, fontSize: 12)),
                         ],
                       ),
                     ),

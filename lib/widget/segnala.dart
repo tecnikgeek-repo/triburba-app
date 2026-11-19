@@ -22,7 +22,7 @@ Future<String?> scegliMotivo(BuildContext context, {required String intestazione
               ),
               Padding(
                 padding: const EdgeInsets.fromLTRB(20, 0, 20, 8),
-                child: Text(spiega, style: const TextStyle(color: muto, fontSize: 13)),
+                child: Text(spiega, style: TextStyle(color: muto, fontSize: 13)),
               ),
               for (final x in motivi) ListTile(title: Text(x), onTap: () => Navigator.pop(c, x)),
               const SizedBox(height: 8),

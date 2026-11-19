@@ -34,13 +34,13 @@ Future<bool> apriTamtam(BuildContext context, Post p) async {
             children: [
               Row(
                 children: [
-                  const IconaTk('tamtam', lato: 28, colore: oro),
+                  IconaTk('tamtam', lato: 28, colore: oro),
                   const SizedBox(width: 8),
                   Expanded(child: Text('Tam-tam', style: titolo(24))),
                 ],
               ),
               const SizedBox(height: 4),
-              Text('Fai girare il post ${t['titolo'] ?? 'alle altre tribù'}.', style: const TextStyle(color: testo2)),
+              Text('Fai girare il post ${t['titolo'] ?? 'alle altre tribù'}.', style: TextStyle(color: testo2)),
               const SizedBox(height: 14),
               // tutta la città: il rilancio conta come un voto
               _Opzione(
@@ -56,10 +56,10 @@ Future<bool> apriTamtam(BuildContext context, Post p) async {
               const SizedBox(height: 16),
               Text(
                 (t['vicino'] ?? 'Negli altri quartieri').toUpperCase(),
-                style: const TextStyle(color: muto, fontSize: 11.5, fontWeight: FontWeight.w800, letterSpacing: .6),
+                style: TextStyle(color: muto, fontSize: 11.5, fontWeight: FontWeight.w800, letterSpacing: .6),
               ),
               const SizedBox(height: 4),
-              const Text(
+              Text(
                 'Arriva quando un residente di lì lo accetta (nella tua municipalità subito).',
                 style: TextStyle(color: muto, fontSize: 12.5),
               ),
@@ -176,7 +176,7 @@ class _Opzione extends StatelessWidget {
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
                     Text(titolo, style: const TextStyle(fontWeight: FontWeight.w800, fontSize: 15)),
-                    if (testo.isNotEmpty) Text(testo, style: const TextStyle(color: testo2, fontSize: 12.5, height: 1.3)),
+                    if (testo.isNotEmpty) Text(testo, style: TextStyle(color: testo2, fontSize: 12.5, height: 1.3)),
                   ],
                 ),
               ),
@@ -185,7 +185,7 @@ class _Opzione extends StatelessWidget {
                   margin: const EdgeInsets.only(left: 8),
                   padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
                   decoration: BoxDecoration(color: terracotta.withValues(alpha: .18), borderRadius: BorderRadius.circular(99)),
-                  child: const Text(
+                  child: Text(
                     'RITIRA',
                     style: TextStyle(color: terracotta, fontSize: 11, fontWeight: FontWeight.w800, letterSpacing: .6),
                   ),

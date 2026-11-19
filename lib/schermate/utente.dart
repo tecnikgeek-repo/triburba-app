@@ -212,7 +212,7 @@ class _SchermataUtenteState extends State<SchermataUtente> {
                       Container(height: 6, color: linea2),
                       FractionallySizedBox(
                         widthFactor: perc / 100,
-                        child: Container(height: 6, decoration: const BoxDecoration(gradient: gradiente)),
+                        child: Container(height: 6, decoration: BoxDecoration(gradient: gradiente)),
                       ),
                     ],
                   ),
@@ -226,12 +226,12 @@ class _SchermataUtenteState extends State<SchermataUtente> {
             runSpacing: 6,
             crossAxisAlignment: WrapCrossAlignment.center,
             children: [
-              const Text('Manca:', style: TextStyle(color: muto, fontSize: 12.5)),
+              Text('Manca:', style: TextStyle(color: muto, fontSize: 12.5)),
               for (final m in mancano)
                 ActionChip(
-                  avatar: const Icon(Icons.add, size: 16, color: terracotta),
+                  avatar: Icon(Icons.add, size: 16, color: terracotta),
                   label: Text(m.$1),
-                  labelStyle: const TextStyle(fontFamily: 'Inter', fontWeight: FontWeight.w700, fontSize: 12.5, color: testo),
+                  labelStyle: TextStyle(fontFamily: 'Inter', fontWeight: FontWeight.w700, fontSize: 12.5, color: testo),
                   backgroundColor: terracotta.withValues(alpha: .14),
                   side: BorderSide(color: terracotta.withValues(alpha: .4)),
                   shape: const StadiumBorder(),
@@ -284,7 +284,7 @@ class _SchermataUtenteState extends State<SchermataUtente> {
                           child: CachedNetworkImage(imageUrl: copertina, fit: BoxFit.cover),
                         ),
                       )
-                    : const DecoratedBox(decoration: BoxDecoration(gradient: gradiente)),
+                    : DecoratedBox(decoration: BoxDecoration(gradient: gradiente)),
               ),
               if (io && !_caricoCopertina)
                 Positioned(
@@ -316,7 +316,7 @@ class _SchermataUtenteState extends State<SchermataUtente> {
                 bottom: 0,
                 child: Container(
                   padding: const EdgeInsets.all(3),
-                  decoration: const BoxDecoration(color: vernice, shape: BoxShape.circle),
+                  decoration: BoxDecoration(color: vernice, shape: BoxShape.circle),
                   // tocco sulla foto: si apre grande (le iniziali senza foto non si aprono)
                   child: Builder(
                     builder: (context) {
@@ -350,7 +350,7 @@ class _SchermataUtenteState extends State<SchermataUtente> {
                           if (u['bloccato'] != true && u['sistema'] != true) ...[
                             IconButton.outlined(
                               tooltip: 'Messaggio',
-                              icon: const IconaTk('messaggi', lato: 21, colore: testo),
+                              icon: IconaTk('messaggi', lato: 21, colore: testo),
                               onPressed: () => apriChat(context, username: widget.username),
                             ),
                             const SizedBox(width: 8),
@@ -385,7 +385,7 @@ class _SchermataUtenteState extends State<SchermataUtente> {
                   if (f.bot) ...[const SizedBox(width: 6), const PillaProva()],
                 ],
               ),
-              Text('@${f.username}', style: const TextStyle(color: muto)),
+              Text('@${f.username}', style: TextStyle(color: muto)),
               if (u['compleanno'] is Map) _compleanno(u, io, f),
               if ((u['bio'] as String?)?.isNotEmpty == true) ...[
                 const SizedBox(height: 8),
@@ -444,7 +444,7 @@ class _SchermataUtenteState extends State<SchermataUtente> {
                         borderRadius: BorderRadius.circular(99),
                         border: Border.all(color: linea2),
                       ),
-                      child: const Row(
+                      child: Row(
                         children: [
                           Icon(Icons.edit_outlined, color: muto, size: 20),
                           SizedBox(width: 10),
@@ -478,7 +478,7 @@ class _SchermataUtenteState extends State<SchermataUtente> {
             padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
             decoration: BoxDecoration(
               borderRadius: BorderRadius.circular(99),
-              gradient: const LinearGradient(colors: [terracotta, Color(0xFFD94F7A)]),
+              gradient: LinearGradient(colors: [terracotta, Color(0xFFD94F7A)]),
             ),
             child: Row(
               mainAxisSize: MainAxisSize.min,
@@ -530,12 +530,12 @@ class _SchermataUtenteState extends State<SchermataUtente> {
     );
   }
 
-  Widget _info(IconData i, String t, {Color colore = testo2}) => Row(
+  Widget _info(IconData i, String t, {Color? colore}) => Row(
     mainAxisSize: MainAxisSize.min,
     children: [
       Icon(i, size: 15, color: muto),
       const SizedBox(width: 4),
-      Text(t, style: TextStyle(color: colore, fontSize: 13)),
+      Text(t, style: TextStyle(color: colore ?? testo2, fontSize: 13)),
     ],
   );
 

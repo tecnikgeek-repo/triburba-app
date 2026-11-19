@@ -129,14 +129,14 @@ class _SchermataMessaggiState extends State<SchermataMessaggi> with SingleTicker
             padding: const EdgeInsets.all(32),
             children: [
               const SizedBox(height: 40),
-              const IconaTk('messaggi', lato: 52, colore: terracotta),
+              IconaTk('messaggi', lato: 52, colore: terracotta),
               const SizedBox(height: 14),
               Text(vuotoTitolo, textAlign: TextAlign.center, style: titolo(18)),
               const SizedBox(height: 8),
               Text(
                 vuotoTesto,
                 textAlign: TextAlign.center,
-                style: const TextStyle(color: muto, height: 1.45),
+                style: TextStyle(color: muto, height: 1.45),
               ),
             ],
           )
@@ -174,7 +174,7 @@ class _SchermataMessaggiState extends State<SchermataMessaggi> with SingleTicker
                   mainAxisAlignment: MainAxisAlignment.center,
                   crossAxisAlignment: CrossAxisAlignment.end,
                   children: [
-                    Text(v.quando, style: const TextStyle(color: muto, fontSize: 12)),
+                    Text(v.quando, style: TextStyle(color: muto, fontSize: 12)),
                     if (nuova) ...[
                       const SizedBox(height: 4),
                       Badge(label: Text(v.nonLetti > 9 ? '9+' : '${v.nonLetti}'), backgroundColor: terracotta),
@@ -199,7 +199,7 @@ class _Etichetta extends StatelessWidget {
     decoration: BoxDecoration(color: superficie2, borderRadius: BorderRadius.circular(6)),
     child: Text(
       t.toUpperCase(),
-      style: const TextStyle(color: testo2, fontSize: 9.5, fontWeight: FontWeight.w800, letterSpacing: .4),
+      style: TextStyle(color: testo2, fontSize: 9.5, fontWeight: FontWeight.w800, letterSpacing: .4),
     ),
   );
 }
@@ -629,7 +629,7 @@ class _SchermataChatState extends State<SchermataChat> with WidgetsBindingObserv
         titolo,
         style: TextStyle(color: rosso ? pompeiano : testo, fontWeight: FontWeight.w600),
       ),
-      subtitle: Text(sotto, style: const TextStyle(color: muto, fontSize: 12.5)),
+      subtitle: Text(sotto, style: TextStyle(color: muto, fontSize: 12.5)),
       onTap: () => Navigator.pop(context, chiave),
     );
     final c = _chat;
@@ -662,8 +662,8 @@ class _SchermataChatState extends State<SchermataChat> with WidgetsBindingObserv
                             width: 42,
                             height: 42,
                             alignment: Alignment.center,
-                            decoration: const BoxDecoration(color: superficie, shape: BoxShape.circle),
-                            child: const Icon(Icons.add_rounded, color: muto),
+                            decoration: BoxDecoration(color: superficie, shape: BoxShape.circle),
+                            child: Icon(Icons.add_rounded, color: muto),
                           ),
                         ),
                       ),
@@ -759,7 +759,7 @@ class _SchermataChatState extends State<SchermataChat> with WidgetsBindingObserv
           mainAxisSize: MainAxisSize.min,
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            const Padding(
+            Padding(
               padding: EdgeInsets.fromLTRB(18, 16, 18, 6),
               child: Text(
                 'Reagisci con una emoji',
@@ -829,7 +829,7 @@ class _SchermataChatState extends State<SchermataChat> with WidgetsBindingObserv
                       const SizedBox(width: 3),
                       Text(
                         '${r.n}',
-                        style: const TextStyle(color: muto, fontSize: 11.5, fontWeight: FontWeight.w700),
+                        style: TextStyle(color: muto, fontSize: 11.5, fontWeight: FontWeight.w700),
                       ),
                     ],
                   ],
@@ -859,7 +859,7 @@ class _SchermataChatState extends State<SchermataChat> with WidgetsBindingObserv
               ListTile(
                 leading: const Icon(Icons.delete_sweep_outlined),
                 title: const Text('Elimina la chat'),
-                subtitle: const Text('Sparisce solo per te', style: TextStyle(color: muto, fontSize: 12.5)),
+                subtitle: Text('Sparisce solo per te', style: TextStyle(color: muto, fontSize: 12.5)),
                 onTap: () => Navigator.pop(s, 'cancella'),
               ),
             ListTile(
@@ -931,8 +931,8 @@ class _SchermataChatState extends State<SchermataChat> with WidgetsBindingObserv
                             maxLines: 1,
                             overflow: TextOverflow.ellipsis,
                             style: _attivitaAltro != null
-                                ? const TextStyle(color: golfo, fontSize: 12.5, fontStyle: FontStyle.italic, fontWeight: FontWeight.w600)
-                                : const TextStyle(color: muto, fontSize: 12.5),
+                                ? TextStyle(color: golfo, fontSize: 12.5, fontStyle: FontStyle.italic, fontWeight: FontWeight.w600)
+                                : TextStyle(color: muto, fontSize: 12.5),
                           ),
                         ],
                       ),
@@ -968,7 +968,7 @@ class _SchermataChatState extends State<SchermataChat> with WidgetsBindingObserv
   /// Messaggi dal basso (il più recente in fondo), con i separatori dei giorni
   Widget _flusso() {
     if (_msg.isEmpty) {
-      return const Center(
+      return Center(
         child: Padding(
           padding: EdgeInsets.all(32),
           child: Text(
@@ -1035,7 +1035,7 @@ class _SchermataChatState extends State<SchermataChat> with WidgetsBindingObserv
       decoration: BoxDecoration(color: superficie2, borderRadius: BorderRadius.circular(99)),
       child: Text(
         g.toUpperCase(),
-        style: const TextStyle(color: muto, fontSize: 11, fontWeight: FontWeight.w700, letterSpacing: .4),
+        style: TextStyle(color: muto, fontSize: 11, fontWeight: FontWeight.w700, letterSpacing: .4),
       ),
     ),
   );
@@ -1069,7 +1069,7 @@ class _SchermataChatState extends State<SchermataChat> with WidgetsBindingObserv
             mainAxisSize: MainAxisSize.min,
             children: [
               Text(m.testo, style: const TextStyle(fontSize: 44, height: 1.15)),
-              Text(m.ora, style: const TextStyle(color: muto, fontSize: 10.5)),
+              Text(m.ora, style: TextStyle(color: muto, fontSize: 10.5)),
             ],
           ),
         ),
@@ -1118,7 +1118,7 @@ class _SchermataChatState extends State<SchermataChat> with WidgetsBindingObserv
                         height: 120,
                         color: superficie,
                         alignment: Alignment.center,
-                        child: const Text('Foto non disponibile', style: TextStyle(color: muto)),
+                        child: Text('Foto non disponibile', style: TextStyle(color: muto)),
                       ),
                     ),
                   ),
@@ -1159,14 +1159,14 @@ class _SchermataChatState extends State<SchermataChat> with WidgetsBindingObserv
             children: [
               TextSpan(
                 text: '${c.persona.nome} vuole scriverti. ',
-                style: const TextStyle(fontWeight: FontWeight.w700, color: testo),
+                style: TextStyle(fontWeight: FontWeight.w700, color: testo),
               ),
               const TextSpan(
                 text: 'Non vi seguite a vicenda: se accetti potete scrivervi e mandarvi foto. Se rifiuti non riceve nessun avviso.',
               ),
             ],
           ),
-          style: const TextStyle(color: testo2, height: 1.4),
+          style: TextStyle(color: testo2, height: 1.4),
         ),
         const SizedBox(height: 10),
         Row(
@@ -1195,7 +1195,7 @@ class _SchermataChatState extends State<SchermataChat> with WidgetsBindingObserv
     margin: const EdgeInsets.fromLTRB(12, 0, 12, 8),
     padding: const EdgeInsets.all(10),
     decoration: BoxDecoration(color: superficie2, borderRadius: BorderRadius.circular(10)),
-    child: Text(t, style: const TextStyle(color: testo2, fontSize: 13, height: 1.4)),
+    child: Text(t, style: TextStyle(color: testo2, fontSize: 13, height: 1.4)),
   );
 
   /// Casella vuota e niente foto: al posto di «Invia» c'è il microfono (vocali solo nelle chat accettate)
@@ -1218,7 +1218,7 @@ class _SchermataChatState extends State<SchermataChat> with WidgetsBindingObserv
                   child: Image.file(_foto!, width: 56, height: 56, fit: BoxFit.cover),
                 ),
                 const SizedBox(width: 10),
-                const Expanded(
+                Expanded(
                   child: Text('La foto passa dal controllo automatico prima di partire.', style: TextStyle(color: muto, fontSize: 12.5)),
                 ),
                 IconButton(tooltip: 'Togli la foto', icon: const Icon(Icons.close), onPressed: () => setState(() => _foto = null)),
@@ -1251,7 +1251,7 @@ class _SchermataChatState extends State<SchermataChat> with WidgetsBindingObserv
                           style: const TextStyle(fontWeight: FontWeight.w700, fontFeatures: [FontFeature.tabularFigures()]),
                         ),
                         const SizedBox(width: 10),
-                        const Expanded(
+                        Expanded(
                           child: Text('Sto registrando…', style: TextStyle(color: testo2)),
                         ),
                         TextButton(onPressed: () => _fermaVocale(manda: false), child: const Text('Annulla')),
@@ -1289,7 +1289,7 @@ class _SchermataChatState extends State<SchermataChat> with WidgetsBindingObserv
                 shape: const CircleBorder(),
                 clipBehavior: Clip.antiAlias,
                 child: Ink(
-                  decoration: const BoxDecoration(gradient: gradienteBottone),
+                  decoration: BoxDecoration(gradient: gradienteBottone),
                   child: InkWell(
                     onTap: _invio
                         ? null
@@ -1320,7 +1320,7 @@ class _SchermataChatState extends State<SchermataChat> with WidgetsBindingObserv
         if (_pannelloEmoji && !_registra)
           Container(
             height: 240,
-            decoration: const BoxDecoration(
+            decoration: BoxDecoration(
               color: superficie2,
               border: Border(top: BorderSide(color: linea)),
             ),

@@ -98,7 +98,7 @@ class _SchermataModerazioneState extends State<SchermataModerazione> {
         body: Center(
           child: _errore == null
               ? const CircularProgressIndicator()
-              : Padding(padding: const EdgeInsets.all(24), child: Text(_errore!, textAlign: TextAlign.center, style: const TextStyle(color: muto))),
+              : Padding(padding: const EdgeInsets.all(24), child: Text(_errore!, textAlign: TextAlign.center, style: TextStyle(color: muto))),
         ),
       );
     }
@@ -136,7 +136,7 @@ class _SchermataModerazioneState extends State<SchermataModerazione> {
 
   Widget _nota(String t) => Padding(
     padding: const EdgeInsets.only(bottom: 12),
-    child: Text(t, style: const TextStyle(color: muto, height: 1.4)),
+    child: Text(t, style: TextStyle(color: muto, height: 1.4)),
   );
 
   // ── Moderatori e candidati ──
@@ -195,13 +195,13 @@ class _SchermataModerazioneState extends State<SchermataModerazione> {
                           Container(
                             padding: const EdgeInsets.symmetric(horizontal: 7, vertical: 2),
                             decoration: BoxDecoration(color: oro.withValues(alpha: .18), borderRadius: BorderRadius.circular(6)),
-                            child: const Text('MODERATORE', style: TextStyle(color: oro, fontSize: 9.5, fontWeight: FontWeight.w800, letterSpacing: .4)),
+                            child: Text('MODERATORE', style: TextStyle(color: oro, fontSize: 9.5, fontWeight: FontWeight.w800, letterSpacing: .4)),
                           ),
                         ],
                       ],
                     ),
                     Text('$voti ${voti == 1 ? 'voto' : 'voti'}${c['io'] == true ? ' · sei tu' : ''}',
-                        style: const TextStyle(color: oro, fontSize: 12.5, fontWeight: FontWeight.w700)),
+                        style: TextStyle(color: oro, fontSize: 12.5, fontWeight: FontWeight.w700)),
                   ],
                 ),
               ),
@@ -225,7 +225,7 @@ class _SchermataModerazioneState extends State<SchermataModerazione> {
           ),
           if ((c['motivazione'] as String?)?.trim().isNotEmpty == true) ...[
             const SizedBox(height: 8),
-            Text('${c['motivazione']}', style: const TextStyle(color: testo2, height: 1.4)),
+            Text('${c['motivazione']}', style: TextStyle(color: testo2, height: 1.4)),
           ],
           if (eletto && residente && c['io'] != true) ...[
             const SizedBox(height: 8),
@@ -235,7 +235,7 @@ class _SchermataModerazioneState extends State<SchermataModerazione> {
                   Expanded(
                     child: Text(
                       'Sfiducia: ${c['sfiducie']} su ${c['sfiducie_servono']} per farlo decadere. È segreta.',
-                      style: const TextStyle(color: muto, fontSize: 12.5),
+                      style: TextStyle(color: muto, fontSize: 12.5),
                     ),
                   ),
                   TextButton(
@@ -253,7 +253,7 @@ class _SchermataModerazioneState extends State<SchermataModerazione> {
                 ],
               )
             else if (c['sfiducia_dal'] != null)
-              Text('La fiducia si potrà togliere dal ${c['sfiducia_dal']}.', style: const TextStyle(color: muto, fontSize: 12.5)),
+              Text('La fiducia si potrà togliere dal ${c['sfiducia_dal']}.', style: TextStyle(color: muto, fontSize: 12.5)),
           ],
         ],
       ),
@@ -338,14 +338,14 @@ class _SchermataModerazioneState extends State<SchermataModerazione> {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          Text(sopra, style: const TextStyle(color: oro, fontSize: 12.5, fontWeight: FontWeight.w700)),
+          Text(sopra, style: TextStyle(color: oro, fontSize: 12.5, fontWeight: FontWeight.w700)),
           const SizedBox(height: 8),
           Row(
             children: [
               FotoProfilo(faccia: Faccia(a), lato: 32),
               const SizedBox(width: 8),
               Expanded(child: Text('${a['nome']}', style: const TextStyle(fontWeight: FontWeight.w700))),
-              Text('${p['quando'] ?? ''}', style: const TextStyle(color: muto, fontSize: 12)),
+              Text('${p['quando'] ?? ''}', style: TextStyle(color: muto, fontSize: 12)),
             ],
           ),
           const SizedBox(height: 8),
@@ -363,14 +363,14 @@ class _SchermataModerazioneState extends State<SchermataModerazione> {
     child: Column(
       crossAxisAlignment: CrossAxisAlignment.stretch,
       children: [
-        const Text('Le regole valgono per tutti i post del quartiere e si aggiungono al regolamento di triburba.',
+        Text('Le regole valgono per tutti i post del quartiere e si aggiungono al regolamento di triburba.',
             style: TextStyle(color: muto, height: 1.4)),
         if (((_d?['quartiere'] as Map?)?['regole_base']) == true) ...[
           const SizedBox(height: 10),
           Container(
             padding: const EdgeInsets.all(12),
             decoration: BoxDecoration(color: terracotta.withValues(alpha: .12), borderRadius: BorderRadius.circular(12), border: Border.all(color: terracotta.withValues(alpha: .4))),
-            child: const Text(
+            child: Text(
               'Rivedi le regole del quartiere: sono quelle di base di triburba. Aggiungi o togli quello che serve al tuo quartiere e salva.',
               style: TextStyle(color: testo, height: 1.4),
             ),

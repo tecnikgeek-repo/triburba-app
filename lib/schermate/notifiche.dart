@@ -105,7 +105,7 @@ class SchermataNotificheState extends State<SchermataNotifiche> {
       ),
       body: n == null
           ? Center(
-              child: _errore == null ? const CircularProgressIndicator() : Text(_errore!, style: const TextStyle(color: muto)),
+              child: _errore == null ? const CircularProgressIndicator() : Text(_errore!, style: TextStyle(color: muto)),
             )
           : RefreshIndicator(
               onRefresh: aggiorna,
@@ -141,7 +141,7 @@ class SchermataNotificheState extends State<SchermataNotifiche> {
                                           : Container(
                                               width: 46,
                                               height: 46,
-                                              decoration: const BoxDecoration(shape: BoxShape.circle, gradient: gradiente),
+                                              decoration: BoxDecoration(shape: BoxShape.circle, gradient: gradiente),
                                               child: const Icon(Icons.groups_rounded, color: bianco),
                                             ),
                                       Positioned(
@@ -184,7 +184,7 @@ class SchermataNotificheState extends State<SchermataNotifiche> {
                                               x.testo,
                                               maxLines: 2,
                                               overflow: TextOverflow.ellipsis,
-                                              style: const TextStyle(color: testo2, fontSize: 13.5),
+                                              style: TextStyle(color: testo2, fontSize: 13.5),
                                             ),
                                           ),
                                         const SizedBox(height: 3),
@@ -200,7 +200,7 @@ class SchermataNotificheState extends State<SchermataNotifiche> {
                                       margin: const EdgeInsets.only(top: 6, left: 6),
                                       width: 9,
                                       height: 9,
-                                      decoration: const BoxDecoration(color: terracotta, shape: BoxShape.circle),
+                                      decoration: BoxDecoration(color: terracotta, shape: BoxShape.circle),
                                     ),
                                 ],
                               ),

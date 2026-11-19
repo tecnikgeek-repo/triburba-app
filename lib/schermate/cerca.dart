@@ -81,10 +81,10 @@ class _SchermataCercaState extends State<SchermataCerca> {
       ),
       body: _errore != null
           ? Center(
-              child: Text(_errore!, style: const TextStyle(color: muto)),
+              child: Text(_errore!, style: TextStyle(color: muto)),
             )
           : _r == null
-          ? const Center(
+          ? Center(
               child: Padding(
                 padding: EdgeInsets.all(32),
                 child: Text('Scrivi almeno due lettere.', style: TextStyle(color: muto)),
@@ -93,7 +93,7 @@ class _SchermataCercaState extends State<SchermataCerca> {
           : ListView(
               children: [
                 if (persone.isEmpty && quartieri.isEmpty && post.isEmpty)
-                  const Padding(
+                  Padding(
                     padding: EdgeInsets.all(32),
                     child: Center(
                       child: Text('Nessun risultato.', style: TextStyle(color: muto)),
@@ -106,7 +106,7 @@ class _SchermataCercaState extends State<SchermataCerca> {
                     title: Text('${u['nome']}', style: const TextStyle(fontWeight: FontWeight.w700)),
                     subtitle: Text(
                       '@${u['username']}${u['quartiere'] != null ? ' · ${u['quartiere']}' : ''}',
-                      style: const TextStyle(color: muto),
+                      style: TextStyle(color: muto),
                     ),
                     onTap: () => apriUtente(context, '${u['username']}'),
                   ),
@@ -115,7 +115,7 @@ class _SchermataCercaState extends State<SchermataCerca> {
                   ListTile(
                     leading: CircleAvatar(backgroundColor: colore('${q['colore']}'), radius: 10),
                     title: Text('${q['nome']}', style: const TextStyle(fontWeight: FontWeight.w700)),
-                    subtitle: Text('${q['mun']} · ${q['residenti']} residenti', style: const TextStyle(color: muto)),
+                    subtitle: Text('${q['mun']} · ${q['residenti']} residenti', style: TextStyle(color: muto)),
                     onTap: () => apriQuartiere(context, '${q['slug']}'),
                   ),
                 if (post.isNotEmpty) _sezione('Post'),
@@ -123,7 +123,7 @@ class _SchermataCercaState extends State<SchermataCerca> {
                   ListTile(
                     leading: FotoProfilo.da(nome: '${p['nome']}', avatar: p['avatar'] as String?, lato: 36),
                     title: Text('${p['testo']}', maxLines: 2, overflow: TextOverflow.ellipsis),
-                    subtitle: Text('${p['nome']} · ${p['quando']}', style: const TextStyle(color: muto)),
+                    subtitle: Text('${p['nome']} · ${p['quando']}', style: TextStyle(color: muto)),
                     onTap: () {
                       final d = destinazioneDaLink('${p['link']}');
                       if (d != null) apriDestinazione(context, d);
@@ -139,7 +139,7 @@ class _SchermataCercaState extends State<SchermataCerca> {
     padding: const EdgeInsets.fromLTRB(16, 18, 16, 4),
     child: Text(
       t.toUpperCase(),
-      style: const TextStyle(color: muto, fontSize: 12, fontWeight: FontWeight.w800, letterSpacing: .6),
+      style: TextStyle(color: muto, fontSize: 12, fontWeight: FontWeight.w800, letterSpacing: .6),
     ),
   );
 }

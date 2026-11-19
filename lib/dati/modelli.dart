@@ -339,6 +339,9 @@ class Io {
   bool get residente => _puo('residente');
   bool get admin => _puo('admin');
   bool get superadmin => _puo('superadmin');
+
+  /// Tema scelto (salvato sull'account, uguale sul sito); null = mai scelto.
+  String? get tema => _s(j['tema']);
   bool get fotoPost => _puo('foto');
 
   int get maxPost => _i((j['limiti'] as Map?)?['post']);

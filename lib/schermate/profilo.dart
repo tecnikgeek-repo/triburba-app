@@ -16,6 +16,7 @@ import '../tema.dart';
 import '../widget/faccia.dart';
 import '../widget/nascita.dart';
 import '../widget/ritaglio.dart';
+import '../widget/scelta_tema.dart';
 import 'admin.dart';
 import 'legale.dart';
 import 'preferenze_notifiche.dart';
@@ -75,7 +76,7 @@ class _SchermataModificaProfiloState extends State<SchermataModificaProfilo> {
               else if (url != null)
                 CachedNetworkImage(imageUrl: url, fit: BoxFit.cover)
               else
-                const DecoratedBox(decoration: BoxDecoration(gradient: gradiente)),
+                DecoratedBox(decoration: BoxDecoration(gradient: gradiente)),
               if (_copertinaNuova != null && _foto) const VeloCaricamento(),
               if (url == null && _copertinaNuova == null)
                 const Center(
@@ -208,7 +209,7 @@ class _SchermataModificaProfiloState extends State<SchermataModificaProfilo> {
                     ? 'Metti una foto: i vicini ti riconoscono e si fidano di più a garantire per te.'
                     : 'Scegli una copertina: è la prima cosa che vede chi apre il tuo profilo.',
                 textAlign: TextAlign.center,
-                style: const TextStyle(color: testo2, height: 1.4),
+                style: TextStyle(color: testo2, height: 1.4),
               ),
             ),
           Center(
@@ -279,7 +280,7 @@ class _SchermataModificaProfiloState extends State<SchermataModificaProfilo> {
           const SizedBox(height: 12),
           BottoneCaldo(testo: 'Salva', occupato: _salvo, onPressed: _salva),
           const SizedBox(height: 14),
-          const Text(
+          Text(
             'Username, email e password si cambiano da Impostazioni → Account.',
             style: TextStyle(color: muto, fontSize: 12.5),
             textAlign: TextAlign.center,
@@ -342,59 +343,67 @@ class SchermataImpostazioni extends StatelessWidget {
             ListTile(
               leading: FotoProfilo(faccia: io.faccia, lato: 44),
               title: Text(io.nome, style: const TextStyle(fontWeight: FontWeight.w700)),
-              subtitle: Text('@${io.username} · ${io.email}', style: const TextStyle(color: muto)),
+              subtitle: Text('@${io.username} · ${io.email}', style: TextStyle(color: muto)),
             ),
           const Divider(),
+          _sezione('Aspetto'),
+          ListTile(
+            leading: Icon(Icons.palette_outlined, color: terracotta),
+            title: const Text('Tema'),
+            subtitle: Text('${tinta.nome} · ${tinta.scura ? 'scuro' : 'chiaro'}', style: TextStyle(color: muto)),
+            trailing: Icon(Icons.chevron_right_rounded, color: muto),
+            onTap: () => apriSceltaTema(context),
+          ),
           _sezione('Notifiche'),
           ListTile(
             leading: const Icon(Icons.notifications_active_outlined),
             title: const Text('Scegli cosa ricevere'),
-            subtitle: const Text('Commenti, reazioni, menzioni… in app e sul telefono', style: TextStyle(color: muto)),
-            trailing: const Icon(Icons.chevron_right_rounded, color: muto),
+            subtitle: Text('Commenti, reazioni, menzioni… in app e sul telefono', style: TextStyle(color: muto)),
+            trailing: Icon(Icons.chevron_right_rounded, color: muto),
             onTap: () => Navigator.of(context).push(MaterialPageRoute<void>(builder: (_) => const SchermataPreferenzeNotifiche())),
           ),
           _sezione('Account'),
           ListTile(
             leading: const Icon(Icons.alternate_email_rounded),
             title: const Text('Username'),
-            subtitle: Text(io != null ? '@${io.username}' : '', style: const TextStyle(color: muto)),
-            trailing: const Icon(Icons.chevron_right_rounded, color: muto),
+            subtitle: Text(io != null ? '@${io.username}' : '', style: TextStyle(color: muto)),
+            trailing: Icon(Icons.chevron_right_rounded, color: muto),
             onTap: () => cambiaUsername(context),
           ),
           ListTile(
             leading: const Icon(Icons.mail_outline_rounded),
             title: const Text('Email'),
-            subtitle: Text(io?.email ?? '', style: const TextStyle(color: muto)),
-            trailing: const Icon(Icons.chevron_right_rounded, color: muto),
+            subtitle: Text(io?.email ?? '', style: TextStyle(color: muto)),
+            trailing: Icon(Icons.chevron_right_rounded, color: muto),
             onTap: () => cambiaEmail(context),
           ),
           ListTile(
             leading: const Icon(Icons.lock_outline_rounded),
             title: const Text('Password'),
-            subtitle: const Text('Cambiala quando vuoi', style: TextStyle(color: muto)),
-            trailing: const Icon(Icons.chevron_right_rounded, color: muto),
+            subtitle: Text('Cambiala quando vuoi', style: TextStyle(color: muto)),
+            trailing: Icon(Icons.chevron_right_rounded, color: muto),
             onTap: () => cambiaPassword(context),
           ),
           ListTile(
             leading: const Icon(Icons.block_rounded),
             title: const Text('Persone bloccate'),
-            subtitle: const Text('Chi hai bloccato non vede i tuoi post e tu non vedi i suoi', style: TextStyle(color: muto)),
-            trailing: const Icon(Icons.chevron_right_rounded, color: muto),
+            subtitle: Text('Chi hai bloccato non vede i tuoi post e tu non vedi i suoi', style: TextStyle(color: muto)),
+            trailing: Icon(Icons.chevron_right_rounded, color: muto),
             onTap: () => Navigator.of(context).push(MaterialPageRoute<void>(builder: (_) => const SchermataBloccati())),
           ),
           ListTile(
             leading: const Icon(Icons.download_outlined),
             title: const Text('Scarica i miei dati'),
-            subtitle: const Text('Un file con profilo, post, commenti e attività', style: TextStyle(color: muto)),
-            trailing: const Icon(Icons.chevron_right_rounded, color: muto),
+            subtitle: Text('Un file con profilo, post, commenti e attività', style: TextStyle(color: muto)),
+            trailing: Icon(Icons.chevron_right_rounded, color: muto),
             onTap: () => scaricaDati(context),
           ),
           if (io?.admin == true)
             ListTile(
-              leading: const Icon(Icons.admin_panel_settings_outlined, color: oro),
+              leading: Icon(Icons.admin_panel_settings_outlined, color: oro),
               title: const Text('Pannello admin'),
-              subtitle: const Text('Gestione, statistiche, iscritti, visite e registro', style: TextStyle(color: muto)),
-              trailing: const Icon(Icons.chevron_right_rounded, color: muto),
+              subtitle: Text('Gestione, statistiche, iscritti, visite e registro', style: TextStyle(color: muto)),
+              trailing: Icon(Icons.chevron_right_rounded, color: muto),
               onTap: () => Navigator.of(context).push(MaterialPageRoute<void>(builder: (_) => const SchermataAdmin())),
             ),
           _sezione('Regole e privacy'),
@@ -406,7 +415,7 @@ class SchermataImpostazioni extends StatelessWidget {
           ListTile(
             leading: const Icon(Icons.info_outline),
             title: const Text('Informazioni'),
-            subtitle: const Text('Versione, licenza, codice sorgente', style: TextStyle(color: muto)),
+            subtitle: Text('Versione, licenza, codice sorgente', style: TextStyle(color: muto)),
             onTap: () => apriInformazioni(
               context,
               notaDati: 'Sul telefono restano solo il tuo accesso e le preferenze; i post stanno su triburba.it.',
@@ -424,7 +433,7 @@ class SchermataImpostazioni extends StatelessWidget {
               'Elimina l\'account',
               style: TextStyle(color: pompeiano, fontWeight: FontWeight.w700),
             ),
-            subtitle: const Text('Cancella per sempre profilo, post e dati', style: TextStyle(color: muto)),
+            subtitle: Text('Cancella per sempre profilo, post e dati', style: TextStyle(color: muto)),
             onTap: () => _elimina(context),
           ),
           const SizedBox(height: 30),
@@ -437,7 +446,7 @@ class SchermataImpostazioni extends StatelessWidget {
     padding: const EdgeInsets.fromLTRB(16, 18, 16, 4),
     child: Text(
       t.toUpperCase(),
-      style: const TextStyle(color: muto, fontSize: 12, fontWeight: FontWeight.w800, letterSpacing: .6),
+      style: TextStyle(color: muto, fontSize: 12, fontWeight: FontWeight.w800, letterSpacing: .6),
     ),
   );
 }
@@ -464,7 +473,7 @@ Future<List<String>?> _modulo(
           mainAxisSize: MainAxisSize.min,
           crossAxisAlignment: CrossAxisAlignment.stretch,
           children: [
-            if (nota != null) Padding(padding: const EdgeInsets.only(bottom: 10), child: Text(nota, style: const TextStyle(color: muto, height: 1.4))),
+            if (nota != null) Padding(padding: const EdgeInsets.only(bottom: 10), child: Text(nota, style: TextStyle(color: muto, height: 1.4))),
             for (var i = 0; i < campi.length; i++)
               Padding(
                 padding: const EdgeInsets.only(bottom: 10),

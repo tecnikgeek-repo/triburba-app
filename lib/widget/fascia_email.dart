@@ -75,11 +75,11 @@ class _FasciaEmailState extends State<FasciaEmail> {
                     Text(
                       'Ti abbiamo scritto a ${emailMascherata(io.email)}: apri la mail e tocca «Conferma la mia email». '
                       'Fino ad allora puoi leggere, ma non scrivere né commentare.',
-                      style: const TextStyle(color: testo2, fontSize: 13.5, height: 1.4),
+                      style: TextStyle(color: testo2, fontSize: 13.5, height: 1.4),
                     ),
                     if (_esito != null) ...[
                       const SizedBox(height: 6),
-                      Text(_esito!, style: const TextStyle(color: oro, fontWeight: FontWeight.w700, fontSize: 13)),
+                      Text(_esito!, style: TextStyle(color: oro, fontWeight: FontWeight.w700, fontSize: 13)),
                     ],
                   ],
                 ),
@@ -109,7 +109,7 @@ class _FasciaEmailState extends State<FasciaEmail> {
 Future<void> avvisoMailMandata(BuildContext context, String email) => showDialog<void>(
   context: context,
   builder: (c) => AlertDialog(
-    icon: const Icon(Icons.mark_email_unread_outlined, color: terracotta, size: 40),
+    icon: Icon(Icons.mark_email_unread_outlined, color: terracotta, size: 40),
     title: const Text('Ti abbiamo scritto'),
     content: Text(
       'Abbiamo mandato una mail a ${emailMascherata(email)}.\n\nAprila e tocca «Conferma la mia email»: '

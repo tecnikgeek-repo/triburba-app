@@ -148,7 +148,7 @@ class _SuggerimentiMenzioniState extends State<SuggerimentiMenzioni> {
                         height: 34,
                         alignment: Alignment.center,
                         decoration: BoxDecoration(color: terracotta.withValues(alpha: .16), shape: BoxShape.circle),
-                        child: const Text(
+                        child: Text(
                           '@',
                           style: TextStyle(color: oro, fontWeight: FontWeight.w800, fontSize: 16),
                         ),
@@ -171,7 +171,7 @@ class _SuggerimentiMenzioniState extends State<SuggerimentiMenzioni> {
                             v.sotto,
                             maxLines: 1,
                             overflow: TextOverflow.ellipsis,
-                            style: const TextStyle(color: muto, fontSize: 12.5),
+                            style: TextStyle(color: muto, fontSize: 12.5),
                           ),
                         ],
                       ),
@@ -180,7 +180,7 @@ class _SuggerimentiMenzioniState extends State<SuggerimentiMenzioni> {
                       const SizedBox(width: 8),
                       Text(
                         v.motivo!,
-                        style: const TextStyle(color: muto, fontSize: 11, fontWeight: FontWeight.w700),
+                        style: TextStyle(color: muto, fontSize: 11, fontWeight: FontWeight.w700),
                       ),
                     ],
                   ],

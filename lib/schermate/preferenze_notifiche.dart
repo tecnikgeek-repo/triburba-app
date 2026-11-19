@@ -95,12 +95,12 @@ class _SchermataPreferenzeNotificheState extends State<SchermataPreferenzeNotifi
       appBar: AppBar(title: const Text('Notifiche')),
       body: c == null
           ? Center(
-              child: _errore == null ? const CircularProgressIndicator() : Text(_errore!, style: const TextStyle(color: muto)),
+              child: _errore == null ? const CircularProgressIndicator() : Text(_errore!, style: TextStyle(color: muto)),
             )
           : ListView(
               padding: const EdgeInsets.fromLTRB(16, 8, 16, 40),
               children: [
-                const Text(
+                Text(
                   'Scegli di cosa vuoi essere avvisato. Campanella: la notifica compare in triburba. '
                   'Telefono: arriva anche come avviso sul telefono. Le scelte si salvano da sole.',
                   style: TextStyle(color: muto, height: 1.4),
@@ -121,7 +121,7 @@ class _SchermataPreferenzeNotificheState extends State<SchermataPreferenzeNotifi
       children: [
         Text(c.titolo, style: const TextStyle(fontWeight: FontWeight.w700, fontSize: 15.5)),
         const SizedBox(height: 3),
-        Text(c.spiega, style: const TextStyle(color: muto, fontSize: 13, height: 1.35)),
+        Text(c.spiega, style: TextStyle(color: muto, fontSize: 13, height: 1.35)),
         const SizedBox(height: 8),
         Row(
           children: [
@@ -161,7 +161,7 @@ class _SchermataPreferenzeNotificheState extends State<SchermataPreferenzeNotifi
             child: Text(t, maxLines: 1, overflow: TextOverflow.fade, softWrap: false, style: const TextStyle(fontWeight: FontWeight.w600, fontSize: 13.5)),
           ),
           if (fisso)
-            const Padding(
+            Padding(
               padding: EdgeInsets.only(right: 8),
               child: Text('SEMPRE', style: TextStyle(color: oro, fontWeight: FontWeight.w800, fontSize: 11, letterSpacing: .4)),
             )

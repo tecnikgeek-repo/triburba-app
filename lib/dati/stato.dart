@@ -5,6 +5,7 @@ import 'package:flutter/services.dart' show MethodChannel;
 
 import 'api.dart';
 import 'modelli.dart';
+import '../tema.dart';
 
 class Stato extends ChangeNotifier {
   Stato(this.api) {
@@ -33,6 +34,8 @@ class Stato extends ChangeNotifier {
 
   void entra(Io nuovo) {
     io = nuovo;
+    // il tema salvato sull'account vince su quello del telefono (scelto magari sul sito)
+    if (nuovo.tema != null && nuovo.tema != tinta.id) impostaTinta(nuovo.tema);
     notifiche = nuovo.notifiche;
     messaggi = nuovo.messaggi;
     _icona(notifiche);

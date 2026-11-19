@@ -47,7 +47,7 @@ class _TestoRiccoState extends State<TestoRicco> {
       t.dispose();
     }
     _tocchi.clear();
-    final base = widget.stile ?? const TextStyle(fontSize: 15.5, height: 1.45, color: testo);
+    final base = widget.stile ?? TextStyle(fontSize: 15.5, height: 1.45, color: testo);
     return Text.rich(
       TextSpan(style: base, children: _pezzi(widget.testo, base)),
       maxLines: widget.maxRighe,
@@ -104,7 +104,7 @@ class _TestoRiccoState extends State<TestoRicco> {
                 margin: const EdgeInsets.symmetric(horizontal: 1),
                 padding: const EdgeInsets.symmetric(horizontal: 7, vertical: 1),
                 decoration: BoxDecoration(
-                  gradient: const LinearGradient(colors: [oro, terracotta]),
+                  gradient: LinearGradient(colors: [oro, terracotta]),
                   borderRadius: BorderRadius.circular(6),
                 ),
                 child: Text(

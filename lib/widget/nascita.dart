@@ -51,7 +51,7 @@ class CampoNascita extends StatelessWidget {
         isEmpty: v == null,
         child: Text(
           v == null ? '' : '${v.day.toString().padLeft(2, '0')}/${v.month.toString().padLeft(2, '0')}/${v.year}',
-          style: const TextStyle(color: testo, fontSize: 16),
+          style: TextStyle(color: testo, fontSize: 16),
         ),
       ),
     );

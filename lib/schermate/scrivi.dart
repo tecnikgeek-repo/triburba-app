@@ -208,7 +208,7 @@ class _SchermataScriviState extends State<SchermataScrivi> {
               child: Column(
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: [
-                  const Icon(Icons.how_to_reg_outlined, size: 54, color: oro),
+                  Icon(Icons.how_to_reg_outlined, size: 54, color: oro),
                   const SizedBox(height: 14),
                   Text(
                     casa == null
@@ -225,7 +225,7 @@ class _SchermataScriviState extends State<SchermataScrivi> {
                               : 'Su triburba si scrive nella propria tribù: scegli il quartiere dove abiti dalla mappa.')
                         : 'Per pubblicare a ${casa['nome']} servono le garanzie di ${io.viciniGaranti} già confermati. Intanto puoi leggere, reagire e commentare.',
                     textAlign: TextAlign.center,
-                    style: const TextStyle(color: testo2, height: 1.45),
+                    style: TextStyle(color: testo2, height: 1.45),
                   ),
                 ],
               ),
@@ -243,9 +243,9 @@ class _SchermataScriviState extends State<SchermataScrivi> {
                         children: [
                           Text(io.nome, style: const TextStyle(fontWeight: FontWeight.w700)),
                           if (_portata == 'bacheca')
-                            const Text('Sulla tua bacheca', style: TextStyle(color: muto, fontSize: 12.5))
+                            Text('Sulla tua bacheca', style: TextStyle(color: muto, fontSize: 12.5))
                           else if (casa != null)
-                            Text('Nella tribù di ${casa['nome']}', style: const TextStyle(color: muto, fontSize: 12.5)),
+                            Text('Nella tribù di ${casa['nome']}', style: TextStyle(color: muto, fontSize: 12.5)),
                         ],
                       ),
                     ),
@@ -277,7 +277,7 @@ class _SchermataScriviState extends State<SchermataScrivi> {
                   style: ButtonStyle(
                     foregroundColor: WidgetStateProperty.resolveWith((st) => st.contains(WidgetState.selected) ? bianco : testo),
                     backgroundColor: WidgetStateProperty.resolveWith((st) => st.contains(WidgetState.selected) ? terracotta : superficie),
-                    side: const WidgetStatePropertyAll(BorderSide(color: linea2)),
+                    side: WidgetStatePropertyAll(BorderSide(color: linea2)),
                     padding: const WidgetStatePropertyAll(EdgeInsets.symmetric(horizontal: 8)),
                     iconSize: const WidgetStatePropertyAll(18),
                     textStyle: const WidgetStatePropertyAll(TextStyle(fontFamily: 'Inter', fontSize: 14.5, fontWeight: FontWeight.w600)),
@@ -328,7 +328,7 @@ class _SchermataScriviState extends State<SchermataScrivi> {
                         () => _avvolgi('{${e.key}}', '{/}'),
                       ),
                     _tasto(
-                      const Text(
+                      Text(
                         '@tribu',
                         style: TextStyle(color: oro, fontWeight: FontWeight.w800, fontSize: 12.5),
                       ),
@@ -337,7 +337,7 @@ class _SchermataScriviState extends State<SchermataScrivi> {
                     ),
                     if (io.superadmin)
                       _tasto(
-                        const Text(
+                        Text(
                           '@triburba',
                           style: TextStyle(color: oro, fontWeight: FontWeight.w800, fontSize: 12.5),
                         ),
@@ -394,7 +394,7 @@ class _SchermataScriviState extends State<SchermataScrivi> {
                     ],
                   ),
                 const SizedBox(height: 20),
-                const Text(
+                Text(
                   'FIN DOVE ARRIVA',
                   style: TextStyle(color: muto, fontSize: 12, fontWeight: FontWeight.w800, letterSpacing: .6),
                 ),
@@ -410,7 +410,7 @@ class _SchermataScriviState extends State<SchermataScrivi> {
                     padding: const EdgeInsets.only(bottom: 8),
                     child: Text(
                       'Per scrivere nel quartiere servono le garanzie di ${io.viciniGaranti} già confermati.',
-                      style: const TextStyle(color: muto, fontSize: 12.5, height: 1.4),
+                      style: TextStyle(color: muto, fontSize: 12.5, height: 1.4),
                     ),
                   ),
                 if (io.puoPubblicare) ...[
@@ -432,7 +432,7 @@ class _SchermataScriviState extends State<SchermataScrivi> {
                   _scelta('ovunque', Icons.public, 'Ovunque', 'Solo tu: lo vede tutta triburba, in ogni quartiere.'),
                 ],
                 const SizedBox(height: 10),
-                const Text(
+                Text(
                   'Le foto passano un controllo automatico. Ricorda il regolamento: rispetto per tutti, niente dati personali di altri.',
                   style: TextStyle(color: muto, fontSize: 12, height: 1.4),
                 ),
@@ -445,7 +445,7 @@ class _SchermataScriviState extends State<SchermataScrivi> {
     padding: const EdgeInsets.only(top: 16, bottom: 8),
     child: Text(
       t.toUpperCase(),
-      style: const TextStyle(color: muto, fontSize: 12, fontWeight: FontWeight.w800, letterSpacing: .6),
+      style: TextStyle(color: muto, fontSize: 12, fontWeight: FontWeight.w800, letterSpacing: .6),
     ),
   );
 
@@ -475,7 +475,7 @@ class _SchermataScriviState extends State<SchermataScrivi> {
                 style: TextStyle(color: valore == null ? muto : testo, fontWeight: FontWeight.w700),
               ),
               const SizedBox(width: 4),
-              const Icon(Icons.chevron_right_rounded, color: muto),
+              Icon(Icons.chevron_right_rounded, color: muto),
             ],
           ),
         ),
@@ -485,7 +485,7 @@ class _SchermataScriviState extends State<SchermataScrivi> {
 
   List<Widget> _campiAttivita(Io io) => [
     _sezione('L\'attività'),
-    const Text(
+    Text(
       'Parte solo se entro la data limite confermano almeno le persone che servono. Se non si arriva al minimo, avvisiamo tutti.',
       style: TextStyle(color: testo2, fontSize: 13, height: 1.4),
     ),
@@ -512,7 +512,7 @@ class _SchermataScriviState extends State<SchermataScrivi> {
       ),
       child: Row(
         children: [
-          const Icon(Icons.groups_outlined, color: terracotta),
+          Icon(Icons.groups_outlined, color: terracotta),
           const SizedBox(width: 12),
           const Expanded(
             child: Text('Persone che servono', style: TextStyle(fontWeight: FontWeight.w600)),
@@ -639,7 +639,7 @@ class _SchermataScriviState extends State<SchermataScrivi> {
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
                       Text(t, style: const TextStyle(fontWeight: FontWeight.w700)),
-                      Text(s, style: const TextStyle(color: muto, fontSize: 12.5, height: 1.3)),
+                      Text(s, style: TextStyle(color: muto, fontSize: 12.5, height: 1.3)),
                     ],
                   ),
                 ),

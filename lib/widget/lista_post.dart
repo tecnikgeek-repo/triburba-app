@@ -146,7 +146,7 @@ class _Messaggio extends StatelessWidget {
         Text(
           testo,
           textAlign: TextAlign.center,
-          style: const TextStyle(color: testo2, fontSize: 15, height: 1.4),
+          style: TextStyle(color: testo2, fontSize: 15, height: 1.4),
         ),
         if (azione != null) ...[const SizedBox(height: 14), OutlinedButton(onPressed: azione!.$2, child: Text(azione!.$1))],
       ],

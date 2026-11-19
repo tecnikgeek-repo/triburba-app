@@ -84,7 +84,7 @@ class SchermataFeedState extends State<SchermataFeed> with TickerProviderStateMi
                 isLabelVisible: stato.messaggi > 0,
                 label: Text(stato.messaggi > 99 ? '99+' : '${stato.messaggi}'),
                 backgroundColor: terracotta,
-                child: const IconaTk('messaggi', lato: 25, colore: testo),
+                child: IconaTk('messaggi', lato: 25, colore: testo),
               ),
               onPressed: () => apriMessaggi(context),
             ),
@@ -172,7 +172,7 @@ class SchermataFeedState extends State<SchermataFeed> with TickerProviderStateMi
         padding: const EdgeInsets.fromLTRB(14, 10, 10, 10),
         child: Row(
           children: [
-            const Icon(Icons.hourglass_top_rounded, color: oro, size: 22),
+            Icon(Icons.hourglass_top_rounded, color: oro, size: 22),
             const SizedBox(width: 10),
             Expanded(
               child: Text.rich(
@@ -185,10 +185,10 @@ class SchermataFeedState extends State<SchermataFeed> with TickerProviderStateMi
                     TextSpan(text: 'Servono ${stato.io!.viciniGaranti} già confermati che garantiscano per te: poi potrai pubblicare.'),
                   ],
                 ),
-                style: const TextStyle(fontSize: 13, color: testo2, height: 1.35),
+                style: TextStyle(fontSize: 13, color: testo2, height: 1.35),
               ),
             ),
-            const Icon(Icons.chevron_right, color: muto),
+            Icon(Icons.chevron_right, color: muto),
           ],
         ),
       ),
@@ -204,7 +204,7 @@ class SchermataFeedState extends State<SchermataFeed> with TickerProviderStateMi
         padding: const EdgeInsets.fromLTRB(14, 10, 10, 10),
         child: Row(
           children: [
-            const Icon(Icons.place_outlined, color: oro, size: 22),
+            Icon(Icons.place_outlined, color: oro, size: 22),
             const SizedBox(width: 10),
             Expanded(
               child: Text.rich(
@@ -214,10 +214,10 @@ class SchermataFeedState extends State<SchermataFeed> with TickerProviderStateMi
                     TextSpan(text: '${z['testo'] ?? ''}'),
                   ],
                 ),
-                style: const TextStyle(fontSize: 13, color: testo2, height: 1.35),
+                style: TextStyle(fontSize: 13, color: testo2, height: 1.35),
               ),
             ),
-            const Icon(Icons.chevron_right, color: muto),
+            Icon(Icons.chevron_right, color: muto),
           ],
         ),
       ),
@@ -228,7 +228,7 @@ class SchermataFeedState extends State<SchermataFeed> with TickerProviderStateMi
     color: terracotta.withValues(alpha: .12),
     child: InkWell(
       onTap: () => stato.apri({'tipo': 'mappa'}),
-      child: const Padding(
+      child: Padding(
         padding: EdgeInsets.fromLTRB(14, 10, 10, 10),
         child: Row(
           children: [

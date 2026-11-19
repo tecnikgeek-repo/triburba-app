@@ -119,7 +119,7 @@ class _SchermataQuartiereState extends State<SchermataQuartiere> {
                     ),
                   ),
                 ),
-              const DecoratedBox(
+              DecoratedBox(
                 decoration: BoxDecoration(
                   gradient: LinearGradient(begin: Alignment.topCenter, end: Alignment.bottomCenter, colors: [Colors.transparent, vernice]),
                 ),
@@ -148,7 +148,7 @@ class _SchermataQuartiereState extends State<SchermataQuartiere> {
                           Text('${q['nome']}', style: titolo(26)),
                           Text(
                             q['citta'] == 'Napoli' ? '${q['municipalita']} · Napoli' : '${q['citta']}',
-                            style: const TextStyle(color: testo2, fontSize: 13),
+                            style: TextStyle(color: testo2, fontSize: 13),
                           ),
                         ],
                       ),
@@ -186,7 +186,7 @@ class _SchermataQuartiereState extends State<SchermataQuartiere> {
                     decoration: BoxDecoration(color: terracotta.withValues(alpha: .16), borderRadius: BorderRadius.circular(10)),
                     child: Text(
                       q['residente'] == true ? 'La tua tribù' : 'Casa · residenza in attesa',
-                      style: const TextStyle(color: terracotta, fontWeight: FontWeight.w800),
+                      style: TextStyle(color: terracotta, fontWeight: FontWeight.w800),
                     ),
                   ),
                 ),
@@ -227,7 +227,7 @@ class _SchermataQuartiereState extends State<SchermataQuartiere> {
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   if (mod.isNotEmpty) ...[
-                    const Text(
+                    Text(
                       'MODERATORI ELETTI',
                       style: TextStyle(color: muto, fontSize: 11.5, fontWeight: FontWeight.w800, letterSpacing: .6),
                     ),
@@ -253,7 +253,7 @@ class _SchermataQuartiereState extends State<SchermataQuartiere> {
                     const SizedBox(height: 12),
                   ],
                   if (facce.isNotEmpty) ...[
-                    const Text(
+                    Text(
                       'ALCUNI VICINI',
                       style: TextStyle(color: muto, fontSize: 11.5, fontWeight: FontWeight.w800, letterSpacing: .6),
                     ),
@@ -269,7 +269,7 @@ class _SchermataQuartiereState extends State<SchermataQuartiere> {
                                 onTap: () => apriUtente(context, facce[i].username),
                                 child: Container(
                                   padding: const EdgeInsets.all(2),
-                                  decoration: const BoxDecoration(color: superficie, shape: BoxShape.circle),
+                                  decoration: BoxDecoration(color: superficie, shape: BoxShape.circle),
                                   child: FotoProfilo(faccia: facce[i], lato: 30),
                                 ),
                               ),
@@ -289,14 +289,14 @@ class _SchermataQuartiereState extends State<SchermataQuartiere> {
               padding: EdgeInsets.zero,
               child: ExpansionTile(
                 shape: const Border(),
-                leading: const Icon(Icons.gavel_rounded, color: oro),
+                leading: Icon(Icons.gavel_rounded, color: oro),
                 title: const Text('Regole della tribù', style: TextStyle(fontWeight: FontWeight.w700)),
                 childrenPadding: const EdgeInsets.fromLTRB(16, 0, 16, 14),
                 children: [
-                  Text('${q['regole']}', style: const TextStyle(color: testo2, height: 1.45)),
+                  Text('${q['regole']}', style: TextStyle(color: testo2, height: 1.45)),
                   if (q['regole_base'] == true) ...[
                     const SizedBox(height: 10),
-                    const Text(
+                    Text(
                       'Sono le regole di base di triburba, uguali per tutte le tribù: i moderatori possono aggiungere o togliere quello che serve al quartiere.',
                       style: TextStyle(color: muto, fontSize: 12.5, height: 1.4),
                     ),
@@ -320,7 +320,7 @@ class _SchermataQuartiereState extends State<SchermataQuartiere> {
             ),
           ),
         ),
-        const Padding(
+        Padding(
           padding: EdgeInsets.fromLTRB(16, 18, 16, 8),
           child: Text(
             'BACHECA',
@@ -335,7 +335,7 @@ class _SchermataQuartiereState extends State<SchermataQuartiere> {
     child: Column(
       children: [
         Text(n, style: titolo(21)),
-        Text(t, style: const TextStyle(color: muto, fontSize: 12)),
+        Text(t, style: TextStyle(color: muto, fontSize: 12)),
       ],
     ),
   );
@@ -451,7 +451,7 @@ class _SchermataResidentiState extends State<SchermataResidenti> {
                     padding: const EdgeInsets.fromLTRB(16, 4, 16, 6),
                     child: Text(
                       'Chi arriva resta «in attesa» finché $min vicini già confermati non garantiscono per lui: così la tribù è fatta di vicini veri.',
-                      style: const TextStyle(color: testo2, fontSize: 13, height: 1.4),
+                      style: TextStyle(color: testo2, fontSize: 13, height: 1.4),
                     ),
                   ),
                   if (att.isNotEmpty) _sezione('In attesa (${att.length})'),
@@ -459,14 +459,14 @@ class _SchermataResidentiState extends State<SchermataResidenti> {
                     ListTile(
                       leading: FotoProfilo(faccia: Faccia(u), lato: 42),
                       title: Text('${u['nome']}', style: const TextStyle(fontWeight: FontWeight.w700)),
-                      subtitle: Text('${u['garanzie']}/$min garanzie', style: const TextStyle(color: muto)),
+                      subtitle: Text('${u['garanzie']}/$min garanzie', style: TextStyle(color: muto)),
                       onTap: () => apriUtente(context, '${u['username']}'),
                       trailing: Row(
                         mainAxisSize: MainAxisSize.min,
                         children: [
                           if (r['puo_garantire'] == true)
                             u['garantito_da_me'] == true
-                                ? const Chip2(testo: 'Garantito', icona: Icons.check, colore: golfo)
+                                ? Chip2(testo: 'Garantito', icona: Icons.check, colore: golfo)
                                 : FilledButton(
                                     style: FilledButton.styleFrom(
                                       minimumSize: const Size(0, 36),
@@ -479,7 +479,7 @@ class _SchermataResidentiState extends State<SchermataResidenti> {
                             IconButton(
                               tooltip: 'Conferma direttamente',
                               onPressed: () => _garantisci(u, diretta: true),
-                              icon: const Icon(Icons.verified_outlined, color: oro),
+                              icon: Icon(Icons.verified_outlined, color: oro),
                             ),
                         ],
                       ),
@@ -489,7 +489,7 @@ class _SchermataResidentiState extends State<SchermataResidenti> {
                     ListTile(
                       leading: FotoProfilo(faccia: Faccia(u), lato: 42),
                       title: Text('${u['nome']}', style: const TextStyle(fontWeight: FontWeight.w700)),
-                      subtitle: Text('@${u['username']}', style: const TextStyle(color: muto)),
+                      subtitle: Text('@${u['username']}', style: TextStyle(color: muto)),
                       onTap: () => apriUtente(context, '${u['username']}'),
                     ),
                 ],
@@ -502,7 +502,7 @@ class _SchermataResidentiState extends State<SchermataResidenti> {
     padding: const EdgeInsets.fromLTRB(16, 16, 16, 4),
     child: Text(
       t.toUpperCase(),
-      style: const TextStyle(color: muto, fontSize: 12, fontWeight: FontWeight.w800, letterSpacing: .6),
+      style: TextStyle(color: muto, fontSize: 12, fontWeight: FontWeight.w800, letterSpacing: .6),
     ),
   );
 }

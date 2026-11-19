@@ -122,7 +122,7 @@ class _ElencoFollowState extends State<ElencoFollow> with AutomaticKeepAliveClie
           child: Column(
             mainAxisSize: MainAxisSize.min,
             children: [
-              Text(_errore!, textAlign: TextAlign.center, style: const TextStyle(color: testo2)),
+              Text(_errore!, textAlign: TextAlign.center, style: TextStyle(color: testo2)),
               const SizedBox(height: 12),
               OutlinedButton(onPressed: () => _avanti(daCapo: true), child: const Text('Riprova')),
             ],
@@ -152,7 +152,7 @@ class _ElencoFollowState extends State<ElencoFollow> with AutomaticKeepAliveClie
                 padding: const EdgeInsets.fromLTRB(12, 0, 12, 8),
                 child: Text(
                   _totale == 1 ? '1 persona' : '$_totale persone',
-                  style: const TextStyle(fontFamily: 'Inter', color: muto, fontWeight: FontWeight.w700, fontSize: 13),
+                  style: TextStyle(fontFamily: 'Inter', color: muto, fontWeight: FontWeight.w700, fontSize: 13),
                 ),
               );
             }
@@ -204,7 +204,7 @@ class _ElencoFollowState extends State<ElencoFollow> with AutomaticKeepAliveClie
                     '@${f.username}${q.isNotEmpty ? ' · $q' : ''}',
                     maxLines: 1,
                     overflow: TextOverflow.ellipsis,
-                    style: const TextStyle(fontFamily: 'Inter', color: muto, fontSize: 13),
+                    style: TextStyle(fontFamily: 'Inter', color: muto, fontSize: 13),
                   ),
                 ],
               ),
@@ -214,7 +214,7 @@ class _ElencoFollowState extends State<ElencoFollow> with AutomaticKeepAliveClie
               Container(
                 padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
                 decoration: BoxDecoration(color: superficie2, borderRadius: BorderRadius.circular(6)),
-                child: const Text('TU', style: TextStyle(fontFamily: 'Inter', fontWeight: FontWeight.w800, fontSize: 11, color: testo2)),
+                child: Text('TU', style: TextStyle(fontFamily: 'Inter', fontWeight: FontWeight.w800, fontSize: 11, color: testo2)),
               )
             else
               SizedBox(

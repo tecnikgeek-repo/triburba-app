@@ -77,7 +77,7 @@ class VeloCaricamento extends StatelessWidget {
       child: Column(
         mainAxisSize: MainAxisSize.min,
         children: [
-          const SizedBox(width: 30, height: 30, child: CircularProgressIndicator(strokeWidth: 3, color: oro)),
+          SizedBox(width: 30, height: 30, child: CircularProgressIndicator(strokeWidth: 3, color: oro)),
           const SizedBox(height: 10),
           Text(testo, style: const TextStyle(color: bianco, fontWeight: FontWeight.w700, fontSize: 13.5)),
         ],
@@ -235,7 +235,7 @@ class _SchermataRitaglioState extends State<SchermataRitaglio> {
                     },
                   ),
                 ),
-                const Padding(
+                Padding(
                   padding: EdgeInsets.fromLTRB(20, 4, 20, 0),
                   child: Text(
                     'Trascina la foto per scegliere la parte da mostrare. Con due dita, o col cursore, la ingrandisci. '
@@ -248,7 +248,7 @@ class _SchermataRitaglioState extends State<SchermataRitaglio> {
                   padding: const EdgeInsets.symmetric(horizontal: 12),
                   child: Row(
                     children: [
-                      const Icon(Icons.zoom_out, color: muto),
+                      Icon(Icons.zoom_out, color: muto),
                       Expanded(
                         child: Slider(
                           value: _z,
@@ -258,7 +258,7 @@ class _SchermataRitaglioState extends State<SchermataRitaglio> {
                           onChanged: (v) => _zoom(v, _cornice.size.center(Offset.zero)),
                         ),
                       ),
-                      const Icon(Icons.zoom_in, color: muto),
+                      Icon(Icons.zoom_in, color: muto),
                     ],
                   ),
                 ),

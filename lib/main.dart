@@ -46,6 +46,7 @@ Future<void> _inizializza() async {
 
 Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
+  await caricaTinta();
   configTk = configTriburba;
   registraLicenzaAgpl();
   PlatformDispatcher.instance.onError = (e, s) {
@@ -61,13 +62,20 @@ class AppTriburba extends StatelessWidget {
   final Future<void> avvio;
 
   @override
-  Widget build(BuildContext context) => MaterialApp(
+  // cambiando tema l'app si ridisegna da capo con i colori nuovi (si riparte dalla Home)
+  Widget build(BuildContext context) => ValueListenableBuilder<String>(
+    valueListenable: tintaCambiata,
+    builder: (context, id, _) => _app(id),
+  );
+
+  Widget _app(String id) => MaterialApp(
+    key: ValueKey('tema-$id'),
     title: 'triburba',
     debugShowCheckedModeBanner: false,
     navigatorKey: chiaveNavigazione,
     theme: temaTriburba(),
     darkTheme: temaTriburba(),
-    themeMode: ThemeMode.dark,
+    themeMode: tinta.scura ? ThemeMode.dark : ThemeMode.light,
     locale: const Locale('it'),
     supportedLocales: const [Locale('it')],
     localizationsDelegates: const [
@@ -123,7 +131,7 @@ class _AvvioState extends State<Avvio> with SingleTickerProviderStateMixin {
           const SizedBox(height: 16),
           const Marchio(misura: 40),
           const SizedBox(height: 8),
-          const Text(
+          Text(
             'OGNI QUARTIERE UNA VOCE',
             style: TextStyle(color: muto, letterSpacing: 2, fontSize: 11.5, fontWeight: FontWeight.w700),
           ),
@@ -137,7 +145,7 @@ class _ErroreAvvio extends StatelessWidget {
   const _ErroreAvvio();
 
   @override
-  Widget build(BuildContext context) => const Scaffold(
+  Widget build(BuildContext context) => Scaffold(
     body: Center(
       child: Padding(
         padding: EdgeInsets.all(28),

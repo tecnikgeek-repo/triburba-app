@@ -145,7 +145,7 @@ Future<void> apriChiHaReagito(BuildContext context, int postId) => showModalBott
       builder: (c, s) {
         if (s.hasError) {
           return Center(
-            child: Text('${s.error}', style: const TextStyle(color: muto)),
+            child: Text('${s.error}', style: TextStyle(color: muto)),
           );
         }
         if (!s.hasData) return const Center(child: CircularProgressIndicator());
@@ -169,7 +169,7 @@ Future<void> apriChiHaReagito(BuildContext context, int postId) => showModalBott
                 title: Text('${r['nome']}', style: const TextStyle(fontWeight: FontWeight.w700)),
                 subtitle: Text(
                   r['quartiere'] == null ? '@${r['username']}' : '@${r['username']} · ${r['quartiere']}',
-                  style: const TextStyle(color: muto),
+                  style: TextStyle(color: muto),
                 ),
                 onTap: () {
                   Navigator.pop(c);

@@ -96,7 +96,7 @@ class _PostCardState extends State<PostCard> {
             if (stato.io != null && p.autore.username != stato.io!.username && p.autore.username != 'triburba.it')
               _voce(c, 'blocca', Icons.block_rounded, 'Blocca @${p.autore.username}', pericolo: true),
             if (p.segnalato)
-              const ListTile(
+              ListTile(
                 leading: Icon(Icons.check, color: golfo),
                 title: Text('Hai già segnalato questo post'),
               ),
@@ -184,7 +184,7 @@ class _PostCardState extends State<PostCard> {
               padding: const EdgeInsets.fromLTRB(20, 0, 20, 4),
               child: Text('Perché lo segnali?', style: titolo(20)),
             ),
-            const Padding(
+            Padding(
               padding: EdgeInsets.fromLTRB(20, 0, 20, 8),
               child: Text(
                 'Quando abbastanza residenti lo segnalano, il post viene nascosto in attesa dei moderatori.',
@@ -239,7 +239,7 @@ class _PostCardState extends State<PostCard> {
                   Expanded(
                     child: Text(
                       'Nascosto ${p.nascosto} dopo le segnalazioni dei residenti. Lo vedono solo l\'autore e lo staff.',
-                      style: const TextStyle(fontSize: 12.5, color: testo2),
+                      style: TextStyle(fontSize: 12.5, color: testo2),
                     ),
                   ),
                 ],
@@ -259,7 +259,7 @@ class _PostCardState extends State<PostCard> {
                         p.sondaggio == null &&
                         p.testo.length <= 120 &&
                         '\n'.allMatches(p.testo).length < 3)
-                    ? const TextStyle(fontSize: 20, height: 1.35, color: testo, fontWeight: FontWeight.w500)
+                    ? TextStyle(fontSize: 20, height: 1.35, color: testo, fontWeight: FontWeight.w500)
                     : null,
               ),
             ),
@@ -310,7 +310,7 @@ class _PostCardState extends State<PostCard> {
                   '@${p.autore.username} · ${p.quando}',
                   maxLines: 1,
                   overflow: TextOverflow.ellipsis,
-                  style: const TextStyle(color: muto, fontSize: 12.5),
+                  style: TextStyle(color: muto, fontSize: 12.5),
                 ),
               ],
             ),
@@ -318,7 +318,7 @@ class _PostCardState extends State<PostCard> {
         ),
         IconButton(
           onPressed: _menu,
-          icon: const Icon(Icons.more_horiz, color: muto),
+          icon: Icon(Icons.more_horiz, color: muto),
           tooltip: 'Altre azioni',
         ),
       ],
@@ -365,10 +365,10 @@ class _PostCardState extends State<PostCard> {
       }
     }
     // stesse diciture della versione web
-    if (p.tutti) chips.add(const Chip2(testo: 'Tutta triburba', icona: Icons.map_outlined, colore: oro));
-    if (p.area) chips.add(const Chip2(testo: 'Area metropolitana', icona: Icons.map_outlined, colore: oro));
+    if (p.tutti) chips.add(Chip2(testo: 'Tutta triburba', icona: Icons.map_outlined, colore: oro));
+    if (p.area) chips.add(Chip2(testo: 'Area metropolitana', icona: Icons.map_outlined, colore: oro));
     if (p.citta) {
-      chips.add(const Chip2(testo: 'Tutta Napoli', icona: Icons.location_city, colore: oro));
+      chips.add(Chip2(testo: 'Tutta Napoli', icona: Icons.location_city, colore: oro));
     } else if (p.rilanci > 0 && !p.area) {
       chips.add(
         Chip2(
@@ -434,17 +434,17 @@ class _PostCardState extends State<PostCard> {
       ),
       child: Row(
         children: [
-          const Icon(Icons.how_to_vote_outlined, color: oro, size: 28),
+          Icon(Icons.how_to_vote_outlined, color: oro, size: 28),
           const SizedBox(width: 10),
           Expanded(
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                Text(eletto ? 'Eletto moderatore' : 'Si candida a moderatore', style: const TextStyle(color: muto, fontSize: 12)),
+                Text(eletto ? 'Eletto moderatore' : 'Si candida a moderatore', style: TextStyle(color: muto, fontSize: 12)),
                 Text('${p.autore.nome} per ${p.quartiere?.nome ?? 'il quartiere'}', style: const TextStyle(fontWeight: FontWeight.w800)),
                 Text(
                   c == null ? 'Candidatura ritirata' : '${c['voti']} ${c['voti'] == 1 ? 'voto' : 'voti'}',
-                  style: const TextStyle(color: oro, fontSize: 12.5, fontWeight: FontWeight.w700),
+                  style: TextStyle(color: oro, fontSize: 12.5, fontWeight: FontWeight.w700),
                 ),
               ],
             ),
@@ -473,11 +473,11 @@ class _PostCardState extends State<PostCard> {
       imageUrl: url,
       fit: BoxFit.cover,
       width: double.infinity,
-      placeholder: (_, _) => const AspectRatio(
+      placeholder: (_, _) => AspectRatio(
         aspectRatio: 4 / 3,
         child: ColoredBox(color: superficie2),
       ),
-      errorWidget: (_, _, _) => const AspectRatio(
+      errorWidget: (_, _, _) => AspectRatio(
         aspectRatio: 4 / 3,
         child: ColoredBox(
           color: superficie2,
@@ -548,7 +548,7 @@ class _PostCardState extends State<PostCard> {
             dominio,
             maxLines: 1,
             overflow: TextOverflow.ellipsis,
-            style: const TextStyle(color: muto, fontSize: 12),
+            style: TextStyle(color: muto, fontSize: 12),
           ),
           const SizedBox(height: 2),
           if (l.titolo != null)
@@ -565,7 +565,7 @@ class _PostCardState extends State<PostCard> {
                 l.descrizione!,
                 maxLines: 2,
                 overflow: TextOverflow.ellipsis,
-                style: const TextStyle(color: testo2, fontSize: 13, height: 1.4),
+                style: TextStyle(color: testo2, fontSize: 13, height: 1.4),
               ),
             ),
         ],
@@ -627,7 +627,7 @@ class _PostCardState extends State<PostCard> {
                       p.reazioni.chi.isEmpty ? '${p.reazioni.n}' : p.reazioni.chi,
                       maxLines: 1,
                       overflow: TextOverflow.ellipsis,
-                      style: const TextStyle(color: testo2, fontSize: 13),
+                      style: TextStyle(color: testo2, fontSize: 13),
                     ),
                   ),
                 ],
@@ -695,7 +695,7 @@ class _PostCardState extends State<PostCard> {
           ),
           _azione(
             icona: IconaConBollino(
-              icona: const IconaTk('comment', lato: 22, colore: testo2),
+              icona: IconaTk('comment', lato: 22, colore: testo2),
               n: p.commenti,
             ),
             testo: p.commenti == 0 ? 'Commenta' : (p.commenti == 1 ? 'Commento' : 'Commenti'),
@@ -721,7 +721,7 @@ class _PostCardState extends State<PostCard> {
           ),
           _azione(
             icona: IconaConBollino(
-              icona: const IconaTk('share', lato: 22, colore: testo2),
+              icona: IconaTk('share', lato: 22, colore: testo2),
               n: p.condivisioni,
             ),
             testo: 'Condividi',
@@ -732,7 +732,7 @@ class _PostCardState extends State<PostCard> {
     );
   }
 
-  Widget _azione({required Widget icona, required String testo, Color colore = testo2, VoidCallback? onTap, VoidCallback? onLongPress}) =>
+  Widget _azione({required Widget icona, required String testo, Color? colore, VoidCallback? onTap, VoidCallback? onLongPress}) =>
       Expanded(
         child: InkWell(
           onTap: onTap,
@@ -746,7 +746,7 @@ class _PostCardState extends State<PostCard> {
                 testo,
                 maxLines: 1,
                 overflow: TextOverflow.ellipsis,
-                style: TextStyle(color: colore, fontSize: 11.5, fontWeight: FontWeight.w700),
+                style: TextStyle(color: colore ?? testo2, fontSize: 11.5, fontWeight: FontWeight.w700),
               ),
             ],
           ),
@@ -776,7 +776,7 @@ class _PostCardState extends State<PostCard> {
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
                           Text(c.autore.nome, style: const TextStyle(fontWeight: FontWeight.w700, fontSize: 13)),
-                          TestoRicco(c.testo, maxRighe: 3, stile: const TextStyle(fontSize: 13.5, height: 1.35, color: testo)),
+                          TestoRicco(c.testo, maxRighe: 3, stile: TextStyle(fontSize: 13.5, height: 1.35, color: testo)),
                         ],
                       ),
                     ),
@@ -791,7 +791,7 @@ class _PostCardState extends State<PostCard> {
                 padding: const EdgeInsets.only(left: 36, top: 2),
                 child: Text(
                   'Vedi tutti i ${p.commenti} commenti',
-                  style: const TextStyle(color: muto, fontSize: 13, fontWeight: FontWeight.w600),
+                  style: TextStyle(color: muto, fontSize: 13, fontWeight: FontWeight.w600),
                 ),
               ),
             ),
@@ -838,7 +838,7 @@ Future<String?> modificaTesto(
                       ),
                       child: Row(
                         children: [
-                          const Icon(Icons.link_rounded, size: 18, color: muto),
+                          Icon(Icons.link_rounded, size: 18, color: muto),
                           const SizedBox(width: 8),
                           Expanded(
                             child: Text(
@@ -850,7 +850,7 @@ Future<String?> modificaTesto(
                           ),
                           IconButton(
                             tooltip: "Togli l'anteprima",
-                            icon: const Icon(Icons.close_rounded, size: 20, color: testo2),
+                            icon: Icon(Icons.close_rounded, size: 20, color: testo2),
                             onPressed: () async {
                               await togliAnteprima();
                               aggiorna(() => conAnteprima = false);

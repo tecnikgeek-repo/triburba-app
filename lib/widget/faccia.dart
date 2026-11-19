@@ -56,7 +56,7 @@ class FotoProfilo extends StatelessWidget {
       width: lato + (anello ? 5 : 0),
       height: lato + (anello ? 5 : 0),
       padding: EdgeInsets.all(anello ? 2.5 : 0),
-      decoration: anello ? const BoxDecoration(shape: BoxShape.circle, gradient: gradiente) : null,
+      decoration: anello ? BoxDecoration(shape: BoxShape.circle, gradient: gradiente) : null,
       child: ClipOval(
         child: SizedBox(width: lato, height: lato, child: dentro),
       ),
@@ -110,7 +110,7 @@ class PillaProva extends StatelessWidget {
   Widget build(BuildContext context) => Container(
     padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 1),
     decoration: BoxDecoration(color: oro.withValues(alpha: .18), borderRadius: BorderRadius.circular(5)),
-    child: const Text(
+    child: Text(
       'PROVA',
       style: TextStyle(color: oro, fontSize: 9.5, fontWeight: FontWeight.w800, letterSpacing: .5),
     ),

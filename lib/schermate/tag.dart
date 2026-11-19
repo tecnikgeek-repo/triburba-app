@@ -85,7 +85,7 @@ class _SchermataTagState extends State<SchermataTag> {
               child: Column(
                 mainAxisSize: MainAxisSize.min,
                 children: [
-                  Text(_errore!, textAlign: TextAlign.center, style: const TextStyle(color: testo2)),
+                  Text(_errore!, textAlign: TextAlign.center, style: TextStyle(color: testo2)),
                   const SizedBox(height: 12),
                   OutlinedButton(onPressed: _carica, child: const Text('Riprova')),
                 ],
@@ -104,20 +104,20 @@ class _SchermataTagState extends State<SchermataTag> {
                     children: [
                       Text(
                         '$_nPost POST · $_seguaci ${_seguaci == 1 ? 'PERSONA LO SEGUE' : 'PERSONE LO SEGUONO'}',
-                        style: const TextStyle(color: muto, fontSize: 11.5, fontWeight: FontWeight.w800, letterSpacing: .8),
+                        style: TextStyle(color: muto, fontSize: 11.5, fontWeight: FontWeight.w800, letterSpacing: .8),
                       ),
                       const SizedBox(height: 4),
                       Text.rich(
                         TextSpan(
                           children: [
-                            const TextSpan(text: '#', style: TextStyle(color: oro)),
+                            TextSpan(text: '#', style: TextStyle(color: oro)),
                             TextSpan(text: tag),
                           ],
                         ),
                         style: titolo(30),
                       ),
                       const SizedBox(height: 6),
-                      const Text(
+                      Text(
                         'Segui l\'hashtag e i post che lo usano ti arrivano in «Per te», anche da altri quartieri.',
                         style: TextStyle(color: testo2, fontSize: 13.5, height: 1.4),
                       ),
@@ -133,7 +133,7 @@ class _SchermataTagState extends State<SchermataTag> {
                   ),
                 ),
                 if (_post.isEmpty)
-                  const Padding(
+                  Padding(
                     padding: EdgeInsets.all(32),
                     child: Text(
                       'Nessun post con questo hashtag, per ora.',

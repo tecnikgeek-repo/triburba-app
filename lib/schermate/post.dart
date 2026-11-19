@@ -136,7 +136,7 @@ class _SchermataPostState extends State<SchermataPost> {
             ListTile(
               leading: const Icon(Icons.visibility_off_outlined),
               title: const Text('Nascondi commento'),
-              subtitle: const Text('Non lo vedrai più', style: TextStyle(color: muto, fontSize: 12.5)),
+              subtitle: Text('Non lo vedrai più', style: TextStyle(color: muto, fontSize: 12.5)),
               onTap: () => Navigator.pop(s, 'nascondi'),
             ),
             ListTile(
@@ -236,7 +236,7 @@ class _SchermataPostState extends State<SchermataPost> {
                             child: Center(child: CircularProgressIndicator()),
                           )
                         else if (_commenti!.isEmpty)
-                          const Padding(
+                          Padding(
                             padding: EdgeInsets.all(24),
                             child: Center(
                               child: Text('Ancora nessun commento: scrivi il primo.', style: TextStyle(color: muto)),
@@ -297,7 +297,7 @@ class _SchermataPostState extends State<SchermataPost> {
                           StemmaMini(stemma: c.stemma, altezza: 14),
                           if (c.autoreDelPost) ...[
                             const SizedBox(width: 6),
-                            const Text(
+                            Text(
                               'AUTORE',
                               style: TextStyle(color: terracotta, fontSize: 9.5, fontWeight: FontWeight.w800, letterSpacing: .4),
                             ),
@@ -306,7 +306,7 @@ class _SchermataPostState extends State<SchermataPost> {
                         ],
                       ),
                       const SizedBox(height: 2),
-                      TestoRicco(c.testo, stile: const TextStyle(fontSize: 14.5, height: 1.4, color: testo)),
+                      TestoRicco(c.testo, stile: TextStyle(fontSize: 14.5, height: 1.4, color: testo)),
                     ],
                   ),
                 ),
@@ -315,7 +315,7 @@ class _SchermataPostState extends State<SchermataPost> {
                 padding: const EdgeInsets.only(left: 6, top: 3),
                 child: Row(
                   children: [
-                    Text(_quando(c.creato), style: const TextStyle(color: muto, fontSize: 12)),
+                    Text(_quando(c.creato), style: TextStyle(color: muto, fontSize: 12)),
                     _azioncina(
                       c.mia == null ? 'Mi piace' : nomiReazioni[c.mia]!,
                       () => _reagisci(c, c.mia ?? reazioneRapida),
@@ -344,13 +344,13 @@ class _SchermataPostState extends State<SchermataPost> {
                     if (c.likes > 0) ...[
                       PilaEmoji(c.top.isEmpty && c.mia != null ? [c.mia!] : c.top, lato: 15),
                       const SizedBox(width: 3),
-                      Text('${c.likes}', style: const TextStyle(color: muto, fontSize: 12)),
+                      Text('${c.likes}', style: TextStyle(color: muto, fontSize: 12)),
                     ],
                     if (!c.mio)
                       InkResponse(
                         onTap: () => _menuCommento(c),
                         radius: 20,
-                        child: const Padding(
+                        child: Padding(
                           padding: EdgeInsets.fromLTRB(10, 2, 2, 2),
                           child: Icon(Icons.more_horiz_rounded, size: 20, color: muto, semanticLabel: 'Nascondi o segnala'),
                         ),
@@ -365,14 +365,14 @@ class _SchermataPostState extends State<SchermataPost> {
     ),
   );
 
-  Widget _azioncina(String t, VoidCallback f, {Color colore = muto, VoidCallback? tenuto}) => InkWell(
+  Widget _azioncina(String t, VoidCallback f, {Color? colore, VoidCallback? tenuto}) => InkWell(
     onTap: f,
     onLongPress: tenuto,
     child: Padding(
       padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
       child: Text(
         t,
-        style: TextStyle(color: colore, fontSize: 12, fontWeight: FontWeight.w700),
+        style: TextStyle(color: colore ?? muto, fontSize: 12, fontWeight: FontWeight.w700),
       ),
     ),
   );
@@ -391,7 +391,7 @@ class _SchermataPostState extends State<SchermataPost> {
 
   Widget _casella() {
     if (!_puoCommentare) {
-      return const SafeArea(
+      return SafeArea(
         top: false,
         child: Padding(
           padding: EdgeInsets.all(14),
@@ -405,7 +405,7 @@ class _SchermataPostState extends State<SchermataPost> {
     }
     final io = stato.io;
     return Container(
-      decoration: const BoxDecoration(
+      decoration: BoxDecoration(
         color: vernice2,
         border: Border(top: BorderSide(color: linea)),
       ),
@@ -422,13 +422,13 @@ class _SchermataPostState extends State<SchermataPost> {
                     Expanded(
                       child: Text(
                         'Rispondi a ${_rispostaA!.nome}',
-                        style: const TextStyle(color: testo2, fontSize: 12.5, fontWeight: FontWeight.w600),
+                        style: TextStyle(color: testo2, fontSize: 12.5, fontWeight: FontWeight.w600),
                       ),
                     ),
                     IconButton(
                       visualDensity: VisualDensity.compact,
                       onPressed: () => setState(() => _rispostaA = null),
-                      icon: const Icon(Icons.close, size: 18, color: muto),
+                      icon: Icon(Icons.close, size: 18, color: muto),
                     ),
                   ],
                 ),
@@ -460,15 +460,15 @@ class _SchermataPostState extends State<SchermataPost> {
                         contentPadding: const EdgeInsets.symmetric(horizontal: 14, vertical: 11),
                         border: OutlineInputBorder(
                           borderRadius: BorderRadius.circular(22),
-                          borderSide: const BorderSide(color: linea2),
+                          borderSide: BorderSide(color: linea2),
                         ),
                         enabledBorder: OutlineInputBorder(
                           borderRadius: BorderRadius.circular(22),
-                          borderSide: const BorderSide(color: linea2),
+                          borderSide: BorderSide(color: linea2),
                         ),
                         focusedBorder: OutlineInputBorder(
                           borderRadius: BorderRadius.circular(22),
-                          borderSide: const BorderSide(color: terracotta, width: 1.5),
+                          borderSide: BorderSide(color: terracotta, width: 1.5),
                         ),
                       ),
                     ),
@@ -477,7 +477,7 @@ class _SchermataPostState extends State<SchermataPost> {
                     onPressed: _invio ? null : _invia,
                     icon: _invio
                         ? const SizedBox(width: 20, height: 20, child: CircularProgressIndicator(strokeWidth: 2))
-                        : const Icon(Icons.send_rounded, color: terracotta),
+                        : Icon(Icons.send_rounded, color: terracotta),
                     tooltip: 'Invia',
                   ),
                 ],

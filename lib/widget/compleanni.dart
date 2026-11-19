@@ -74,7 +74,7 @@ class FestaCompleanniState extends State<FestaCompleanni> {
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                const Row(
+                Row(
                   children: [
                     Icon(Icons.cake_outlined, color: oro, size: 20),
                     SizedBox(width: 8),
@@ -108,7 +108,7 @@ class FestaCompleanniState extends State<FestaCompleanni> {
                     children: [
                       Container(
                         padding: const EdgeInsets.all(2),
-                        decoration: const BoxDecoration(shape: BoxShape.circle, color: oro),
+                        decoration: BoxDecoration(shape: BoxShape.circle, color: oro),
                         child: FotoProfilo(faccia: f, lato: 38),
                       ),
                       Positioned(
@@ -128,7 +128,7 @@ class FestaCompleanniState extends State<FestaCompleanni> {
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
                         Text(f.nome, maxLines: 1, overflow: TextOverflow.ellipsis, style: const TextStyle(fontWeight: FontWeight.w700)),
-                        Text('@${f.username}', maxLines: 1, overflow: TextOverflow.ellipsis, style: const TextStyle(color: muto, fontSize: 12.5)),
+                        Text('@${f.username}', maxLines: 1, overflow: TextOverflow.ellipsis, style: TextStyle(color: muto, fontSize: 12.5)),
                       ],
                     ),
                   ),
@@ -294,7 +294,7 @@ class _CartaFestaState extends State<_CartaFesta> with TickerProviderStateMixin 
                 child: Container(
                   width: 72,
                   height: 72,
-                  decoration: const BoxDecoration(
+                  decoration: BoxDecoration(
                     shape: BoxShape.circle,
                     gradient: LinearGradient(colors: [terracottaScura, terracotta, Color(0xFFE98C3A)]),
                     boxShadow: [
@@ -306,7 +306,7 @@ class _CartaFestaState extends State<_CartaFesta> with TickerProviderStateMixin 
                 ),
               ),
               const SizedBox(height: 14),
-              const Text('OGGI È IL TUO GIORNO', style: TextStyle(color: muto, fontSize: 12, fontWeight: FontWeight.w700, letterSpacing: 1.2)),
+              Text('OGGI È IL TUO GIORNO', style: TextStyle(color: muto, fontSize: 12, fontWeight: FontWeight.w700, letterSpacing: 1.2)),
               const SizedBox(height: 6),
               Text.rich(
                 TextSpan(
@@ -316,7 +316,7 @@ class _CartaFestaState extends State<_CartaFesta> with TickerProviderStateMixin 
                       text: '${mio['nome']}',
                       style: TextStyle(
                         foreground: Paint()
-                          ..shader = const LinearGradient(colors: [terracotta, Color(0xFFF0B445), Color(0xFFD94F7A)])
+                          ..shader = LinearGradient(colors: [terracotta, Color(0xFFF0B445), Color(0xFFD94F7A)])
                               .createShader(const Rect.fromLTWH(0, 0, 160, 40)),
                       ),
                     ),
@@ -327,7 +327,7 @@ class _CartaFestaState extends State<_CartaFesta> with TickerProviderStateMixin 
                 style: const TextStyle(fontSize: 28, fontWeight: FontWeight.w800, height: 1.1, letterSpacing: -.6),
               ),
               const SizedBox(height: 8),
-              const Text(
+              Text(
                 'Tutta triburba festeggia con te. Che sia un anno pieno di vicini belli e quartieri vivi.',
                 textAlign: TextAlign.center,
                 style: TextStyle(color: testo2, fontSize: 14.5, height: 1.45),
@@ -360,7 +360,7 @@ class _CartaFestaState extends State<_CartaFesta> with TickerProviderStateMixin 
                 ),
               ] else if (pubblico) ...[
                 const SizedBox(height: 10),
-                const Text('I tuoi vicini lo sanno: gli auguri arrivano qui.', style: TextStyle(color: oro, fontWeight: FontWeight.w600, fontSize: 13.5)),
+                Text('I tuoi vicini lo sanno: gli auguri arrivano qui.', style: TextStyle(color: oro, fontWeight: FontWeight.w600, fontSize: 13.5)),
               ],
               // la scelta «fai sapere il compleanno» l'ha già fatta all'iscrizione (o nel profilo): non si richiede qui
               TextButton.icon(

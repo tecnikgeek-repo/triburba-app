@@ -60,7 +60,7 @@ class _SchermataLegaleState extends State<SchermataLegale> {
                       child: Column(
                         mainAxisSize: MainAxisSize.min,
                         children: [
-                          Text(_errore!, textAlign: TextAlign.center, style: const TextStyle(color: muto)),
+                          Text(_errore!, textAlign: TextAlign.center, style: TextStyle(color: muto)),
                           const SizedBox(height: 12),
                           OutlinedButton(onPressed: _carica, child: const Text('Riprova')),
                         ],
@@ -72,7 +72,7 @@ class _SchermataLegaleState extends State<SchermataLegale> {
               children: [
                 Text('${d['titolo']}', style: titolo(26)),
                 const SizedBox(height: 6),
-                Text('Ultimo aggiornamento: ${d['aggiornato']}', style: const TextStyle(color: muto, fontSize: 13)),
+                Text('Ultimo aggiornamento: ${d['aggiornato']}', style: TextStyle(color: muto, fontSize: 13)),
                 const SizedBox(height: 12),
                 ...TestoHtml.blocchi(context, '${d['html']}'),
               ],
@@ -127,7 +127,7 @@ class TestoHtml {
               child: Row(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  SizedBox(width: 20, child: Text(tag == 'ol' ? '$n.' : '•', style: const TextStyle(color: terracotta, fontWeight: FontWeight.w800, height: 1.5))),
+                  SizedBox(width: 20, child: Text(tag == 'ol' ? '$n.' : '•', style: TextStyle(color: terracotta, fontWeight: FontWeight.w800, height: 1.5))),
                   Expanded(child: _ricco(context, li.group(1)!)),
                 ],
               ),
@@ -159,7 +159,7 @@ class TestoHtml {
             for (var i = 0; i < celle.length; i++) ...[
               Text(
                 _etichetta(celle[i].group(1)!) ?? (i < testate.length ? testate[i] : ''),
-                style: const TextStyle(color: oro, fontSize: 11.5, fontWeight: FontWeight.w800, letterSpacing: .4),
+                style: TextStyle(color: oro, fontSize: 11.5, fontWeight: FontWeight.w800, letterSpacing: .4),
               ),
               const SizedBox(height: 2),
               _ricco(context, celle[i].group(2)!),
@@ -221,7 +221,7 @@ class TestoHtml {
           link = chiude ? null : RegExp(r'href="([^"]*)"').firstMatch(m.group(3) ?? '')?.group(1);
       }
     }
-    return Text.rich(TextSpan(children: spans), style: const TextStyle(color: testo, fontSize: 15, height: 1.5));
+    return Text.rich(TextSpan(children: spans), style: TextStyle(color: testo, fontSize: 15, height: 1.5));
   }
 
   /// Link: le altre pagine legali si aprono nell'app, email e siti esterni con l'app giusta.

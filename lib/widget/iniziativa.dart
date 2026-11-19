@@ -75,7 +75,7 @@ class _BloccoIniziativaState extends State<BloccoIniziativa> {
 
   Widget _etichetta(String t) => Text(
     t.toUpperCase(),
-    style: const TextStyle(color: oro, fontSize: 11, fontWeight: FontWeight.w800, letterSpacing: 1.1),
+    style: TextStyle(color: oro, fontSize: 11, fontWeight: FontWeight.w800, letterSpacing: 1.1),
   );
 
   // ── Attività ──
@@ -106,7 +106,7 @@ class _BloccoIniziativaState extends State<BloccoIniziativa> {
                     const SizedBox(height: 2),
                     Row(
                       children: [
-                        const Icon(Icons.event_outlined, size: 16, color: testo2),
+                        Icon(Icons.event_outlined, size: 16, color: testo2),
                         const SizedBox(width: 5),
                         Flexible(
                           child: Text(_maiuscola(a.quando), style: const TextStyle(fontWeight: FontWeight.w800, fontSize: 15.5)),
@@ -118,10 +118,10 @@ class _BloccoIniziativaState extends State<BloccoIniziativa> {
                         padding: const EdgeInsets.only(top: 2),
                         child: Row(
                           children: [
-                            const Icon(Icons.place_outlined, size: 15, color: muto),
+                            Icon(Icons.place_outlined, size: 15, color: muto),
                             const SizedBox(width: 5),
                             Flexible(
-                              child: Text(a.luogo!, style: const TextStyle(color: testo2, fontSize: 13)),
+                              child: Text(a.luogo!, style: TextStyle(color: testo2, fontSize: 13)),
                             ),
                           ],
                         ),
@@ -146,12 +146,12 @@ class _BloccoIniziativaState extends State<BloccoIniziativa> {
               children: [
                 TextSpan(
                   text: '${a.n}',
-                  style: const TextStyle(fontSize: 18, fontWeight: FontWeight.w800, color: testo),
+                  style: TextStyle(fontSize: 18, fontWeight: FontWeight.w800, color: testo),
                 ),
                 TextSpan(text: ' su ${a.minimo} ${a.minimo == 1 ? 'persona' : 'persone'} ci saranno'),
               ],
             ),
-            style: const TextStyle(color: testo2, fontSize: 14),
+            style: TextStyle(color: testo2, fontSize: 14),
           ),
           const SizedBox(height: 6),
           _barra(quota),
@@ -177,7 +177,7 @@ class _BloccoIniziativaState extends State<BloccoIniziativa> {
                       padding: const EdgeInsets.only(left: 8),
                       child: Text(
                         '+${a.n - a.facce.length}',
-                        style: const TextStyle(color: testo2, fontWeight: FontWeight.w700),
+                        style: TextStyle(color: testo2, fontWeight: FontWeight.w700),
                       ),
                     ),
                 ],
@@ -205,7 +205,7 @@ class _BloccoIniziativaState extends State<BloccoIniziativa> {
             const SizedBox(height: 10),
             Text(
               'Se entro ${a.scadenza} non arrivate a ${a.minimo}, l\'attività non parte e avvisiamo tutti.',
-              style: const TextStyle(color: muto, fontSize: 12.5, height: 1.35),
+              style: TextStyle(color: muto, fontSize: 12.5, height: 1.35),
             ),
           ],
         ],
@@ -231,7 +231,7 @@ class _BloccoIniziativaState extends State<BloccoIniziativa> {
                 children: [
                   _etichetta(['Sondaggio', if (s.multi) 'più risposte', if (s.soloResidenti) 'solo residenti'].join(' · ')),
                   const SizedBox(height: 2),
-                  Text(sotto, style: const TextStyle(color: testo2, fontSize: 13)),
+                  Text(sotto, style: TextStyle(color: testo2, fontSize: 13)),
                 ],
               ),
             ),
@@ -261,14 +261,14 @@ class _BloccoIniziativaState extends State<BloccoIniziativa> {
           ),
         ],
         if (s.puo && !s.risultati)
-          const Padding(
+          Padding(
             padding: EdgeInsets.only(top: 6),
             child: Text('I risultati si vedono dopo aver votato.', style: TextStyle(color: muto, fontSize: 12.5)),
           ),
         if (!s.puo && s.motivo != null)
           Padding(
             padding: const EdgeInsets.only(top: 4),
-            child: Text(s.motivo!, style: const TextStyle(color: muto, fontSize: 12.5)),
+            child: Text(s.motivo!, style: TextStyle(color: muto, fontSize: 12.5)),
           ),
       ],
     );
@@ -329,7 +329,7 @@ class _BloccoIniziativaState extends State<BloccoIniziativa> {
                       ),
                       if (s.risultati) Text('${(quota * 100).round()}%', style: const TextStyle(fontWeight: FontWeight.w800)),
                       if (o.mia)
-                        const Padding(
+                        Padding(
                           padding: EdgeInsets.only(left: 6),
                           child: Icon(Icons.check_rounded, size: 18, color: terracotta),
                         ),
@@ -352,11 +352,11 @@ class _BloccoIniziativaState extends State<BloccoIniziativa> {
       child: Stack(
         fit: StackFit.expand,
         children: [
-          const ColoredBox(color: superficie2),
+          ColoredBox(color: superficie2),
           FractionallySizedBox(
             alignment: Alignment.centerLeft,
             widthFactor: quota,
-            child: const DecoratedBox(decoration: BoxDecoration(gradient: gradiente)),
+            child: DecoratedBox(decoration: BoxDecoration(gradient: gradiente)),
           ),
         ],
       ),

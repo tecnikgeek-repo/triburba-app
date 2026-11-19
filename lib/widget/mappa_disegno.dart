@@ -315,7 +315,7 @@ class _MappaDisegnoState extends State<MappaDisegno> {
           IconButton(
             tooltip: 'Torna alla vista iniziale',
             visualDensity: VisualDensity.compact,
-            icon: const Icon(Icons.restart_alt_rounded, color: testo2, size: 22),
+            icon: Icon(Icons.restart_alt_rounded, color: testo2, size: 22),
             onPressed: () => setState(() {
               _vista = _inizio;
               _scelta = null;
@@ -356,10 +356,10 @@ class _MappaDisegnoState extends State<MappaDisegno> {
                   Expanded(
                     child: Text(
                       sc.nome,
-                      style: const TextStyle(fontFamily: fontTesto, fontWeight: FontWeight.w700, fontSize: 14, color: testo),
+                      style: TextStyle(fontFamily: fontTesto, fontWeight: FontWeight.w700, fontSize: 14, color: testo),
                     ),
                   ),
-                  if (acceso) const Icon(Icons.chevron_right_rounded, color: testo2, size: 20),
+                  if (acceso) Icon(Icons.chevron_right_rounded, color: testo2, size: 20),
                 ],
               ),
               const SizedBox(height: 2),

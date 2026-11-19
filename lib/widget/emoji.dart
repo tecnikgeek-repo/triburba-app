@@ -61,7 +61,7 @@ class PilaEmoji extends StatelessWidget {
             Positioned(
               left: i * lato * .62,
               child: Container(
-                decoration: const BoxDecoration(shape: BoxShape.circle, color: superficie),
+                decoration: BoxDecoration(shape: BoxShape.circle, color: superficie),
                 child: Emoji(n[i], lato: lato),
               ),
             ),

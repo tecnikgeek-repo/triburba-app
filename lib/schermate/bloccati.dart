@@ -66,18 +66,18 @@ class _SchermataBloccatiState extends State<SchermataBloccati> {
     return Scaffold(
       appBar: AppBar(title: const Text('Persone bloccate')),
       body: p == null
-          ? Center(child: _errore == null ? const CircularProgressIndicator(color: terracotta) : Text(_errore!, style: const TextStyle(color: muto)))
+          ? Center(child: _errore == null ? CircularProgressIndicator(color: terracotta) : Text(_errore!, style: TextStyle(color: muto)))
           : ListView(
               padding: const EdgeInsets.all(16),
               children: [
-                const Text(
+                Text(
                   'Chi blocchi non vede i tuoi post e i tuoi commenti, e tu non vedi i suoi; non può commentarti, citarti né seguirti. '
                   'Non riceve nessun avviso. Per bloccare qualcuno usa «Blocca» sul suo profilo o nel menu dei suoi post.',
                   style: TextStyle(color: muto, height: 1.4),
                 ),
                 const SizedBox(height: 16),
                 if (p.isEmpty)
-                  const Padding(
+                  Padding(
                     padding: EdgeInsets.symmetric(vertical: 24),
                     child: Row(
                       children: [
@@ -92,7 +92,7 @@ class _SchermataBloccatiState extends State<SchermataBloccati> {
                     contentPadding: EdgeInsets.zero,
                     leading: FotoProfilo.da(nome: '${x['nome']}', avatar: x['avatar'] as String?, lato: 42),
                     title: Text('${x['nome']}', style: const TextStyle(fontWeight: FontWeight.w700)),
-                    subtitle: Text('@${x['username']}', style: const TextStyle(color: muto)),
+                    subtitle: Text('@${x['username']}', style: TextStyle(color: muto)),
                     trailing: OutlinedButton(
                       onPressed: () async {
                         if (await bloccaPersona(context, '${x['username']}', '${x['nome']}', sblocca: true) && mounted) {

@@ -63,7 +63,7 @@ class SchermataBenvenuto extends StatelessWidget {
                   style: titolo(22, colore: testo2, peso: FontWeight.w600, altezza: 1.25),
                 ),
                 const SizedBox(height: 14),
-                const Text(
+                Text(
                   'Tribus + urbs: la tribù della città. Scrivi nel tuo quartiere, garantisci per i vicini veri, '
                   'fai girare le notizie con il tam-tam fino a tutta Napoli.',
                   textAlign: TextAlign.center,
@@ -137,7 +137,7 @@ class _SchermataAccessoState extends State<SchermataAccesso> {
         const SizedBox(height: 12),
         Text('Bentornato', style: titolo(30), textAlign: TextAlign.center),
         const SizedBox(height: 6),
-        const Text(
+        Text(
           'Entra con il tuo account triburba.',
           style: TextStyle(color: muto),
           textAlign: TextAlign.center,
@@ -302,7 +302,7 @@ class _SchermataIscrizioneState extends State<SchermataIscrizione> {
 
   @override
   Widget build(BuildContext context) {
-    const stileLink = TextStyle(color: golfo, fontWeight: FontWeight.w700);
+    final stileLink = TextStyle(color: golfo, fontWeight: FontWeight.w700);
     return Scaffold(
       appBar: AppBar(title: Text(widget.google != null ? 'Ultimo passo' : 'Iscriviti')),
       body: ListView(
@@ -338,7 +338,7 @@ class _SchermataIscrizioneState extends State<SchermataIscrizione> {
             const SizedBox(height: 14),
           ] else
             const TastoGoogle(),
-          const Text(
+          Text(
             'Su triburba si usa il nome vero: i vicini devono riconoscerti per garantire che abiti davvero lì.',
             style: TextStyle(color: testo2, height: 1.4),
           ),
@@ -388,11 +388,11 @@ class _SchermataIscrizioneState extends State<SchermataIscrizione> {
               padding: const EdgeInsets.only(top: 6),
               child: Text(
                 'Non è ancora aperto: la tua iscrizione conta come richiesta. Quando si accende entri da solo nella sua tribù.',
-                style: const TextStyle(color: oro, fontSize: 12.5),
+                style: TextStyle(color: oro, fontSize: 12.5),
               ),
             )
           else if (_scelta == null)
-            const Padding(
+            Padding(
               padding: EdgeInsets.only(top: 6),
               child: Text(
                 'Lo scegli solo adesso: ci sono tutti i quartieri e i comuni, anche quelli non ancora aperti.',
@@ -524,7 +524,7 @@ class _SceltaZonaState extends State<_SceltaZona> {
                       title: Text(q.$2, style: const TextStyle(fontWeight: FontWeight.w700)),
                       // zona spenta («q34»/«c12»): si sceglie lo stesso, quando si accende si entra da soli
                       subtitle: int.tryParse(q.$1) == null
-                          ? const Text('Non ancora aperto', style: TextStyle(color: muto, fontSize: 12))
+                          ? Text('Non ancora aperto', style: TextStyle(color: muto, fontSize: 12))
                           : null,
                       onTap: () => Navigator.pop(context, (q.$1, q.$2)),
                     ),
@@ -532,13 +532,13 @@ class _SceltaZonaState extends State<_SceltaZona> {
               if (widget.dati.spenti.any((c) => _va(c.$2))) _titolo('Non ancora aperti'),
               for (final x in widget.dati.spenti.where((c) => _va(c.$2)).take(_q.isEmpty ? 12 : 60))
                 ListTile(
-                  leading: const Icon(Icons.wb_twilight_rounded, color: muto, size: 20),
+                  leading: Icon(Icons.wb_twilight_rounded, color: muto, size: 20),
                   title: Text(x.$2),
-                  subtitle: Text('${x.$3}/${widget.dati.soglia} richieste', style: const TextStyle(color: muto, fontSize: 12)),
+                  subtitle: Text('${x.$3}/${widget.dati.soglia} richieste', style: TextStyle(color: muto, fontSize: 12)),
                   onTap: () => Navigator.pop(context, (x.$1, '${x.$2} (da aprire)')),
                 ),
               ListTile(
-                leading: const Icon(Icons.travel_explore_rounded, color: oro),
+                leading: Icon(Icons.travel_explore_rounded, color: oro),
                 title: const Text('La mia città non c\'è'),
                 onTap: () => Navigator.pop(context, ('altro', 'Un\'altra città')),
               ),
@@ -554,7 +554,7 @@ class _SceltaZonaState extends State<_SceltaZona> {
     padding: const EdgeInsets.fromLTRB(16, 14, 16, 4),
     child: Text(
       t.toUpperCase(),
-      style: const TextStyle(color: muto, fontSize: 12, fontWeight: FontWeight.w800, letterSpacing: .6),
+      style: TextStyle(color: muto, fontSize: 12, fontWeight: FontWeight.w800, letterSpacing: .6),
     ),
   );
 }

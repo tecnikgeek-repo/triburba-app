@@ -121,7 +121,7 @@ class _TastoGoogleState extends State<TastoGoogle> {
           ),
         ),
         if (widget.oppure)
-          const Padding(
+          Padding(
             padding: EdgeInsets.symmetric(vertical: 18),
             child: Row(
               children: [
