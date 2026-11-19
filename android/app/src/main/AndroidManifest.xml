@@ -4,6 +4,8 @@
     <uses-permission android:name="android.permission.POST_NOTIFICATIONS" />
     <!-- messaggi vocali nelle chat -->
     <uses-permission android:name="android.permission.RECORD_AUDIO" />
+    <!-- Meet (stanza vocale): altoparlante/auricolare durante la chiamata -->
+    <uses-permission android:name="android.permission.MODIFY_AUDIO_SETTINGS" />
     <!-- aggiornamento automatico fuori da Play: scarica e installa il nuovo APK (tolto nella versione Play) -->
     <uses-permission android:name="android.permission.REQUEST_INSTALL_PACKAGES" />
     <application

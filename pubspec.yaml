@@ -2,7 +2,7 @@ name: triburba
 description: "triburba per Android e iPhone: il social dei quartieri. Ogni quartiere una voce, insieme una città. Software libero AGPL-3.0."
 publish_to: 'none'
 
-version: 1.0.50+51
+version: 1.0.51+52
 
 environment:
   sdk: ^3.13.4
@@ -30,6 +30,7 @@ dependencies:
   google_sign_in: ^7.2.0
   record: ^7.2.0
   just_audio: ^0.10.6
+  flutter_webrtc: ^1.6.3
 
 dev_dependencies:
   flutter_test:

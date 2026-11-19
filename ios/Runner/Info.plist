@@ -69,7 +69,7 @@
 	<key>NSCameraUsageDescription</key>
 	<string>Per scattare una foto da pubblicare nel tuo quartiere o da usare come foto profilo.</string>
 	<key>NSMicrophoneUsageDescription</key>
-	<string>Per registrare i messaggi vocali che mandi ai tuoi vicini.</string>
+	<string>Per registrare i messaggi vocali che mandi ai tuoi vicini e per parlare nel Meet, la stanza vocale del quartiere.</string>
 	<key>NSPhotoLibraryUsageDescription</key>
 	<string>Per scegliere una foto da pubblicare nel tuo quartiere o da usare come foto profilo.</string>
 	<key>UIBackgroundModes</key>

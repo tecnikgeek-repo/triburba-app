@@ -11,6 +11,7 @@ import '../widget/faccia.dart';
 import '../widget/lista_post.dart';
 import '../widget/tamtam.dart';
 import 'moderazione.dart';
+import 'meet.dart';
 import 'naviga.dart';
 
 class SchermataQuartiere extends StatefulWidget {
@@ -219,6 +220,11 @@ class _SchermataQuartiereState extends State<SchermataQuartiere> {
               label: const Text('Vedi i residenti'),
             ),
           ),
+        // Meet: la stanza vocale del quartiere (entrano i residenti maggiorenni, lo decide il server)
+        Padding(
+          padding: const EdgeInsets.fromLTRB(14, 12, 14, 0),
+          child: CartaMeet(quartiereId: (q['id'] as num).toInt(), nomeQuartiere: '${q['nome']}', colore: colore('${q['colore']}')),
+        ),
         if (facce.isNotEmpty || mod.isNotEmpty)
           Padding(
             padding: const EdgeInsets.fromLTRB(14, 12, 14, 0),
