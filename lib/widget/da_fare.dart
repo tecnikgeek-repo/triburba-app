@@ -1,8 +1,9 @@
 // In cima alla Home, come un social vero: la carta «Cosa succede a …?» con le scorciatoie Foto / Attività / Sondaggio
-// e la fila «Da fare» (schede orizzontali come le storie), uguale a quella del sito: le dà il server
+// e «Da fare» a fisarmonica (banner + elenco), uguale a quello del sito: le voci le dà il server
 // (/app/v1/da-fare) e ogni scheda porta dritta all'azione. Qui anche la schermata «Nuovi vicini» col tasto
 // «Dai il benvenuto».
 import 'package:flutter/material.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
 import '../dati/api.dart';
 import '../dati/modelli.dart';
@@ -135,25 +136,49 @@ class TestataHome extends StatelessWidget {
   );
 }
 
-/// La fila «Da fare». Se non c'è niente da fare non occupa spazio.
+/// «Da fare» a fisarmonica, come sul sito (26/11/2026): il banner dice quante cose ci sono; toccandolo si apre
+/// l'elenco. Aperto o chiuso resta come l'ha lasciato la persona. Ogni voce ha la ✕ «Non ora» (pausa di qualche
+/// giorno decisa in Admin, torna prima se il numero cresce). Se non c'è niente da fare non occupa spazio.
 class FilaDaFare extends StatefulWidget {
-  const FilaDaFare({super.key, this.voci});
+  const FilaDaFare({super.key, this.voci, this.aperto});
 
   /// Solo per le anteprime: voci già pronte, senza rete.
   final List<Map<String, dynamic>>? voci;
+
+  /// Solo per le anteprime: aperta o chiusa senza leggere la scelta salvata.
+  final bool? aperto;
 
   @override
   State<FilaDaFare> createState() => FilaDaFareState();
 }
 
 class FilaDaFareState extends State<FilaDaFare> {
+  static const _chiaveAperto = 'tb_dafare_aperto';
   List<Map<String, dynamic>>? _voci;
+  bool _aperto = false;
 
   @override
   void initState() {
     super.initState();
     _voci = widget.voci;
+    _aperto = widget.aperto ?? false;
+    if (widget.aperto == null) _leggiAperto();
     if (_voci == null) aggiorna();
+  }
+
+  Future<void> _leggiAperto() async {
+    try {
+      final a = (await SharedPreferences.getInstance()).getBool(_chiaveAperto) ?? false;
+      if (mounted && a != _aperto) setState(() => _aperto = a);
+    } catch (_) {
+      // niente archivio: resta chiusa
+    }
+  }
+
+  void _giraAperto() {
+    setState(() => _aperto = !_aperto);
+    final a = _aperto;
+    SharedPreferences.getInstance().then((p) => p.setBool(_chiaveAperto, a)).catchError((_) => false);
   }
 
   Future<void> aggiorna() async {
@@ -161,7 +186,7 @@ class FilaDaFareState extends State<FilaDaFare> {
       final v = await stato.api.daFare();
       if (mounted) setState(() => _voci = v);
     } on ErroreApi {
-      // senza rete la fila semplicemente non si vede
+      // senza rete il riquadro semplicemente non si vede
     }
   }
 
@@ -171,39 +196,128 @@ class FilaDaFareState extends State<FilaDaFare> {
     stato.ricarica();
   }
 
+  /// ✕ «Non ora»: la voce sparisce subito; il server la rimette fuori più avanti
+  void _nonOra(Map<String, dynamic> v) {
+    setState(() => _voci = [...?_voci]..remove(v));
+    final chiudi = v['chiudi'];
+    final numero = v['numero'] is int ? v['numero'] : null;
+    final f = chiudi != null ? stato.api.guida('$chiudi') : stato.api.daFareChiudi('${v['chiave']}', numero);
+    f.catchError((_) => <String, dynamic>{});
+  }
+
   @override
   Widget build(BuildContext context) {
     final voci = _voci ?? const [];
     if (voci.isEmpty) return const SizedBox.shrink();
-    return Padding(
-      padding: const EdgeInsets.only(top: 14),
+    final n = voci.length;
+    return Container(
+      margin: const EdgeInsets.fromLTRB(10, 14, 10, 0),
+      decoration: BoxDecoration(
+        borderRadius: BorderRadius.circular(18),
+        border: Border.all(color: terracotta.withValues(alpha: .35)),
+        gradient: LinearGradient(
+          begin: Alignment.topLeft,
+          end: Alignment.bottomRight,
+          colors: [
+            Color.alphaBlend(terracotta.withValues(alpha: .22), superficie),
+            superficie,
+            Color.alphaBlend(oro.withValues(alpha: .12), superficie),
+          ],
+          stops: const [0, .55, 1],
+        ),
+        boxShadow: [BoxShadow(color: terracotta.withValues(alpha: .28), blurRadius: 34, spreadRadius: -20, offset: const Offset(0, 16))],
+      ),
       child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
+        crossAxisAlignment: CrossAxisAlignment.stretch,
         children: [
-          Padding(
-            padding: const EdgeInsets.symmetric(horizontal: 16),
-            child: Row(
-              children: [
-                Icon(Icons.auto_awesome, size: 18, color: terracotta),
-                const SizedBox(width: 6),
-                Text('Da fare', style: titolo(16)),
-                const Spacer(),
-                Text(
-                  voci.length == 1 ? '1 cosa per te' : '${voci.length} cose per te',
-                  style: TextStyle(color: muto, fontSize: 12.5),
+          Semantics(
+            button: true,
+            expanded: _aperto,
+            child: InkWell(
+              borderRadius: BorderRadius.circular(18),
+              onTap: _giraAperto,
+              child: Padding(
+                padding: const EdgeInsets.all(14),
+                child: Row(
+                  children: [
+                    Stack(
+                      clipBehavior: Clip.none,
+                      children: [
+                        Container(
+                          width: 48,
+                          height: 48,
+                          decoration: BoxDecoration(
+                            gradient: gradiente,
+                            borderRadius: BorderRadius.circular(14),
+                            boxShadow: [
+                              BoxShadow(color: terracotta.withValues(alpha: .55), blurRadius: 18, spreadRadius: -8, offset: const Offset(0, 8)),
+                            ],
+                          ),
+                          child: const Center(child: Icon(Icons.auto_awesome, size: 25, color: bianco)),
+                        ),
+                        Positioned(
+                          top: -7,
+                          right: -9,
+                          child: Container(
+                            constraints: const BoxConstraints(minWidth: 24),
+                            height: 24,
+                            padding: const EdgeInsets.symmetric(horizontal: 6),
+                            alignment: Alignment.center,
+                            decoration: BoxDecoration(
+                              color: const Color(0xFFE5484D),
+                              borderRadius: BorderRadius.circular(99),
+                              border: Border.all(color: superficie, width: 2),
+                            ),
+                            child: Text('$n', style: const TextStyle(color: bianco, fontSize: 12, fontWeight: FontWeight.w800, height: 1)),
+                          ),
+                        ),
+                      ],
+                    ),
+                    const SizedBox(width: 14),
+                    Expanded(
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Text('Da fare', style: titolo(21)),
+                          const SizedBox(height: 2),
+                          Text(n == 1 ? '1 cosa per te' : '$n cose per te', style: TextStyle(color: testo2, fontSize: 14)),
+                        ],
+                      ),
+                    ),
+                    AnimatedRotation(
+                      turns: _aperto ? .5 : 0,
+                      duration: const Duration(milliseconds: 300),
+                      curve: Curves.easeOutCubic,
+                      child: Container(
+                        width: 38,
+                        height: 38,
+                        decoration: BoxDecoration(color: superficie2, shape: BoxShape.circle, border: Border.all(color: linea)),
+                        child: Icon(Icons.keyboard_arrow_down_rounded, size: 22, color: testo2),
+                      ),
+                    ),
+                  ],
                 ),
-              ],
+              ),
             ),
           ),
-          const SizedBox(height: 10),
-          SizedBox(
-            height: 206,
-            child: ListView.separated(
-              scrollDirection: Axis.horizontal,
-              padding: const EdgeInsets.symmetric(horizontal: 10),
-              itemCount: voci.length,
-              separatorBuilder: (_, _) => const SizedBox(width: 10),
-              itemBuilder: (_, i) => _carta(voci[i]),
+          ClipRect(
+            child: AnimatedSize(
+              duration: const Duration(milliseconds: 350),
+              curve: Curves.easeOutCubic,
+              alignment: Alignment.topCenter,
+              child: _aperto
+                  ? Padding(
+                      padding: const EdgeInsets.fromLTRB(12, 0, 12, 12),
+                      child: Column(
+                        children: [
+                          for (var i = 0; i < n; i++) ...[
+                            if (i > 0) const SizedBox(height: 8),
+                            _riga(voci[i]),
+                          ],
+                        ],
+                      ),
+                    )
+                  : const SizedBox(width: double.infinity),
             ),
           ),
         ],
@@ -211,122 +325,121 @@ class FilaDaFareState extends State<FilaDaFare> {
     );
   }
 
-  /// Scheda con la ✕ (per ora «Presentati ai vicini»): si chiude e torna più avanti, mai una notifica
-  Widget _carta(Map<String, dynamic> v) {
-    final chiudi = v['chiudi'];
-    if (chiudi == null) return _cartaBase(v);
+  /// Una voce: icona, titolo e testo, tasto sotto (come sul sito da telefono), ✕ «Non ora» a destra
+  Widget _riga(Map<String, dynamic> v) {
+    final numero = v['numero'];
     return Stack(
       children: [
-        _cartaBase(v),
+        Material(
+          color: Colors.transparent,
+          child: InkWell(
+            borderRadius: BorderRadius.circular(14),
+            onTap: () => _apri(v),
+            child: Ink(
+              width: double.infinity,
+              padding: const EdgeInsets.fromLTRB(12, 12, 46, 12),
+              decoration: BoxDecoration(
+                color: superficie2,
+                borderRadius: BorderRadius.circular(14),
+                border: Border.all(color: linea),
+              ),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Row(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Stack(
+                        clipBehavior: Clip.none,
+                        children: [
+                          Container(
+                            width: 44,
+                            height: 44,
+                            decoration: BoxDecoration(gradient: gradiente, borderRadius: BorderRadius.circular(13)),
+                            child: Center(child: iconaDaFare('${v['icona']}', lato: 23)),
+                          ),
+                          if (numero != null && '$numero'.isNotEmpty)
+                            Positioned(
+                              top: -6,
+                              right: -10,
+                              child: Container(
+                                padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
+                                decoration: BoxDecoration(
+                                  color: vernice,
+                                  borderRadius: BorderRadius.circular(99),
+                                  border: Border.all(color: linea2),
+                                ),
+                                child: Text('$numero', style: TextStyle(color: testo, fontSize: 11, fontWeight: FontWeight.w800)),
+                              ),
+                            ),
+                        ],
+                      ),
+                      const SizedBox(width: 14),
+                      Expanded(
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            Text(
+                              '${v['titolo']}',
+                              maxLines: 2,
+                              overflow: TextOverflow.ellipsis,
+                              style: const TextStyle(fontWeight: FontWeight.w800, fontSize: 14.5, height: 1.2),
+                            ),
+                            const SizedBox(height: 3),
+                            Text(
+                              '${v['testo']}',
+                              maxLines: 2,
+                              overflow: TextOverflow.ellipsis,
+                              style: TextStyle(color: testo2, fontSize: 12.5, height: 1.3),
+                            ),
+                          ],
+                        ),
+                      ),
+                    ],
+                  ),
+                  const SizedBox(height: 10),
+                  Padding(
+                    padding: const EdgeInsets.only(left: 58),
+                    child: Container(
+                      padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 8),
+                      decoration: BoxDecoration(color: terracotta.withValues(alpha: .16), borderRadius: BorderRadius.circular(99)),
+                      child: Row(
+                        mainAxisSize: MainAxisSize.min,
+                        children: [
+                          Flexible(
+                            child: Text(
+                              '${v['tasto']}',
+                              overflow: TextOverflow.ellipsis,
+                              style: TextStyle(color: terracotta, fontWeight: FontWeight.w800, fontSize: 13),
+                            ),
+                          ),
+                          const SizedBox(width: 4),
+                          Icon(Icons.arrow_forward, size: 14, color: terracotta),
+                        ],
+                      ),
+                    ),
+                  ),
+                ],
+              ),
+            ),
+          ),
+        ),
         Positioned(
-          top: 4,
-          right: 4,
-          child: IconButton(
-            tooltip: 'Non ora',
-            visualDensity: VisualDensity.compact,
-            iconSize: 16,
-            style: IconButton.styleFrom(backgroundColor: superficie2, foregroundColor: muto),
-            icon: const Icon(Icons.close_rounded),
-            onPressed: () {
-              setState(() => _voci = [...?_voci]..remove(v));
-              stato.api.guida('$chiudi').catchError((_) => <String, dynamic>{});
-            },
+          top: 0,
+          bottom: 0,
+          right: 6,
+          child: Center(
+            child: IconButton(
+              tooltip: 'Non ora: torna tra qualche giorno',
+              visualDensity: VisualDensity.compact,
+              iconSize: 15,
+              style: IconButton.styleFrom(backgroundColor: superficie, foregroundColor: muto, minimumSize: const Size(28, 28)),
+              icon: const Icon(Icons.close_rounded),
+              onPressed: () => _nonOra(v),
+            ),
           ),
         ),
       ],
-    );
-  }
-
-  Widget _cartaBase(Map<String, dynamic> v) {
-    final gruppo = '${v['gruppo']}';
-    final tinta = switch (gruppo) {
-      'moderazione' => oro,
-      'admin' => const Color(0xFF7B4BD6),
-      'profilo' => golfo,
-      _ => terracotta,
-    };
-    final numero = v['numero'];
-    return Material(
-      color: Colors.transparent,
-      child: InkWell(
-        borderRadius: BorderRadius.circular(16),
-        onTap: () => _apri(v),
-        child: Ink(
-          width: 158,
-          padding: const EdgeInsets.fromLTRB(13, 14, 13, 12),
-          decoration: BoxDecoration(
-            borderRadius: BorderRadius.circular(16),
-            border: Border.all(color: linea2),
-            gradient: LinearGradient(
-              begin: Alignment.topLeft,
-              end: Alignment.bottomRight,
-              colors: [Color.alphaBlend(tinta.withValues(alpha: .18), superficie), superficie],
-              stops: const [0, .62],
-            ),
-          ),
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              Stack(
-                clipBehavior: Clip.none,
-                children: [
-                  Container(
-                    width: 48,
-                    height: 48,
-                    decoration: BoxDecoration(gradient: gradiente, borderRadius: BorderRadius.circular(14)),
-                    child: Center(child: iconaDaFare('${v['icona']}', lato: 25)),
-                  ),
-                  if (numero != null && '$numero'.isNotEmpty)
-                    Positioned(
-                      top: -7,
-                      right: -14,
-                      child: Container(
-                        padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
-                        decoration: BoxDecoration(
-                          color: vernice,
-                          borderRadius: BorderRadius.circular(99),
-                          border: Border.all(color: linea2),
-                        ),
-                        child: Text(
-                          '$numero',
-                          style: TextStyle(color: testo, fontSize: 11, fontWeight: FontWeight.w800),
-                        ),
-                      ),
-                    ),
-                ],
-              ),
-              const SizedBox(height: 10),
-              Text(
-                '${v['titolo']}',
-                maxLines: 2,
-                overflow: TextOverflow.ellipsis,
-                style: const TextStyle(fontWeight: FontWeight.w800, fontSize: 14.5, height: 1.2),
-              ),
-              const SizedBox(height: 4),
-              Text(
-                '${v['testo']}',
-                maxLines: 3,
-                overflow: TextOverflow.ellipsis,
-                style: TextStyle(color: testo2, fontSize: 12.5, height: 1.3),
-              ),
-              const Spacer(),
-              Row(
-                children: [
-                  Flexible(
-                    child: Text(
-                      '${v['tasto']}',
-                      overflow: TextOverflow.ellipsis,
-                      style: TextStyle(color: terracotta, fontWeight: FontWeight.w800, fontSize: 13),
-                    ),
-                  ),
-                  const SizedBox(width: 3),
-                  Icon(Icons.arrow_forward, size: 14, color: terracotta),
-                ],
-              ),
-            ],
-          ),
-        ),
-      ),
     );
   }
 }

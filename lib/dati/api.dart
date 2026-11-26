@@ -182,6 +182,10 @@ class Api {
   /// Guida: «benvenuto» visto, carta «nascondi», «invito» fatto.
   Future<Map<String, dynamic>> guida(String azione) => post('/app/v1/guida', {'azione': azione});
 
+  /// «Da fare»: la ✕ «Non ora» di una voce (torna dopo qualche giorno, o prima se il numero cresce).
+  Future<Map<String, dynamic>> daFareChiudi(String chiave, Object? numero) =>
+      post('/app/v1/guida', {'azione': 'dafare_chiudi', 'chiave': chiave, 'numero': numero});
+
   /// Biografia scritta nel benvenuto: ritorna il messaggio di ringraziamento
   Future<String> salvaBio(String testo) async => '${(await post('/app/v1/guida', {'azione': 'bio', 'testo': testo}))['msg'] ?? ''}';
 

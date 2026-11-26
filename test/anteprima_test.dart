@@ -433,7 +433,7 @@ void main() {
       t,
       Scaffold(
         appBar: AppBar(title: const Text('Per te')),
-        body: ListView(children: [FilaDaFare(voci: daFareNuovo)]),
+        body: ListView(children: [FilaDaFare(voci: daFareNuovo, aperto: true)]),
       ),
       '36-da-fare-nuovo-iscritto',
     );
