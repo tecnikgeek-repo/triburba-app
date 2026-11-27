@@ -1,5 +1,6 @@
 // Struttura dell'app: barra in basso (Home, Mappa, Scrivi, Notifiche, Profilo) e apertura delle destinazioni
 // che arrivano da notifiche push e link.
+import 'ai.dart';
 import 'dart:async';
 
 import 'package:flutter/material.dart';
@@ -93,17 +94,23 @@ class _SchermataHomeState extends State<SchermataHome> with WidgetsBindingObserv
     final io = stato.io;
     final n = stato.notifiche;
     return Scaffold(
-      body: IndexedStack(
-        index: _scheda,
+      body: Stack(
         children: [
-          SchermataFeed(key: _feed),
-          const SchermataMappa(),
-          const SizedBox.shrink(),
-          SchermataNotifiche(key: _notifiche),
-          if (io != null)
-            SchermataUtente(key: ValueKey('io-${io.username}'), username: io.username, mio: true)
-          else
-            const SizedBox.shrink(),
+          IndexedStack(
+            index: _scheda,
+            children: [
+              SchermataFeed(key: _feed),
+              const SchermataMappa(),
+              const SizedBox.shrink(),
+              SchermataNotifiche(key: _notifiche),
+              if (io != null)
+                SchermataUtente(key: ValueKey('io-${io.username}'), username: io.username, mio: true)
+              else
+                const SizedBox.shrink(),
+            ],
+          ),
+          // triburba-ai: la bolla in basso a destra, sopra la barra (come nell'app Paydea)
+          const Positioned(right: 16, bottom: 16, child: BollaAi()),
         ],
       ),
       bottomNavigationBar: NavigationBar(
