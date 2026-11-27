@@ -67,6 +67,28 @@ class Portata {
   final bool attesa;
 }
 
+/// Una tappa del tam-tam (27/11/2026): origine → Napoli → provincia → Campania.
+/// [stato]: «fatta» (raggiunta), «corso» (la prossima, con [n] su [soglia] posti), «vuota» (da fare).
+class Tappa {
+  Tappa(Map<String, dynamic> j)
+    : livello = _s(j['livello']) ?? '',
+      nome = _s(j['nome']) ?? '',
+      titolo = _s(j['titolo']) ?? '',
+      stato = _s(j['stato']) ?? 'vuota',
+      info = _s(j['info']) ?? '',
+      slug = _s(j['slug']),
+      n = _i(j['n']),
+      soglia = _i(j['soglia']);
+
+  final String livello, nome, titolo, stato, info;
+  final String? slug;
+  final int n, soglia;
+
+  bool get origine => livello == 'origine';
+
+  static List<Tappa> elenco(Object? j) => (j as List? ?? []).map((t) => Tappa(t as Map<String, dynamic>)).toList();
+}
+
 class AnteprimaLink {
   AnteprimaLink(Map<String, dynamic> j)
     : url = _s(j['url']) ?? '',
@@ -132,6 +154,7 @@ class Post {
       mioRilancio = j['mio_rilancio'] == true,
       mieiTamtam = (j['miei_tamtam'] as List? ?? []).map((e) => '$e').toList(),
       soglia = _i(j['soglia']),
+      tappe = Tappa.elenco(j['tappe']),
       link = j['link'] is Map ? AnteprimaLink(j['link'] as Map<String, dynamic>) : null,
       candidatura = j['candidatura'] is Map ? j['candidatura'] as Map<String, dynamic> : null,
       attivita = j['attivita'] is Map ? Attivita(j['attivita'] as Map<String, dynamic>) : null,
@@ -163,6 +186,9 @@ class Post {
   final List<String> mieiTamtam;
   final List<Portata> portate;
   int rilanci, soglia;
+
+  /// Tappe del tam-tam: cambiano dopo un rilancio o un ritiro (le manda il sito).
+  List<Tappa> tappe;
   bool mioRilancio, segnalato, puoSegnalare;
   AnteprimaLink? link;
   final Map<String, dynamic>? candidatura;
@@ -367,14 +393,15 @@ class DatiIscrizione {
             (g) => (
               '${(g as Map)['nome']}',
               (g['quartieri'] as List).map((q) => ('${(q as Map)['id']}', '${q['nome']}', '${q['colore']}')).toList(),
+              g['napoli'] == true || '${g['nome']}'.startsWith('Napoli · '),
             ),
           )
           .toList(),
       spenti = (j['spenti'] as List).map((c) => (_s((c as Map)['chiave']) ?? 'c${c['id']}', '${c['nome']}', _i(c['richieste']))).toList(),
       soglia = _i(j['soglia']);
 
-  /// (nome municipalità, [(id, nome, colore)])
-  final List<(String, List<(String, String, String)>)> gruppi;
+  /// (nome del gruppo, [(id, nome, colore)], è una municipalità di Napoli)
+  final List<(String, List<(String, String, String)>, bool)> gruppi;
 
   /// (chiave `c12` comune o `q34` quartiere di Napoli, nome, richieste)
   final List<(String, String, int)> spenti;

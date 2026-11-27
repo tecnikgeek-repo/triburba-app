@@ -18,6 +18,7 @@ import 'faccia.dart';
 import 'bollino.dart';
 import '../schermate/moderazione.dart';
 import 'icona_tk.dart';
+import 'tappe.dart';
 import 'iniziativa.dart';
 import '../schermate/bloccati.dart';
 import 'tamtam.dart';
@@ -266,6 +267,7 @@ class _PostCardState extends State<PostCard> {
           if (p.attivita != null || p.sondaggio != null) BloccoIniziativa(post: p, onCambiato: () => setState(() {})),
           if (p.immagine != null) _foto(),
           if (p.link != null && p.immagine == null) _anteprimaLink(p.link!),
+          if (p.tappe.isNotEmpty) TappeTamtam(tappe: p.tappe, colore: qCol),
           _numeri(),
           const Divider(height: 1),
           _azioni(),
@@ -337,7 +339,8 @@ class _PostCardState extends State<PostCard> {
           onTap: () => apriUtente(context, p.autore.username),
         ),
       );
-    } else if (p.quartiere != null) {
+    } else if (p.quartiere != null && p.tappe.isEmpty) {
+      // con le tappe il posto d'origine è la prima tappa: niente pastiglia doppia
       chips.add(
         Chip2(
           testo: p.quartiere!.nome,
@@ -347,7 +350,7 @@ class _PostCardState extends State<PostCard> {
         ),
       );
     }
-    // arrivato a tutta Napoli o all'area metropolitana: resta solo il quartiere/comune da cui è partito
+    // arrivato a tutta Napoli, alla provincia o alla Campania: resta solo il quartiere/comune da cui è partito
     for (final x in (p.citta || p.area || p.tutti) ? const <Portata>[] : p.portate) {
       if (x.attesa) {
         chips.add(Chip2(testo: 'In attesa: ${x.nome}', icona: Icons.schedule, colore: muto, tenue: true));
@@ -366,19 +369,7 @@ class _PostCardState extends State<PostCard> {
     }
     // stesse diciture della versione web
     if (p.tutti) chips.add(Chip2(testo: 'Tutta triburba', icona: Icons.map_outlined, colore: oro));
-    if (p.area) chips.add(Chip2(testo: 'Area metropolitana', icona: Icons.map_outlined, colore: oro));
-    if (p.citta) {
-      chips.add(Chip2(testo: 'Tutta Napoli', icona: Icons.location_city, colore: oro));
-    } else if (p.rilanci > 0 && !p.area) {
-      chips.add(
-        Chip2(
-          testo: p.daComune ? "Verso l'area ${p.rilanci}" : 'Verso Napoli ${p.rilanci}/${p.soglia}',
-          iconaTk: 'tamtam',
-          colore: oro,
-          tenue: true,
-        ),
-      );
-    }
+    if (chips.isEmpty) return const SizedBox.shrink();
     return Padding(
       padding: const EdgeInsets.fromLTRB(14, 8, 14, 0),
       child: Wrap(spacing: 6, runSpacing: 6, children: chips),

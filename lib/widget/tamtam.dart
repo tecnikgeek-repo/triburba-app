@@ -107,19 +107,22 @@ Future<bool> apriTamtam(BuildContext context, Post p) async {
         p.mioRilancio = false;
         p.rilanci = (j['rilanci'] as num? ?? 0).toInt();
         p.citta = j['arrivato'] == true;
+        if (j['tappe'] is List) p.tappe = Tappa.elenco(j['tappe']);
       } else {
         p.portate.removeWhere((x) => x.nome == '${j['nome']}');
       }
       if (context.mounted) messaggio(context, (j['msg'] ?? 'Tam-tam ritirato').toString());
       return true;
     }
-    final msg = await stato.api.tamtam(p.id, dest);
+    final j = await stato.api.tamtam(p.id, dest);
     if (!p.mieiTamtam.contains(dest)) p.mieiTamtam.add(dest);
     if (dest == 'c:1') {
       p.mioRilancio = true;
-      p.rilanci += 1;
+      p.rilanci = (j['rilanci'] as num?)?.toInt() ?? p.rilanci + 1;
+      p.citta = j['arrivato'] == true || p.citta;
+      if (j['tappe'] is List) p.tappe = Tappa.elenco(j['tappe']);
     }
-    if (context.mounted) messaggio(context, msg);
+    if (context.mounted) messaggio(context, (j['msg'] ?? '').toString());
     return true;
   } on ErroreApi catch (e) {
     if (context.mounted) messaggio(context, e.messaggio);

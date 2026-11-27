@@ -262,8 +262,8 @@ class Api {
       ((await get('/api/post/reazioni', {'post_id': '$postId'}))['persone'] as List).cast<Map<String, dynamic>>();
 
   /// Tam-tam: dest = `c:1` (tutta la città), `q:ID` (altro quartiere), `m:ID` (municipalità).
-  Future<String> tamtam(int postId, String dest) async =>
-      ((await post('/api/porta', {'post_id': postId, 'dest': dest}))['msg'] ?? '').toString();
+  /// Tam-tam: {msg} e, per il rilancio verso Napoli/provincia/Campania, anche {citta, tappe, rilanci, arrivato}.
+  Future<Map<String, dynamic>> tamtam(int postId, String dest) => post('/api/porta', {'post_id': postId, 'dest': dest});
 
   /// Ritira un tam-tam fatto da me: {citta, rilanci, arrivato} oppure {livello, nome}, sempre con msg.
   Future<Map<String, dynamic>> ritiraTamtam(int postId, String dest) => post('/api/porta/ritira', {'post_id': postId, 'dest': dest});

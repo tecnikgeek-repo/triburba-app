@@ -368,9 +368,9 @@ class _SchermataIscrizioneState extends State<SchermataIscrizione> {
             onTap: _scegli,
             borderRadius: BorderRadius.circular(12),
             child: InputDecorator(
-              decoration: const InputDecoration(labelText: 'Dove abiti', prefixIcon: Icon(Icons.place_outlined)),
+              decoration: const InputDecoration(labelText: 'Città (dove abiti)', prefixIcon: Icon(Icons.place_outlined)),
               child: Text(
-                _sceltaNome ?? (_dati == null ? 'Carico i quartieri…' : 'Scegli quartiere o comune'),
+                _sceltaNome ?? (_dati == null ? 'Carico le città…' : 'Scegli la tua città'),
                 style: TextStyle(color: _sceltaNome == null ? muto : testo),
               ),
             ),
@@ -473,7 +473,8 @@ class _SchermataIscrizioneState extends State<SchermataIscrizione> {
   }
 }
 
-/// Scelta del quartiere acceso, del comune da aprire o «la mia città non c'è», con ricerca.
+/// Scelta della città (27/11/2026, come sul sito): prima la città o il comune della Campania; per Napoli poi il quartiere.
+/// Anche i comuni non ancora aperti si scelgono: quando si accendono si entra da soli. Con «la mia città non c'è» si scrive a mano.
 class _SceltaZona extends StatefulWidget {
   const _SceltaZona({required this.dati});
 
@@ -485,6 +486,16 @@ class _SceltaZona extends StatefulWidget {
 
 class _SceltaZonaState extends State<_SceltaZona> {
   String _q = '';
+
+  /// secondo passo: i quartieri di Napoli
+  bool _napoli = false;
+  final _cerca = TextEditingController();
+
+  @override
+  void dispose() {
+    _cerca.dispose();
+    super.dispose();
+  }
 
   String _norm(String s) => s
       .toLowerCase()
@@ -507,17 +518,41 @@ class _SceltaZonaState extends State<_SceltaZona> {
           padding: const EdgeInsets.fromLTRB(16, 0, 16, 8),
           child: TextField(
             autofocus: false,
+            controller: _cerca,
             onChanged: (v) => setState(() => _q = v),
-            decoration: const InputDecoration(hintText: 'Cerca quartiere o comune…', prefixIcon: Icon(Icons.search), isDense: true),
+            decoration: InputDecoration(
+              hintText: _napoli ? 'Cerca il tuo quartiere…' : 'Cerca il tuo comune…',
+              prefixIcon: const Icon(Icons.search),
+              isDense: true,
+            ),
           ),
         ),
         Expanded(
           child: ListView(
             controller: scorri,
             children: [
+              if (_napoli && _q.isEmpty)
+                ListTile(
+                  leading: const Icon(Icons.arrow_back_rounded),
+                  title: const Text('Tutte le città'),
+                  onTap: () => setState(() => _napoli = false),
+                ),
+              // primo passo: Napoli in cima, poi i comuni provincia per provincia (cercando si vede tutto)
+              if (!_napoli && _va('Napoli'))
+                ListTile(
+                  leading: Icon(Icons.location_city_rounded, color: terracotta),
+                  title: const Text('Napoli', style: TextStyle(fontWeight: FontWeight.w700)),
+                  subtitle: Text('Poi scegli il quartiere', style: TextStyle(color: muto, fontSize: 12)),
+                  trailing: const Icon(Icons.chevron_right_rounded),
+                  onTap: () => setState(() {
+                    _napoli = true;
+                    _q = '';
+                    _cerca.clear();
+                  }),
+                ),
               for (final g in widget.dati.gruppi)
-                if (g.$2.any((q) => _va(q.$2))) ...[
-                  _titolo(g.$1),
+                if ((_q.isNotEmpty || g.$3 == _napoli) && g.$2.any((q) => _va(q.$2))) ...[
+                  _titolo(g.$3 ? g.$1.replaceFirst('Napoli · ', '') : g.$1),
                   for (final q in g.$2.where((q) => _va(q.$2)))
                     ListTile(
                       leading: CircleAvatar(radius: 8, backgroundColor: colore(q.$3)),
@@ -526,7 +561,7 @@ class _SceltaZonaState extends State<_SceltaZona> {
                       subtitle: int.tryParse(q.$1) == null
                           ? Text('Non ancora aperto', style: TextStyle(color: muto, fontSize: 12))
                           : null,
-                      onTap: () => Navigator.pop(context, (q.$1, q.$2)),
+                      onTap: () => Navigator.pop(context, (q.$1, g.$3 ? '${q.$2} · Napoli' : q.$2)),
                     ),
                 ],
               if (widget.dati.spenti.any((c) => _va(c.$2))) _titolo('Non ancora aperti'),
@@ -537,9 +572,11 @@ class _SceltaZonaState extends State<_SceltaZona> {
                   subtitle: Text('${x.$3}/${widget.dati.soglia} richieste', style: TextStyle(color: muto, fontSize: 12)),
                   onTap: () => Navigator.pop(context, (x.$1, '${x.$2} (da aprire)')),
                 ),
+              if (!_napoli)
               ListTile(
                 leading: Icon(Icons.travel_explore_rounded, color: oro),
                 title: const Text('La mia città non c\'è'),
+                subtitle: Text('Fuori dalla Campania', style: TextStyle(color: muto, fontSize: 12)),
                 onTap: () => Navigator.pop(context, ('altro', 'Un\'altra città')),
               ),
               const SizedBox(height: 20),
