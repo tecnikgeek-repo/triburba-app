@@ -178,7 +178,7 @@ class _SchermataMappaState extends State<SchermataMappa> {
           ),
           const SizedBox(height: 6),
           Text(
-            'I quartieri di Napoli e i comuni dell\'area metropolitana restano nella nebbia finché non li chiede '
+            'I quartieri di Napoli e i comuni della Campania restano nella nebbia finché non li chiede '
             'abbastanza gente: a ${m.sogliaApertura} richieste si accendono da soli sulla mappa.',
             style: TextStyle(color: testo2, fontSize: 13, height: 1.4),
           ),

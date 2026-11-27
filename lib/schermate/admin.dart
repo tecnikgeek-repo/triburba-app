@@ -593,7 +593,7 @@ class _GestioneState extends State<_Gestione> with AutomaticKeepAliveClientMixin
     final vis = f.isEmpty ? l.where((c) => _i(c['attiva']) == 1 || _i(c['iscritti']) > 0).toList() : l.where((c) => _s(c['nome']).toLowerCase().contains(f)).toList();
     return _Sezione(
       icona: Icons.location_city_outlined,
-      intestazione: "Comuni dell'area metropolitana",
+      intestazione: 'Comuni della Campania',
       spiega: '$accesi accesi su ${l.length}. Cerca un comune per accenderlo o spegnerlo.',
       figli: [
         TextField(
