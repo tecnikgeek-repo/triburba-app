@@ -7,6 +7,7 @@ import '../dati/api.dart';
 import '../dati/stato.dart';
 import '../tema.dart';
 import '../widget/faccia.dart';
+import 'ai.dart';
 import 'naviga.dart';
 
 class SchermataCerca extends StatefulWidget {
@@ -56,8 +57,30 @@ class _SchermataCercaState extends State<SchermataCerca> {
     }
   }
 
+  // triburba-ai (27/11/2026): le domande scritte nella ricerca le risolve l'AI, come sul sito
+  static final _inizioDomanda = RegExp(
+    r"^(come|dove|cosa|che|chi|quando|quanto|quanti|quante|quale|quali|perch[eé]|posso|si pu[oò]|c'è|ci sono|mi |vorrei|voglio|aiutami|spiegami|dimmi|consigliami|esiste|esistono|serve|servono|cos'è|com'è|qual è)\b",
+    caseSensitive: false,
+  );
+
+  bool _domanda(String q) => q.endsWith('?') || _inizioDomanda.hasMatch(q) || q.split(RegExp(r'\s+')).length >= 5;
+
+  void _chiediAi(String q) {
+    FocusScope.of(context).unfocus();
+    Navigator.of(context, rootNavigator: true).push(MaterialPageRoute<void>(builder: (_) => AiScreen(domanda: q)));
+  }
+
+  Widget _voceAi(String q) => ListTile(
+    leading: const AvatarAi(lato: 42),
+    title: Text('Chiedi a triburba-ai', style: TextStyle(fontWeight: FontWeight.w800, color: Theme.of(context).colorScheme.primary)),
+    subtitle: Text('«$q»', maxLines: 2, overflow: TextOverflow.ellipsis, style: TextStyle(color: muto)),
+    trailing: Icon(Icons.arrow_forward_rounded, color: muto),
+    onTap: () => _chiediAi(q),
+  );
+
   @override
   Widget build(BuildContext context) {
+    final q = _campo.text.trim();
     final persone = (_r?['persone'] as List? ?? []).cast<Map<String, dynamic>>();
     final quartieri = (_r?['quartieri'] as List? ?? []).cast<Map<String, dynamic>>();
     final post = (_r?['post'] as List? ?? []).cast<Map<String, dynamic>>();
@@ -69,6 +92,9 @@ class _SchermataCercaState extends State<SchermataCerca> {
           autofocus: true,
           onChanged: _scrive,
           textInputAction: TextInputAction.search,
+          onSubmitted: (v) {
+            if (_domanda(v.trim())) _chiediAi(v.trim());
+          },
           decoration: const InputDecoration(
             hintText: 'Cerca persone, quartieri, post…',
             border: InputBorder.none,
@@ -92,7 +118,9 @@ class _SchermataCercaState extends State<SchermataCerca> {
             )
           : ListView(
               children: [
-                if (persone.isEmpty && quartieri.isEmpty && post.isEmpty)
+                // la domanda va per prima; se non c'è altro resta solo lei
+                if (q.length >= 2 && (_domanda(q) || (persone.isEmpty && quartieri.isEmpty && post.isEmpty))) _voceAi(q)
+                else if (persone.isEmpty && quartieri.isEmpty && post.isEmpty)
                   Padding(
                     padding: EdgeInsets.all(32),
                     child: Center(

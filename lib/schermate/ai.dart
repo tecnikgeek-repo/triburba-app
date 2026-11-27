@@ -150,13 +150,16 @@ String fraseAuguri(String nome) => _unaDi([
 ]);
 
 class AiScreen extends StatefulWidget {
-  const AiScreen({super.key, this.auguri, this.negozioUrl = '', this.negozioNome = ''});
+  const AiScreen({super.key, this.auguri, this.domanda, this.negozioUrl = '', this.negozioNome = ''});
 
   /// Dentro un negozio la chat è quella del suo minisito: propone solo i suoi prodotti, come sul sito.
   final String negozioUrl, negozioNome;
 
   /// Se c'è, la chat si apre con questo messaggio e i coriandoli.
   final String? auguri;
+
+  /// Se c'è (una domanda scritta nella ricerca), la chat si apre e la manda subito.
+  final String? domanda;
 
   @override
   State<AiScreen> createState() => _AiScreenState();
@@ -196,6 +199,12 @@ class _AiScreenState extends State<AiScreen> {
       _turni.add(_Turno(domanda: '')..risposta = RispostaAi(ok: true, testo: widget.auguri!));
       WidgetsBinding.instance.addPostFrameCallback((_) {
         if (mounted) _festa();
+      });
+    }
+    final d = widget.domanda?.trim() ?? '';
+    if (d.isNotEmpty) {
+      WidgetsBinding.instance.addPostFrameCallback((_) {
+        if (mounted) _manda(testo: d);
       });
     }
     // la versione del motore che risponde: la dà il sito, così cambia da sola senza aggiornare l'app
@@ -1156,6 +1165,16 @@ class _AttesaState extends State<_Attesa> {
 
 /// Logo di triburba-ai: l'emblema di triburba (stesso disegno del logo «Emblema triburba» della chat del sito).
 const String _logoAiSvg = '<svg viewBox="-20 -230 1300 1300" xmlns="http://www.w3.org/2000/svg"><g fill="none" stroke="#fff" stroke-width="40" stroke-linecap="round" stroke-linejoin="round"><line x1="70" y1="483" x2="225" y2="518"/> <line x1="225" y1="518" x2="55" y2="702"/> <line x1="55" y1="702" x2="340" y2="672"/> <line x1="225" y1="518" x2="340" y2="672"/> <line x1="340" y1="672" x2="515" y2="540"/> <line x1="225" y1="518" x2="515" y2="540"/> <line x1="225" y1="518" x2="225" y2="345"/> <line x1="225" y1="345" x2="345" y2="345"/> <line x1="345" y1="345" x2="515" y2="540"/> <line x1="515" y1="540" x2="560" y2="722"/> <line x1="515" y1="540" x2="728" y2="657"/> <line x1="515" y1="540" x2="645" y2="440"/> <line x1="560" y1="722" x2="728" y2="657"/> <line x1="728" y1="657" x2="870" y2="520"/> <line x1="728" y1="657" x2="950" y2="715"/> <line x1="870" y1="520" x2="950" y2="715"/> <line x1="870" y1="520" x2="1068" y2="515"/> <line x1="1068" y1="515" x2="950" y2="715"/> <line x1="870" y1="520" x2="645" y2="440"/> <line x1="870" y1="520" x2="980" y2="400"/> <line x1="980" y1="400" x2="870" y2="320"/> <line x1="870" y1="320" x2="787" y2="365"/> <line x1="787" y1="365" x2="645" y2="440"/> <line x1="787" y1="365" x2="765" y2="232"/> <polyline points="515,540 515,135 530,135 530,100 580,64 630,100 630,135 645,135 645,440"/> <polyline points="645,232 765,232"/> <polyline points="349,345 349,285"/> <path d="M349,285 A83,83 0 0 1 515,285"/> <line x1="432" y1="180" x2="432" y2="202"/> <line x1="580" y1="46" x2="580" y2="64"/></g><g fill="#fff"><circle cx="515" cy="540" r="46"/> <circle cx="225" cy="345" r="38"/> <circle cx="345" cy="345" r="38"/> <circle cx="765" cy="232" r="38"/> <circle cx="787" cy="365" r="32"/> <circle cx="870" cy="320" r="38"/> <circle cx="980" cy="400" r="38"/> <circle cx="645" cy="440" r="43"/> <circle cx="870" cy="520" r="46"/> <circle cx="1068" cy="515" r="40"/> <circle cx="950" cy="715" r="43"/> <circle cx="728" cy="657" r="43"/> <circle cx="560" cy="722" r="38"/> <circle cx="340" cy="672" r="40"/> <circle cx="225" cy="518" r="43"/> <circle cx="70" cy="483" r="35"/> <circle cx="55" cy="702" r="40"/> <circle cx="580" cy="46" r="27"/> <circle cx="432" cy="180" r="27"/></g></svg>';
+
+/// Il logo di triburba-ai (lo stesso della chat), per chi lo mostra fuori dalla chat: la ricerca.
+class AvatarAi extends StatelessWidget {
+  const AvatarAi({super.key, this.lato = 42});
+
+  final double lato;
+
+  @override
+  Widget build(BuildContext context) => _Avatar(lato: lato);
+}
 
 class _Avatar extends StatelessWidget {
   const _Avatar({required this.lato});
